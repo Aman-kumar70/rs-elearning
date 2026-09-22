@@ -35,6 +35,29 @@
     </div>
   </div>
 
+  <div class="widget-panel">
+    <h3>Pixel &amp; Band Inspector</h3>
+    <p class="widget-sub">This 8×8 grid is a tiny multispectral "scene" — water, vegetation, soil and a road. Click any pixel to see its actual DN values in each band, and how those four numbers combine into what you'd see on screen.</p>
+    <div class="band-inspector">
+      <div class="bi-grid" id="bi-grid"></div>
+      <div class="bi-panel">
+        <div class="bi-title">Selected pixel</div>
+        <div class="bi-region" id="bi-region">Click a pixel →</div>
+        <div class="bi-bars" id="bi-bars"></div>
+        <div class="bi-swatches">
+          <div class="bi-swatch-wrap">
+            <div class="bi-swatch" id="bi-swatch-true"></div>
+            <div class="bi-swatch-label">True Colour<br>(R-G-B)</div>
+          </div>
+          <div class="bi-swatch-wrap">
+            <div class="bi-swatch" id="bi-swatch-false"></div>
+            <div class="bi-swatch-label">False Colour<br>(NIR-R-G)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="figure">
     <div class="figure-img-wrap"><img src="img/dip-what-is-digital-image.jpg" alt="What is a digital image, IIRS lecture slide"></div>
     <figcaption>The building blocks: a digital image is made of square pixels arranged in rows and columns; a multispectral image stacks several single-band images into one "cube."
@@ -139,5 +162,75 @@ ax[1].<span class="c-fn">imshow</span>(false_colour); ax[1].<span class="c-fn">s
 </section>
 
 <script src="app.js"></script>
+<script>
+(function() {
+  const SIZE = 8;
+  // Region DN profiles: [Blue, Green, Red, NIR] roughly matching RS.2 signatures
+  const REGIONS = {
+    water:      { name: 'Water',      dn: [60, 45, 25, 8],    rgb: [30,60,110] },
+    vegetation: { name: 'Vegetation', dn: [35, 90, 45, 195],  rgb: [40,110,50] },
+    soil:       { name: 'Dry Soil',   dn: [95, 115, 135, 155],rgb: [150,120,85] },
+    urban:      { name: 'Road / Urban', dn: [110,112,118,100],rgb: [120,120,125] }
+  };
+  function regionFor(r, c) {
+    if (c < 2 && r > 2 && r < 6) return 'water';        // river strip
+    if (r < 3) return 'vegetation';
+    if (r >= 5 && c >= 5) return 'urban';
+    return 'soil';
+  }
+  function jitter(v) { return Math.max(0, Math.min(255, Math.round(v + (Math.random()*16-8)))); }
+
+  const grid = document.getElementById('bi-grid');
+  const cellsData = [];
+  for (let r=0; r<SIZE; r++) {
+    for (let c=0; c<SIZE; c++) {
+      const region = regionFor(r,c);
+      const base = REGIONS[region];
+      const dn = base.dn.map(jitter);
+      cellsData.push({r,c,region,dn});
+      const cell = document.createElement('div');
+      cell.className = 'bi-cell';
+      const rgb = base.rgb;
+      cell.style.background = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+      cell.dataset.idx = cellsData.length - 1;
+      grid.appendChild(cell);
+    }
+  }
+
+  const bandMeta = [
+    {label:'B', name:'Blue', color:'#3b82f6'},
+    {label:'G', name:'Green', color:'#4ade80'},
+    {label:'R', name:'Red', color:'#f87171'},
+    {label:'N', name:'NIR', color:'#a78bfa'}
+  ];
+
+  function selectCell(idx) {
+    document.querySelectorAll('.bi-cell').forEach(el => el.classList.remove('selected'));
+    grid.children[idx].classList.add('selected');
+    const d = cellsData[idx];
+    document.getElementById('bi-region').textContent = REGIONS[d.region].name + ` — row ${d.r}, col ${d.c}`;
+
+    const barsEl = document.getElementById('bi-bars');
+    barsEl.innerHTML = d.dn.map((v,i) => `
+      <div class="bi-bar-col">
+        <div class="bi-bar-val">${v}</div>
+        <div class="bi-bar" style="height:${(v/255*100).toFixed(0)}%; background:${bandMeta[i].color};"></div>
+        <div class="bi-bar-label" style="color:${bandMeta[i].color};">${bandMeta[i].label}</div>
+      </div>`).join('');
+
+    const [b,g,r,n] = d.dn;
+    document.getElementById('bi-swatch-true').style.background = `rgb(${r},${g},${b})`;
+    document.getElementById('bi-swatch-false').style.background = `rgb(${n},${r},${g})`;
+  }
+
+  grid.addEventListener('click', (e) => {
+    const cell = e.target.closest('.bi-cell');
+    if (!cell) return;
+    selectCell(parseInt(cell.dataset.idx));
+  });
+
+  selectCell(20); // pre-select a vegetation pixel
+})();
+</script>
 </body>
 </html>

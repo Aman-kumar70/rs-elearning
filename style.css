@@ -863,3 +863,77 @@ input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; background: v
 .chapter-progress span { width: 22px; height: 4px; border-radius: 2px; background: var(--border); }
 .chapter-progress span.done { background: var(--amber); }
 .chapter-progress span.now { background: var(--teal); }
+
+/* ================================================================
+   IMAGE PROCESSING INTERACTIVE WIDGETS
+   ================================================================ */
+
+/* ---- Pixel & Band Inspector (IP.1) ---- */
+.band-inspector { display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: start; }
+@media (max-width: 800px) { .band-inspector { grid-template-columns: 1fr; } }
+.bi-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; width: 320px; max-width: 100%; }
+.bi-cell { aspect-ratio: 1; border-radius: 3px; cursor: pointer; border: 2px solid transparent; transition: transform 0.15s; }
+.bi-cell:hover { transform: scale(1.12); z-index: 2; }
+.bi-cell.selected { border-color: var(--amber); box-shadow: 0 0 0 2px var(--amber-dim); }
+.bi-panel { min-width: 260px; }
+.bi-panel .bi-title { font-family: var(--font-mono); font-size: 11px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+.bi-panel .bi-region { font-size: 1.2rem; font-weight: 600; margin-bottom: 16px; }
+.bi-bars { display: flex; gap: 14px; align-items: flex-end; height: 140px; margin-bottom: 18px; padding: 0 6px; }
+.bi-bar-col { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; height: 100%; justify-content: flex-end; }
+.bi-bar-val { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
+.bi-bar { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.3s; min-height: 2px; }
+.bi-bar-label { font-family: var(--font-mono); font-size: 11px; font-weight: 700; margin-top: 2px; }
+.bi-swatches { display: flex; gap: 14px; }
+.bi-swatch-wrap { text-align: center; }
+.bi-swatch { width: 64px; height: 64px; border-radius: 10px; margin-bottom: 6px; border: 1px solid var(--border-hi); }
+.bi-swatch-label { font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); }
+
+/* ---- Resampling Sandbox (IP.2) ---- */
+.resample-lab { display: grid; grid-template-columns: 1fr 260px; gap: 28px; align-items: start; }
+@media (max-width: 800px) { .resample-lab { grid-template-columns: 1fr; } }
+.resample-controls .rc-row { margin-bottom: 16px; }
+.resample-controls label { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); display: block; margin-bottom: 6px; }
+.resample-results { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+.resample-result { background: var(--surface-2); border-radius: 10px; padding: 12px 14px; border: 1px solid var(--border); }
+.resample-result .rr-label { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 1px; }
+.resample-result .rr-val { font-family: var(--font-mono); font-size: 1.3rem; font-weight: 700; margin-top: 4px; }
+.resample-result.nn .rr-val { color: var(--amber); }
+.resample-result.bl .rr-val { color: var(--teal); }
+
+/* ---- Contrast Stretch Lab (IP.3) ---- */
+.stretch-lab .histogram-svg { width: 100%; height: 160px; }
+.stretch-strips { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; }
+.stretch-strip-row { display: flex; align-items: center; gap: 14px; }
+.stretch-strip-row .ssr-label { font-family: var(--font-mono); font-size: 11px; color: var(--text-faint); width: 70px; flex-shrink: 0; }
+.stretch-strip { flex: 1; height: 28px; border-radius: 6px; border: 1px solid var(--border-hi); }
+.stretch-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 18px; }
+.stretch-controls label { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); display: flex; justify-content: space-between; margin-bottom: 6px; }
+.stretch-controls label span.val { color: var(--amber); }
+
+/* ---- Convolution Playground (IP.3) ---- */
+.conv-lab { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: start; }
+@media (max-width: 800px) { .conv-lab { grid-template-columns: 1fr; } }
+.conv-kernel-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.conv-kernel-btn { font-family: var(--font-mono); font-size: 11px; padding: 8px 14px; border-radius: 100px; border: 1px solid var(--border-hi); background: var(--surface-2); color: var(--text-dim); cursor: pointer; transition: all 0.2s; }
+.conv-kernel-btn.active { background: var(--teal-dim); color: var(--teal); border-color: var(--teal); }
+.conv-grid { display: grid; grid-template-columns: repeat(6, 46px); gap: 3px; }
+.conv-cell { width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 12px; border-radius: 4px; cursor: pointer; border: 2px solid transparent; color: #1a1f30; }
+.conv-cell.selectable:hover { border-color: var(--teal); }
+.conv-cell.center { border-color: var(--amber) !important; }
+.conv-cell.neighbor { border-color: rgba(45,212,191,0.6) !important; }
+.conv-readout { margin-top: 6px; }
+.conv-readout .cr-formula { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); background: var(--surface-2); border-radius: 10px; padding: 14px 16px; line-height: 1.8; overflow-x: auto; }
+.conv-readout .cr-result { font-family: var(--font-mono); font-size: 1.4rem; color: var(--teal); font-weight: 700; margin-top: 10px; }
+
+/* ---- NDVI Calculator (IP.3) ---- */
+.ndvi-calc { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center; }
+@media (max-width: 700px) { .ndvi-calc { grid-template-columns: 1fr; } }
+.ndvi-sliders label { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); display: flex; justify-content: space-between; margin-bottom: 8px; }
+.ndvi-sliders label span.val { color: var(--text); font-weight: 700; }
+.ndvi-sliders input[type=range] { margin-bottom: 22px; }
+.ndvi-readout { text-align: center; }
+.ndvi-value { font-family: var(--font-mono); font-size: 2.4rem; font-weight: 700; }
+.ndvi-gauge-wrap { margin: 14px 0; }
+.ndvi-gauge-track { height: 14px; border-radius: 100px; background: linear-gradient(90deg, #7c2d12, #a16207, #ca8a04, #65a30d, #16a34a); position: relative; }
+.ndvi-gauge-pointer { position: absolute; top: -6px; width: 4px; height: 26px; background: #fff; border-radius: 2px; box-shadow: 0 0 8px rgba(0,0,0,0.5); transform: translateX(-50%); transition: left 0.2s; }
+.ndvi-label-tag { display: inline-block; margin-top: 12px; font-family: var(--font-mono); font-size: 12px; padding: 5px 14px; border-radius: 100px; }
