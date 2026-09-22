@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Is a Digital Image? — IP.1</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="page-hero">
+  <div class="chapter-badge">Track B · IP.1 of 5</div>
+  <h1>What Is a <span>Digital Image?</span></h1>
+  <p class="hero-intro">Everything in this track — correction, enhancement, classification — operates on one underlying object: a grid of numbers. Understand that grid, in code, and the rest of Digital Image Processing stops feeling abstract.</p>
+  <div class="chapter-progress"><span class="now"></span><span></span><span></span><span></span><span></span></div>
+</header>
+
+<section class="content-section reveal">
+  <div class="section-label">01.1 / The Core Idea</div>
+  <h2 class="section-title">An image is a grid of numbers, nothing more</h2>
+
+  <div class="www-grid">
+    <div class="www-card what">
+      <div class="www-label">What</div>
+      <p>A digital image is a two-dimensional array of pixels ("picture elements"), where each pixel holds a Digital Number (DN) proportional to the energy the sensor recorded at that ground location. A multispectral image is several such grids stacked together — one per band.</p>
+    </div>
+    <div class="www-card why">
+      <div class="www-label">Why</div>
+      <p>Because numbers can be processed by algorithms. Once a satellite scene is "just" a NumPy array, every technique in this course — contrast stretching, filtering, NDVI, classification — becomes ordinary array arithmetic you can run and inspect.</p>
+    </div>
+    <div class="www-card how">
+      <div class="www-label">How</div>
+      <p>Satellite images are usually distributed as GeoTIFFs — files that store both the pixel grid <em>and</em> the geographic metadata (coordinate system, resolution, extent) needed to place every pixel on the map. Python's <code>rasterio</code> library reads them directly into NumPy arrays.</p>
+    </div>
+  </div>
+
+  <div class="figure">
+    <img src="img/dip-what-is-digital-image.jpg" alt="What is a digital image, IIRS lecture slide">
+    <figcaption>The building blocks: a digital image is made of square pixels arranged in rows and columns; a multispectral image stacks several single-band images into one "cube."
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun — "Digital Image Processing: Basic Concepts," Ms. Minakshi Kumar</span>
+    </figcaption>
+  </div>
+
+  <div class="code-block">
+    <div class="code-head"><span>open_image.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><code><span class="c-kw">import</span> rasterio
+<span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+
+<span class="c-kw">with</span> rasterio.<span class="c-fn">open</span>(<span class="c-str">"sentinel2_scene.tif"</span>) <span class="c-kw">as</span> src:
+    image = src.<span class="c-fn">read</span>()              <span class="c-com"># shape: (bands, rows, cols)</span>
+    profile = src.profile          <span class="c-com"># CRS, transform, dtype, nodata...</span>
+
+<span class="c-fn">print</span>(<span class="c-str">"Shape:"</span>, image.shape)          <span class="c-com"># e.g. (4, 2048, 2048) — 4 bands, 2048x2048 pixels</span>
+<span class="c-fn">print</span>(<span class="c-str">"Data type:"</span>, image.dtype)       <span class="c-com"># e.g. uint16 — this is the radiometric resolution</span>
+<span class="c-fn">print</span>(<span class="c-str">"DN range:"</span>, image.<span class="c-fn">min</span>(), <span class="c-str">"–"</span>, image.<span class="c-fn">max</span>())
+<span class="c-fn">print</span>(<span class="c-str">"CRS:"</span>, profile[<span class="c-str">"crs"</span>])          <span class="c-com"># the coordinate reference system</span>
+
+<span class="c-com"># A single pixel's spectral signature: DN in every band, at row=500, col=800</span>
+pixel_signature = image[:, 500, 800]
+<span class="c-fn">print</span>(<span class="c-str">"Pixel signature:"</span>, pixel_signature)</code></pre>
+    <div class="out"># Shape: (4, 2048, 2048)<br># Data type: uint16<br># DN range: 0 – 10847<br># CRS: EPSG:32644<br># Pixel signature: [412 623 388 3140]</div>
+  </div>
+
+  <div class="tech-detail">
+    <div class="label">DN vs. Physical Units</div>
+    <p>A raw DN is <em>not</em> a physical measurement by itself — it's whatever integer the sensor's electronics produced for that photon count, scaled by the bit depth (RS.4). Level-2 / L2A products have already been converted to physically meaningful units (surface reflectance, typically scaled 0–10000 to keep integers), which is exactly why RS.6 told you to always reach for L2 data.</p>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">01.2 / Bands, Stacks &amp; Composites</div>
+  <h2 class="section-title">Turning a stack of grey grids into colour</h2>
+  <p class="section-intro">Each band on its own is a greyscale image. Colour only appears once you choose three bands and assign them to your display's Red, Green and Blue channels. Which three bands you choose is a deliberate decision — not just "how it looks," but which physical property you want to see (RS.5 covered why NIR→red false colour is so common).</p>
+
+  <div class="code-block">
+    <div class="code-head"><span>make_composite.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><code><span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+<span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
+
+<span class="c-com"># image bands, in order: [Blue, Green, Red, NIR]</span>
+blue, green, red, nir = image[0], image[1], image[2], image[3]
+
+<span class="c-kw">def</span> <span class="c-fn">normalize</span>(band):
+    <span class="c-kw">return</span> np.clip((band - np.<span class="c-fn">percentile</span>(band, 2)) /
+                   (np.<span class="c-fn">percentile</span>(band, 98) - np.<span class="c-fn">percentile</span>(band, 2)), 0, 1)
+
+<span class="c-com"># True colour: R-G-B mapped normally</span>
+true_colour = np.dstack([<span class="c-fn">normalize</span>(red), <span class="c-fn">normalize</span>(green), <span class="c-fn">normalize</span>(blue)])
+
+<span class="c-com"># False colour infrared: NIR-R-G — vegetation glows red</span>
+false_colour = np.dstack([<span class="c-fn">normalize</span>(nir), <span class="c-fn">normalize</span>(red), <span class="c-fn">normalize</span>(green)])
+
+fig, ax = plt.<span class="c-fn">subplots</span>(1, 2, figsize=(12,6))
+ax[0].<span class="c-fn">imshow</span>(true_colour);  ax[0].<span class="c-fn">set_title</span>(<span class="c-str">"True Colour (R-G-B)"</span>)
+ax[1].<span class="c-fn">imshow</span>(false_colour); ax[1].<span class="c-fn">set_title</span>(<span class="c-str">"False Colour (NIR-R-G)"</span>)</code></pre>
+  </div>
+
+  <div class="try-it">
+    <div class="ti-label">Try It Yourself</div>
+    <p>Notice the <code>normalize()</code> function above clips to the 2nd–98th percentile instead of the true min/max. That's not arbitrary — it's exactly the <strong>contrast stretch</strong> concept you'll formalize in IP.3. A handful of very bright or very dark outlier pixels would otherwise wash out the whole display.</p>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">01.3 / Vector vs Raster</div>
+  <h2 class="section-title">One more distinction worth knowing</h2>
+  <div class="card-grid">
+    <div class="info-card">
+      <div class="icon" style="background: var(--amber-dim); color: var(--amber);">▦</div>
+      <h3>Raster Data</h3>
+      <p>A grid of cells, each with a value — satellite imagery, elevation models, classified land-cover maps. Great for continuous phenomena (temperature, reflectance) and for anything a sensor directly measures. Everything in this course is raster.</p>
+    </div>
+    <div class="info-card">
+      <div class="icon" style="background: var(--teal-dim); color: var(--teal);">✦</div>
+      <h3>Vector Data</h3>
+      <p>Points, lines and polygons with attached attributes — a road network, administrative boundaries, field parcels. Great for discrete, well-defined objects. You'll often overlay vector boundaries (a district outline, a farm parcel) on top of raster imagery for analysis.</p>
+    </div>
+  </div>
+
+  <div class="key-takeaways">
+    <div class="kt-label">Key Takeaways</div>
+    <ul>
+      <li>A digital image is a <strong>grid of pixels</strong>, each holding a DN; a multispectral image stacks one grid per band.</li>
+      <li>Satellite imagery ships as <strong>GeoTIFF</strong>, readable directly into a NumPy array with <code>rasterio</code> — pixel values <em>and</em> geographic location together.</li>
+      <li>Raw DN &ne; physical reflectance — Level-2 products give you calibrated, comparable values.</li>
+      <li>Colour composites are a <strong>choice</strong> of three bands mapped to R-G-B — true colour vs false colour serve different purposes.</li>
+      <li>Raster (grids, what this whole course works with) and vector (points/lines/polygons) are the two fundamental GIS data models.</li>
+    </ul>
+  </div>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>

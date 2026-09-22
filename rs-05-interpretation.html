@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading a Satellite Image — RS.5</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="page-hero">
+  <div class="chapter-badge">Track A · RS.5 of 6</div>
+  <h1>Reading a <span>Satellite Image</span></h1>
+  <p class="hero-intro">Before you ever run an algorithm, a trained analyst can identify most features in a satellite image with the naked eye — using the same seven visual clues photo-interpreters have used since aerial photography began. This is the skill that makes every other chapter useful.</p>
+  <div class="chapter-progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span><span></span></div>
+</header>
+
+<section class="content-section reveal">
+  <div class="section-label">05.1 / The Seven Elements</div>
+  <h2 class="section-title">The detective clues of image interpretation</h2>
+  <p class="section-intro">Interpretation is the act of examining images to identify objects and judge their significance — turning raw pixels into information. It's built on comparing what you see against what you already know, using seven recurring visual elements.</p>
+
+  <div class="interp-grid">
+    <div class="interp-card">
+      <div class="num">01 / TONE</div>
+      <h3>Tone</h3>
+      <p>The relative brightness or colour of an object. The most fundamental element — without tonal difference, none of the others would be visible.</p>
+      <div class="example"><strong>Example:</strong> Water is typically dark in NIR; dry sand is bright across most bands.</div>
+    </div>
+    <div class="interp-card">
+      <div class="num">02 / SHAPE</div>
+      <h3>Shape</h3>
+      <p>The general form, structure or outline of an individual object — often the first clue to what something is.</p>
+      <div class="example"><strong>Example:</strong> A perfectly straight line is almost always man-made (road, canal, runway); a meandering line is usually a natural river.</div>
+    </div>
+    <div class="interp-card">
+      <div class="num">03 / SIZE</div>
+      <h3>Size</h3>
+      <p>A function of scale — always judge relative to other objects and to the known scale of the image.</p>
+      <div class="example"><strong>Example:</strong> A large rectangular building suggests a factory or warehouse; a small one suggests a house.</div>
+    </div>
+    <div class="interp-card">
+      <div class="num">04 / PATTERN</div>
+      <h3>Pattern</h3>
+      <p>The spatial arrangement of repeated objects — orderly repetition produces a distinctive, recognisable signature.</p>
+      <div class="example"><strong>Example:</strong> Evenly spaced orchard trees or regularly spaced houses in a subdivision.</div>
+    </div>
+    <div class="interp-card">
+      <div class="num">05 / TEXTURE</div>
+      <h3>Texture</h3>
+      <p>The frequency of tonal change within an area — one of the most important elements for distinguishing features, especially in radar imagery.</p>
+      <div class="example"><strong>Example:</strong> Forest canopy = coarse, mottled texture; still water = smooth, uniform texture.</div>
+    </div>
+    <div class="interp-card">
+      <div class="num">06 / SHADOW</div>
+      <h3>Shadow</h3>
+      <p>Reveals the profile and relative height of a target — sometimes the only clue to an object's true 3D shape.</p>
+      <div class="example"><strong>Example:</strong> A tower and a flat parking lot marking might look identical from directly above; their shadows are completely different.</div>
+    </div>
+    <div class="interp-card">
+      <div class="num">07 / ASSOCIATION</div>
+      <h3>Association</h3>
+      <p>The relationship between an object and its surroundings — proximity to other recognisable features that helps confirm identification.</p>
+      <div class="example"><strong>Example:</strong> A school is typically associated with playgrounds and sports fields; a factory with rail sidings or loading docks.</div>
+    </div>
+  </div>
+
+  <div class="figure-row">
+    <div class="figure"><img src="img/interp-size-example.jpg" alt="Size interpretation example, real image"><figcaption>Size in context — a racetrack is identified partly by absolute size, and confirmed relative to the highway and buildings beside it.<span class="fig-credit">IIRS-ISRO Dehradun, Dr. Hina Pande</span></figcaption></div>
+    <div class="figure"><img src="img/interp-pattern-example.jpg" alt="Pattern interpretation example, real image"><figcaption>Pattern — evenly spaced orchard rows and grid-planned housing are two classic, instantly recognisable spatial patterns.<span class="fig-credit">IIRS-ISRO Dehradun, Dr. Hina Pande</span></figcaption></div>
+  </div>
+  <div class="figure-row">
+    <div class="figure"><img src="img/interp-texture-example.jpg" alt="Texture interpretation example, real image"><figcaption>Texture — abrupt tonal mottling versus smooth uniformity; this is especially diagnostic in radar imagery where "colour" as we know it doesn't exist.<span class="fig-credit">IIRS-ISRO Dehradun, Dr. Hina Pande</span></figcaption></div>
+    <div class="figure"><img src="img/interp-shadow-example.jpg" alt="Shadow interpretation example, real image"><figcaption>Shadow — the only element that reveals height and profile directly, turning a flat image into an implicitly 3D one.<span class="fig-credit">IIRS-ISRO Dehradun, Dr. Hina Pande</span></figcaption></div>
+  </div>
+  <div class="figure">
+    <img src="img/interp-association-example.jpg" alt="Association interpretation example, real image">
+    <figcaption>Association — features are identified not in isolation but by what surrounds them: a runway is confirmed by aircraft, hangars, and terminal buildings nearby.
+      <span class="fig-credit">IIRS-ISRO Dehradun, Dr. Hina Pande</span>
+    </figcaption>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">05.2 / True Colour vs False Colour</div>
+  <h2 class="section-title">Why satellite images often look "wrong"</h2>
+  <p class="section-intro">A normal colour photograph maps blue-green-red light to blue-green-red on your screen — matching human vision. A <strong>false-colour composite</strong> instead assigns a non-visible band (usually NIR) to one of the display channels, most commonly displaying NIR as red. This is deliberate: it exploits vegetation's strong NIR reflectance to make vegetation leap out in vivid red, at the cost of no longer looking "natural."</p>
+
+  <div class="figure">
+    <img src="img/interp-truecolor-falsecolor.jpg" alt="True colour vs false colour infrared comparison, real imagery">
+    <figcaption>Side by side: a true-colour image looks like an ordinary aerial photo. A colour-infrared (false-colour) image maps NIR&rarr;red, red&rarr;green, green&rarr;blue — healthy vegetation becomes vivid red, water goes dark blue/black, and subtle vegetation stress becomes far easier to spot.
+      <span class="fig-credit">IIRS-ISRO Dehradun, Dr. Hina Pande</span>
+    </figcaption>
+  </div>
+
+  <div class="figure">
+    <img src="img/interp-stromboli-thermal.jpg" alt="Mid-infrared thermal image of Stromboli volcano">
+    <figcaption>A mid-infrared image of Stromboli Island — thermal bands reveal the volcano's heat signature, information completely invisible in true colour.
+      <span class="fig-credit">IIRS-ISRO Dehradun, Dr. Hina Pande</span>
+    </figcaption>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">05.3 / Putting It Together — Real Scenes</div>
+  <h2 class="section-title">Reading real satellite images</h2>
+  <p class="section-intro">Here's the payoff: applying all seven elements at once to identify real features in real IRS and SPOT imagery, the way an IIRS-trained analyst would.</p>
+
+  <div class="figure-row">
+    <div class="figure">
+      <img src="img/interp-saudi-irrigation-circles.jpg" alt="Circular irrigation patterns in Saudi Arabia, IRS LISS-III">
+      <figcaption>Saudi Arabia, IRS-1C LISS-III. The perfectly circular features (<strong>shape</strong> + <strong>pattern</strong>) are centre-pivot sprinkler irrigation systems. Red = cropped land, dark = fallow — the colour alone (tone) tells you which fields are currently in use.</figcaption>
+    </div>
+    <div class="figure">
+      <img src="img/interp-goa-india.jpg" alt="Goa, India IRS multispectral image">
+      <figcaption>Goa &amp; Terekhol, India, IRS-1D LISS-III. Sediment plumes from the Zuari and Mandovi rivers show as distinct pale patches (<strong>tone</strong>); the Dabolim airport runway is a sharp straight line (<strong>shape</strong>) confirmed by <strong>association</strong> with terminal buildings.</figcaption>
+    </div>
+  </div>
+  <div class="figure-row">
+    <div class="figure">
+      <img src="img/interp-sunderbans.jpg" alt="Sunderbans mangroves, IRS WiFS image">
+      <figcaption>Sunderbans, West Bengal, IRS-1C WiFS. Waters near the coast appear light blue in the shallows; mangroves show bright red (dense vegetation, high NIR); river-borne sediment disperses visibly into the sea (<strong>tone</strong> gradients revealing a process, not just an object).</figcaption>
+    </div>
+    <div class="figure">
+      <img src="img/interp-dhaka.jpg" alt="Dhaka, Bangladesh, IRS LISS-III+PAN image">
+      <figcaption>Dhaka, Bangladesh, IRS-1C LISS-III+PAN merged. The stadium and city airport's distinctive "b"-shaped runway are both identifiable purely from <strong>shape</strong> at this resolution.</figcaption>
+    </div>
+  </div>
+
+  <div class="try-it">
+    <div class="ti-label">Try It Yourself</div>
+    <p>Next time you open Google Earth or NASA Worldview, pick any unfamiliar feature and work through the seven elements in order: tone, shape, size, pattern, texture, shadow, association. You'll be surprised how often you can identify something — an airport, a mine, a reservoir, a farm — without any external information at all.</p>
+  </div>
+
+  <div class="key-takeaways">
+    <div class="kt-label">Key Takeaways</div>
+    <ul>
+      <li>Image interpretation relies on seven visual elements: <strong>tone, shape, size, pattern, texture, shadow, association</strong>.</li>
+      <li><strong>Tone</strong> is foundational — without brightness/colour contrast none of the other elements would be visible at all.</li>
+      <li><strong>False-colour composites</strong> (commonly NIR&rarr;red) trade "natural" appearance for dramatically better vegetation and water discrimination.</li>
+      <li>Interpretation accuracy depends on the analyst's training, knowledge of the area, and the quality/resolution of the imagery.</li>
+      <li>These same principles — especially texture and tone — are exactly what classification algorithms (IP.4) try to encode mathematically.</li>
+    </ul>
+  </div>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>

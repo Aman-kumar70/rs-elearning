@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Is Remote Sensing? — RS.1</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="page-hero">
+  <div class="chapter-badge">Track A · RS.1 of 6</div>
+  <h1>What Is <span>Remote Sensing?</span></h1>
+  <p class="hero-intro">Remote sensing means learning about an object without touching it — and it works because every object on Earth interacts with light in its own particular way. This chapter builds the physics you need before any of the rest of the course makes sense: what's actually flowing from the Sun to a sensor, and why the atmosphere gets in the way.</p>
+  <div class="chapter-progress"><span class="now"></span><span></span><span></span><span></span><span></span><span></span></div>
+</header>
+
+<section class="content-section reveal">
+  <div class="section-label">01.1 / The Idea</div>
+  <h2 class="section-title">Obtaining information about something without touching it</h2>
+
+  <div class="www-grid">
+    <div class="www-card what">
+      <div class="www-label">What</div>
+      <p>Remote sensing is the science of gathering information about an object, area, or phenomenon through analysis of data acquired by a device that is not in physical contact with it. A camera, your eye, and a satellite sensor are all, technically, remote sensing instruments.</p>
+    </div>
+    <div class="www-card why">
+      <div class="www-label">Why</div>
+      <p>Because physical access is often impossible, dangerous, expensive, or simply too slow. You can't walk every square kilometre of the Amazon to track deforestation, or send a person into a cyclone to map flood extent — but a satellite passes over the whole planet every few days.</p>
+    </div>
+    <div class="www-card how">
+      <div class="www-label">How</div>
+      <p>A sensor measures electromagnetic radiation that has interacted with a surface — reflected sunlight, emitted heat, or a radar pulse bounced back. The pattern of that energy across wavelengths and space is converted into a digital image, which is what the rest of this course is about.</p>
+    </div>
+  </div>
+
+  <p class="section-intro" style="margin-bottom:8px;">In the remote sensing context specifically, we mean: a sensor mounted on a platform (aircraft or satellite) records energy reflected or emitted from the Earth's surface, from a distance, and that recording is turned into imagery we can interpret.</p>
+
+  <div class="widget-panel">
+    <h3>Energy Flow: Sun → Earth → Sensor</h3>
+    <p class="widget-sub">This is the path almost every optical satellite image takes. Follow the arrows.</p>
+    <div class="energy-flow">
+      <div class="flow-node sun"><div class="circle">☀️</div><div class="label">Sun</div><div class="desc">Emits EM radiation across all wavelengths</div></div>
+      <div class="flow-arrow"><svg viewBox="0 0 160 40"><path d="M5,20 L150,20" stroke="rgba(245,166,35,0.4)" stroke-width="2" stroke-dasharray="6,4"/><circle class="flow-particle" cx="20" cy="20" r="3"><animate attributeName="cx" values="10;150" dur="2s" repeatCount="indefinite"/></circle></svg></div>
+      <div class="flow-node earth"><div class="circle">🌍</div><div class="label">Earth</div><div class="desc">Surface reflects, absorbs, or re-emits the energy</div></div>
+      <div class="flow-arrow"><svg viewBox="0 0 160 40"><path d="M5,20 L150,20" stroke="rgba(45,212,191,0.4)" stroke-width="2" stroke-dasharray="6,4"/><circle class="flow-particle return" cx="20" cy="20" r="3"><animate attributeName="cx" values="10;150" dur="2s" repeatCount="indefinite"/></circle></svg></div>
+      <div class="flow-node satellite"><div class="circle">🛰️</div><div class="label">Sensor</div><div class="desc">Records the returning energy as a digital signal</div></div>
+    </div>
+  </div>
+
+  <div class="tech-detail">
+    <div class="label">Two Kinds of Remote Sensing</div>
+    <p><strong>Passive</strong> sensors use an external energy source — usually the Sun. They only work when the source is illuminating the target, which is why optical satellites can't see through cloud or darkness. <strong>Active</strong> sensors (RADAR, LiDAR) carry their own energy source, send it out, and measure what bounces back. That means they work day or night and can penetrate cloud cover — the trade-off is a more complex sensor and different image characteristics (radar images "look" very different from optical ones).</p>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">01.2 / Electromagnetic Radiation</div>
+  <h2 class="section-title">The signal that carries the information</h2>
+  <p class="section-intro">Electromagnetic (EM) radiation travels as waves, described by wavelength (distance between wave peaks) and frequency (how many waves pass a point per second). These are inversely related — short wavelength means high frequency, and vice versa. Different wavelengths interact with matter differently, which is the entire reason remote sensing works: a leaf and a rooftop reflect the same visible light similarly, but wildly differently in near-infrared.</p>
+
+  <div class="widget-panel">
+    <h3>Wave Lab</h3>
+    <p class="widget-sub">Drag the sliders to see how wavelength and amplitude change the wave — and how that relates to frequency.</p>
+    <div class="wave-canvas-wrap"><canvas id="wave-canvas"></canvas></div>
+    <div class="wave-controls">
+      <div class="wave-control">
+        <label>Wavelength (&lambda;) <span id="wl-val">400</span> nm</label>
+        <input type="range" id="wl-slider" min="380" max="900" value="400">
+      </div>
+      <div class="wave-control">
+        <label>Amplitude <span id="amp-val">1.0</span></label>
+        <input type="range" id="amp-slider" min="20" max="100" value="70">
+      </div>
+    </div>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula">c = &lambda; &times; &nu;&nbsp;&nbsp;&nbsp;&nbsp;E = h &times; &nu;</div>
+    <div class="formula-note">c = speed of light (3×10⁸ m/s), &lambda; = wavelength, &nu; = frequency, E = energy of a photon, h = Planck's constant. Shorter wavelength &rarr; higher frequency &rarr; higher energy. This is why UV and X-rays are dangerous and radio waves are not.</div>
+  </div>
+
+  <div class="section-label" style="margin-top:8px;">01.3 / The Full Spectrum</div>
+  <h2 class="section-title">Not just visible light</h2>
+  <p class="section-intro">Human eyes only detect a narrow sliver of the EM spectrum (roughly 0.4–0.7 µm). Satellite sensors are built to detect far more — and each region reveals something different about the Earth's surface. Click a band below.</p>
+
+  <div class="spectrum-bar" id="spectrum-bar">
+    <div class="spectrum-band active" data-band="visible" style="background:#3b82f6;">VISIBLE</div>
+    <div class="spectrum-band" data-band="nir" style="background:#8b1a1a;">NIR</div>
+    <div class="spectrum-band" data-band="swir" style="background:#7c2d12;">SWIR</div>
+    <div class="spectrum-band" data-band="tir" style="background:#581c87;">THERMAL IR</div>
+    <div class="spectrum-band" data-band="microwave" style="background:#0f766e;">MICROWAVE</div>
+  </div>
+  <div class="spectrum-info" id="spectrum-info">
+    <div class="band-name">Visible Light</div>
+    <div class="band-range">0.4 – 0.7 µm</div>
+    <div class="band-desc">What human eyes see: blue, green, red. Reflected sunlight only — nothing is emitted here by objects at Earth-surface temperatures. Used for true-colour imagery, basic land/water/vegetation discrimination.</div>
+    <div class="band-uses"><span class="band-use">True-colour imagery</span><span class="band-use">Water turbidity</span><span class="band-use">Urban mapping</span></div>
+  </div>
+
+  <div class="tech-detail">
+    <div class="label">Why the Atmosphere Matters</div>
+    <p>Not every wavelength makes it from the ground to a satellite. Gases like water vapour, CO&#8322;, and ozone absorb specific wavelength bands almost completely. The wavelength ranges that <em>do</em> pass through relatively unobstructed are called <strong>atmospheric windows</strong> — and sensors are deliberately designed to operate inside them. This is why satellite bands cluster around 0.4–2.5 µm (optical/NIR/SWIR window), 8–14 µm (thermal window), and the microwave region (which passes through almost unimpeded, including through clouds).</p>
+  </div>
+
+  <div class="key-takeaways">
+    <div class="kt-label">Key Takeaways</div>
+    <ul>
+      <li>Remote sensing = gathering information about an object <strong>without physical contact</strong>, by measuring the electromagnetic energy it reflects or emits.</li>
+      <li><strong>Passive sensors</strong> depend on sunlight (optical cameras); <strong>active sensors</strong> (RADAR, LiDAR) provide their own energy and work day/night, through cloud.</li>
+      <li>Wavelength and frequency are inversely related (c = &lambda;&nu;); higher frequency = higher photon energy (E = h&nu;).</li>
+      <li>The EM spectrum used in remote sensing spans far beyond visible light: <strong>NIR, SWIR, thermal IR, and microwave</strong> each reveal different surface properties.</li>
+      <li>The atmosphere blocks most wavelengths — sensors are built to operate inside the <strong>atmospheric windows</strong> that do get through.</li>
+    </ul>
+  </div>
+</section>
+
+<script src="app.js"></script>
+<script>
+(function() {
+  const wlSlider = document.getElementById('wl-slider');
+  const ampSlider = document.getElementById('amp-slider');
+  const wlVal = document.getElementById('wl-val');
+  const ampVal = document.getElementById('amp-val');
+  const canvas = document.getElementById('wave-canvas');
+  const ctx = canvas.getContext('2d');
+
+  function wavelengthToColor(wl) {
+    let r=0,g=0,b=0;
+    if (wl>=380&&wl<440){r=-(wl-440)/(440-380);b=1;}
+    else if (wl>=440&&wl<490){g=(wl-440)/(490-440);b=1;}
+    else if (wl>=490&&wl<510){g=1;b=-(wl-510)/(510-490);}
+    else if (wl>=510&&wl<580){r=(wl-510)/(580-510);g=1;}
+    else if (wl>=580&&wl<645){r=1;g=-(wl-645)/(645-580);}
+    else if (wl>=645&&wl<=900){r=1;}
+    return `rgb(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)})`;
+  }
+
+  function resize() {
+    canvas.width = canvas.clientWidth * devicePixelRatio;
+    canvas.height = canvas.clientHeight * devicePixelRatio;
+  }
+  function draw() {
+    const wl = parseInt(wlSlider.value);
+    const amp = parseInt(ampSlider.value);
+    wlVal.textContent = wl;
+    ampVal.textContent = (amp/70).toFixed(1);
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    const color = wavelengthToColor(wl);
+    const cycles = 8;
+    const freqPx = w / cycles;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3 * devicePixelRatio;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    const period = (wl - 380) / (900-380) * (freqPx*1.6) + freqPx*0.5;
+    for (let x=0; x<=w; x++) {
+      const y = h/2 + Math.sin((x/period)*Math.PI*2) * (amp/100) * (h/2*0.75);
+      if (x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(120,160,255,0.15)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0,h/2); ctx.lineTo(w,h/2); ctx.stroke();
+  }
+  window.addEventListener('resize', () => { resize(); draw(); });
+  wlSlider.addEventListener('input', draw);
+  ampSlider.addEventListener('input', draw);
+  resize(); draw();
+})();
+
+(function() {
+  const bandData = {
+    visible: { name: 'Visible Light', range: '0.4 – 0.7 µm', desc: 'What human eyes see: blue, green, red. Reflected sunlight only. Used for true-colour imagery, basic land/water/vegetation discrimination.', uses: ['True-colour imagery','Water turbidity','Urban mapping'] },
+    nir: { name: 'Near-Infrared (NIR)', range: '0.7 – 1.3 µm', desc: 'Invisible to human eyes. Healthy vegetation reflects NIR very strongly because of leaf cell structure — this is the single most useful band for vegetation monitoring (it drives NDVI).', uses: ['Vegetation health (NDVI)','Biomass estimation','Land/water boundary'] },
+    swir: { name: 'Short-Wave Infrared (SWIR)', range: '1.3 – 3 µm', desc: 'Sensitive to moisture content in soil and vegetation, and to certain minerals. Water absorbs strongly here, so wet vegetation and dry vegetation look very different.', uses: ['Moisture content','Mineral & rock mapping','Burned area mapping'] },
+    tir: { name: 'Thermal Infrared', range: '3 – 14 µm', desc: 'Not reflected sunlight — this is energy directly emitted by objects because of their temperature. Used to measure surface temperature, day or night.', uses: ['Land surface temperature','Urban heat islands','Volcanic/fire monitoring'] },
+    microwave: { name: 'Microwave (Radar)', range: '1 mm – 1 m', desc: 'Passes through clouds, smoke, and works day or night. Mostly used actively (RADAR) — the sensor sends its own pulse and measures the return, revealing surface roughness and moisture rather than colour.', uses: ['All-weather flood mapping','Soil moisture','Ship/oil-spill detection'] }
+  };
+  const bands = document.querySelectorAll('.spectrum-band');
+  const info = document.getElementById('spectrum-info');
+  bands.forEach(b => {
+    b.addEventListener('click', () => {
+      bands.forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      const d = bandData[b.dataset.band];
+      info.style.opacity = 0;
+      setTimeout(() => {
+        info.innerHTML = `<div class="band-name">${d.name}</div><div class="band-range">${d.range}</div><div class="band-desc">${d.desc}</div><div class="band-uses">${d.uses.map(u=>`<span class="band-use">${u}</span>`).join('')}</div>`;
+        info.style.opacity = 1;
+      }, 150);
+    });
+  });
+})();
+</script>
+</body>
+</html>

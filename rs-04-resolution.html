@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Four Resolutions — RS.4</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="page-hero">
+  <div class="chapter-badge">Track A · RS.4 of 6</div>
+  <h1>The Four <span>Resolutions</span></h1>
+  <p class="hero-intro">"Resolution" isn't one number — it's four independent trade-offs (spatial, spectral, radiometric, temporal), and no satellite maximizes all four at once. Choosing the right data for a job means knowing which resolution actually matters for your question.</p>
+  <div class="chapter-progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span></div>
+</header>
+
+<section class="content-section reveal">
+  <div class="section-label">04.1 / The Four Types</div>
+  <h2 class="section-title">What each resolution actually means</h2>
+
+  <div class="resolution-grid">
+    <div class="res-card spatial">
+      <div class="res-icon" style="background: var(--amber-dim); color: var(--amber);">🔍</div>
+      <h3>Spatial Resolution</h3>
+      <p>The ground area one pixel covers. "How much detail can I see?" A 1m pixel shows individual buildings; a 1km pixel shows only broad patterns. Defined by IFOV — the solid angle a detector is sensitive to.</p>
+      <div class="res-examples"><span class="res-example">Cartosat-3: 0.25m</span><span class="res-example">IKONOS: 1m</span><span class="res-example">IRS PAN: 5.8m</span><span class="res-example">Landsat: 30m</span><span class="res-example">MODIS: 250m-1km</span></div>
+    </div>
+    <div class="res-card spectral">
+      <div class="res-icon" style="background: var(--teal-dim); color: var(--teal);">🌈</div>
+      <h3>Spectral Resolution</h3>
+      <p>The width and number of wavelength bands a sensor detects. "How many colours can I see?" Narrower bands = higher spectral resolution. Panchromatic = 1 broad band; hyperspectral = hundreds of narrow ones.</p>
+      <div class="res-examples"><span class="res-example">Landsat ETM+: 6 bands</span><span class="res-example">EO-1 ALI: 9 bands</span><span class="res-example">Hyperion: 150 bands</span><span class="res-example">Sentinel-2: 13 bands</span></div>
+    </div>
+    <div class="res-card radiometric">
+      <div class="res-icon" style="background: var(--blue-dim); color: var(--blue);">📊</div>
+      <h3>Radiometric Resolution</h3>
+      <p>Ability to discriminate small energy differences. "How many shades of gray?" Measured in bits — each bit doubles the grey levels. Higher bits = smoother gradients, more shadow detail.</p>
+      <div class="res-examples"><span class="res-example">Landsat MSS: 6-bit (64)</span><span class="res-example">Landsat TM: 8-bit (256)</span><span class="res-example">Landsat OLI: 12-bit (4096)</span><span class="res-example">IKONOS: 11-bit (2048)</span></div>
+    </div>
+    <div class="res-card temporal">
+      <div class="res-icon" style="background: var(--purple-dim); color: var(--purple);">⏱️</div>
+      <h3>Temporal Resolution</h3>
+      <p>How often a satellite revisits the same area. "How often can I see changes?" Depends on orbit, swath width, and latitude. Weather needs hourly; vegetation monitoring can use weeks.</p>
+      <div class="res-examples"><span class="res-example">GOES/INSAT: Hourly</span><span class="res-example">MODIS: 1-2 days</span><span class="res-example">Sentinel-2: 5 days</span><span class="res-example">Landsat: 16 days</span></div>
+    </div>
+  </div>
+
+  <div class="tech-detail">
+    <div class="label">The IFOV Formula</div>
+    <p>Spatial resolution is defined by the <strong>Instantaneous Field of View (IFOV)</strong>: &beta; = a/f (radians), where <strong>a</strong> is detector dimension and <strong>f</strong> is focal length. The <strong>Instantaneous Ground Field of View (IGFOV)</strong> = IFOV × h, where <strong>h</strong> is flying height. To get finer spatial resolution: smaller detector, longer focal length, or lower orbit.</p>
+  </div>
+
+  <div class="figure-row">
+    <div class="figure">
+      <img src="img/res-spatial-resolution-real.jpg" alt="Same area at different spatial resolutions, real imagery">
+      <figcaption>The same ground area at progressively coarser spatial resolution — notice how quickly individual features (roads, buildings, field boundaries) disappear as pixel size grows.
+        <span class="fig-credit">Source: IIRS-ISRO Dehradun — "Earth Observation Platforms and Sensors," Shri Vinay Kumar</span>
+      </figcaption>
+    </div>
+    <div class="figure">
+      <img src="img/res-spectral-resolution-real.jpg" alt="Same scene at different spectral resolutions, real imagery">
+      <figcaption>Spectral resolution in practice: broader bands blend distinct materials together, while narrower bands separate features (like mineral types or crop varieties) that look identical in broadband imagery.
+        <span class="fig-credit">Source: IIRS-ISRO Dehradun, Shri Vinay Kumar</span>
+      </figcaption>
+    </div>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">04.2 / Pixels &amp; DN Values</div>
+  <h2 class="section-title">What your computer actually sees</h2>
+  <p class="section-intro">A satellite image is a grid of pixels, each holding a Digital Number (DN) — the recorded amount of reflected energy. Higher DN = more energy = brighter pixel. Drag the sliders to see how detail changes with spatial and radiometric resolution together.</p>
+
+  <div class="widget-panel">
+    <div class="pixel-grid-wrap">
+      <div class="pixel-grid" id="pixel-grid"></div>
+      <div class="pixel-controls">
+        <div>
+          <div class="pixel-slider-val"><span>Grid Size</span><span id="pixel-size-val">12 × 12</span></div>
+          <input type="range" id="pixel-size-slider" min="6" max="48" value="12">
+        </div>
+        <div>
+          <div class="pixel-slider-val"><span>Bits</span><span id="pixel-bits-val">8-bit (256 levels)</span></div>
+          <input type="range" id="pixel-bits-slider" min="1" max="12" value="8">
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-dim); padding: 12px; background: var(--surface-2); border-radius: 8px;">
+          <strong style="color: var(--teal);">What's happening:</strong> The grid represents a satellite image with a river, urban area, forest, and sand. More pixels = higher spatial resolution. More bits = higher radiometric resolution. Reduce both to see what early satellites like Landsat MSS captured.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-head"><span>degrade_resolution.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><code><span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+<span class="c-kw">from</span> scipy.ndimage <span class="c-kw">import</span> zoom
+
+<span class="c-com"># image is a numpy array of shape (rows, cols) loaded from a GeoTIFF</span>
+<span class="c-kw">def</span> <span class="c-fn">simulate_coarser_pixel</span>(image, factor):
+    <span class="c-com">"""Shrink then re-expand — simulates a lower spatial-resolution sensor."""</span>
+    small = zoom(image, 1/factor, order=1)      <span class="c-com"># downsample (average nearby pixels)</span>
+    <span class="c-kw">return</span> zoom(small, factor, order=0)           <span class="c-com"># blow back up, blocky like real coarse data</span>
+
+<span class="c-kw">def</span> <span class="c-fn">reduce_radiometric_bits</span>(image, bits):
+    <span class="c-com">"""Quantize DN values to fewer grey levels, like an older 6-bit sensor."""</span>
+    levels = 2**bits
+    scaled = (image / image.<span class="c-fn">max</span>()) * (levels - 1)
+    <span class="c-kw">return</span> np.<span class="c-fn">round</span>(scaled) * (255 / (levels - 1))  <span class="c-com"># rescale back to 0-255 for display</span></code></pre>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">04.3 / Radiometric Resolution</div>
+  <h2 class="section-title">The power of bits</h2>
+  <p class="section-intro">The formula is simple: 2<sup>n</sup> = number of grey levels, where n is bit depth. More bits mean the sensor distinguishes finer energy differences — critical for shadow and bright-area detail.</p>
+
+  <div class="widget-panel">
+    <div class="rad-grid" id="rad-grid"></div>
+  </div>
+
+  <div class="figure">
+    <img src="img/res-radiometric-resolution-real.jpg" alt="Radiometric resolution comparison, real imagery">
+    <figcaption>The practical impact of radiometric resolution: at low bit-depth, detail inside shadows and bright areas is simply gone — clipped to a single flat value — no amount of enhancement can recover data that was never recorded.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Shri Vinay Kumar</span>
+    </figcaption>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">04.4 / Choosing the Right Resolution</div>
+  <h2 class="section-title">Application guide &amp; the fundamental trade-off</h2>
+
+  <div class="figure">
+    <img src="img/res-application-vs-resolution.jpg" alt="Application requirements vs achievable resolution, real slide">
+    <figcaption>Matching resolution to application: military surveillance needs sub-metre detail but can accept long revisit times; weather forecasting needs the opposite — frequent hourly imaging at kilometre-scale detail.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Shri Vinay Kumar</span>
+    </figcaption>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Application</th><th>Spatial Resolution Needed</th><th>Example Satellites</th></tr></thead>
+      <tbody>
+        <tr><td class="row-name">Military Surveillance</td><td class="mono-teal">&le; 1 m</td><td>IKONOS PAN, Cartosat-3</td></tr>
+        <tr><td class="row-name">Cartography &amp; Urban Planning</td><td class="mono-teal">2 – 6 m</td><td>Cartosat-2, WorldView</td></tr>
+        <tr><td class="row-name">Land Use, Crop &amp; Forest Monitoring</td><td class="mono-teal">10 – 30 m</td><td>Landsat, Sentinel-2, LISS-III</td></tr>
+        <tr><td class="row-name">Ocean Colour (Chlorophyll, Sediment)</td><td class="mono-teal">300 – 1100 m</td><td>OCM, MODIS</td></tr>
+        <tr><td class="row-name">Meteorology (Clouds, Water Vapor)</td><td class="mono-teal">1 – 8 km</td><td>INSAT, GOES, METEOSAT</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tech-detail">
+    <div class="label">The Resolution Trade-off</div>
+    <p>It is very difficult to obtain high spatial, spectral, temporal, and radiometric resolution all at once. A 0.25m satellite typically has a narrow swath and long revisit time. A weather satellite with hourly revisit (GOES/INSAT) has kilometre-scale pixels. Every satellite embodies a deliberate compromise — you pick the one that matches your application.</p>
+  </div>
+
+  <div class="key-takeaways">
+    <div class="kt-label">Key Takeaways</div>
+    <ul>
+      <li><strong>Spatial resolution</strong> = pixel size on the ground (IFOV × altitude). Smaller pixel = more detail, less coverage.</li>
+      <li><strong>Spectral resolution</strong> = number/width of bands: panchromatic (1) &lt; multispectral (3–10) &lt; hyperspectral (100s).</li>
+      <li><strong>Radiometric resolution</strong> = bits: 2<sup>n</sup> grey levels. 12-bit sensors reveal detail 8-bit sensors simply never recorded.</li>
+      <li><strong>Temporal resolution</strong> = revisit time: hourly for weather, daily for ocean, 5–16 days for land monitoring.</li>
+      <li>You can't max out all four — <strong>every satellite is a deliberate trade-off</strong> matched to its purpose.</li>
+    </ul>
+  </div>
+</section>
+
+<script src="app.js"></script>
+<script>
+(function() {
+  const grid = document.getElementById('pixel-grid');
+  const sizeSlider = document.getElementById('pixel-size-slider');
+  const bitsSlider = document.getElementById('pixel-bits-slider');
+  const sizeVal = document.getElementById('pixel-size-val');
+  const bitsVal = document.getElementById('pixel-bits-val');
+  function getLandscapeValue(row, col, size) {
+    const r = row / size, c = col / size;
+    let val = 0.3 + 0.2 * Math.sin(r * Math.PI * 2) * Math.cos(c * Math.PI * 3);
+    const distToRiver = Math.abs(r - c * 0.8 - 0.1);
+    if (distToRiver < 0.04) val = 0.05;
+    if (r < 0.3 && c > 0.6) val = 0.7 + 0.1 * Math.sin(r * 50) * Math.cos(c * 50);
+    if (r > 0.55 && c < 0.35) val = 0.45 + 0.08 * Math.sin(r * 30) * Math.cos(c * 30);
+    if (r < 0.2 && c < 0.2) val = 0.85;
+    return Math.max(0, Math.min(1, val));
+  }
+  function renderGrid() {
+    const size = parseInt(sizeSlider.value);
+    const bits = parseInt(bitsSlider.value);
+    const maxVal = Math.pow(2, bits) - 1;
+    sizeVal.textContent = `${size} × ${size}`;
+    bitsVal.textContent = `${bits}-bit (${(maxVal + 1).toLocaleString()} levels)`;
+    grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+    grid.innerHTML = '';
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        const normalized = getLandscapeValue(r, c, size);
+        const dn = Math.round(normalized * maxVal);
+        const brightness = Math.round(normalized * 255);
+        const cell = document.createElement('div');
+        cell.className = 'pixel-cell';
+        cell.style.background = `rgb(${brightness},${brightness},${brightness})`;
+        cell.style.aspectRatio = '1';
+        if (size <= 16) cell.textContent = dn;
+        grid.appendChild(cell);
+      }
+    }
+  }
+  sizeSlider.addEventListener('input', renderGrid);
+  bitsSlider.addEventListener('input', renderGrid);
+  renderGrid();
+})();
+(function() {
+  const container = document.getElementById('rad-grid');
+  const bitsList = [1, 2, 4, 8, 11, 12];
+  bitsList.forEach(bits => {
+    const levels = Math.pow(2, bits);
+    const card = document.createElement('div');
+    card.className = 'rad-card';
+    const gradDiv = document.createElement('div');
+    gradDiv.className = 'rad-bar';
+    const stops = [];
+    const nStops = Math.min(levels, 64);
+    for (let i = 0; i < nStops; i++) {
+      const pct = (i / (nStops - 1)) * 100;
+      const val = Math.round((i / (nStops - 1)) * 255);
+      stops.push(`rgb(${val},${val},${val}) ${pct}%`);
+    }
+    gradDiv.style.background = `linear-gradient(to right, ${stops.join(', ')})`;
+    card.innerHTML = `<div class="bits">${bits}-bit</div><div class="levels">${levels.toLocaleString()} grey levels</div>`;
+    card.appendChild(gradDiv);
+    const sensors = { 1:'Binary image', 2:'Early weather fax', 4:'Basic display', 8:'Landsat TM, most displays', 11:'IKONOS — detail in shadows', 12:'Landsat OLI — sharpest' };
+    const sensorDiv = document.createElement('div');
+    sensorDiv.style.cssText = 'font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); margin-top: 8px; text-align: center;';
+    sensorDiv.textContent = sensors[bits] || '';
+    card.appendChild(sensorDiv);
+    container.appendChild(card);
+  });
+})();
+</script>
+</body>
+</html>

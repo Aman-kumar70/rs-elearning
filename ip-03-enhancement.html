@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enhancement, Filtering & Indices — IP.3</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="page-hero">
+  <div class="chapter-badge">Track B · IP.3 of 5</div>
+  <h1>Enhancement, Filtering <span>&amp; Indices</span></h1>
+  <p class="hero-intro">Preprocessing fixes errors; enhancement makes correct data easier to interpret — for a human eye or a downstream algorithm. This is the longest chapter in the course because it's the one you'll use constantly: contrast stretching, spatial filters, band ratios, vegetation indices, and PCA.</p>
+  <div class="chapter-progress"><span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span></div>
+</header>
+
+<section class="content-section reveal">
+  <div class="section-label">03.1 / Contrast Enhancement</div>
+  <h2 class="section-title">Most raw imagery uses only a sliver of its dynamic range</h2>
+  <div class="www-grid">
+    <div class="www-card what">
+      <div class="www-label">What</div>
+      <p>Contrast stretching remaps a narrow range of DN values onto the full display range (0–255), so subtle differences become visible. Raw sensor data — especially 11/12-bit imagery displayed on an 8-bit screen — usually occupies only a small, low-contrast slice of the possible range.</p>
+    </div>
+    <div class="www-card why">
+      <div class="www-label">Why</div>
+      <p>Because a human eye (and many algorithms) can't distinguish DN 512 from DN 515 when both display as nearly the same shade of grey. Stretching those two values apart makes real, meaningful differences in the data visible.</p>
+    </div>
+    <div class="www-card how">
+      <div class="www-label">How</div>
+      <p>A linear transformation function maps input DN to output DN. Min-max stretch uses the image's actual min/max; percentage-cutoff and standard-deviation stretches ignore extreme outlier pixels for a more robust result; non-linear stretches (logarithmic, histogram equalization) redistribute contrast unevenly on purpose.</p>
+    </div>
+  </div>
+
+  <div class="figure">
+    <img src="img/enh-minmax-stretch-example.jpg" alt="Min-max stretch worked example with real DN values">
+    <figcaption>A worked min-max stretch: original DN values (left) are linearly remapped to fill 0–255, visibly increasing contrast between values that were previously nearly indistinguishable.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun — "Digital Image Processing: Image Enhancement," Dr. Poonam S. Tiwari</span>
+    </figcaption>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula">DN<sub>out</sub> = (DN<sub>in</sub> &minus; Min) / (Max &minus; Min) &times; 255</div>
+    <div class="formula-note">Linear min-max stretch. Min/Max can come from the true image extremes, a fixed percentile cutoff (e.g. 2%–98%, ignoring outliers), or the mean ± n standard deviations — each variant trades robustness against extreme pixels for how aggressively it stretches the "typical" range.</div>
+  </div>
+
+  <div class="figure">
+    <img src="img/enh-before-after-contrast.jpg" alt="Before and after effects of contrast stretching, real satellite image">
+    <figcaption>Before and after: the same scene, before stretching (flat, low-contrast) and after (features clearly separable) — this single operation often does more for visual interpretability than anything else in this chapter.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
+    </figcaption>
+  </div>
+
+  <div class="figure">
+    <img src="img/enh-histogram-equalization.jpg" alt="Histogram equalization explanation">
+    <figcaption><strong>Histogram equalization</strong> — a non-linear stretch that redistributes DN values so the output histogram is as uniform (flat) as possible, automatically giving the most contrast to the most populated brightness ranges. Can be too aggressive for imagery with important information in dark shadow or bright cloud areas.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
+    </figcaption>
+  </div>
+
+  <div class="figure">
+    <img src="img/enh-colaba-mumbai-example.jpg" alt="Colaba Mumbai real histogram equalization example">
+    <figcaption>Real example — Colaba, Mumbai: original image and histogram (left) vs. equalized image and histogram (right). The equalized histogram is visibly flatter, and urban/coastal detail becomes far easier to distinguish.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
+    </figcaption>
+  </div>
+
+  <div class="code-block">
+    <div class="code-head"><span>contrast_stretch.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><code><span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+<span class="c-kw">from</span> skimage <span class="c-kw">import</span> exposure
+
+<span class="c-kw">def</span> <span class="c-fn">linear_stretch</span>(band, low_pct=2, high_pct=98):
+    lo, hi = np.<span class="c-fn">percentile</span>(band, [low_pct, high_pct])
+    stretched = np.clip((band - lo) / (hi - lo), 0, 1) * 255
+    <span class="c-kw">return</span> stretched.<span class="c-fn">astype</span>(<span class="c-str">"uint8"</span>)
+
+<span class="c-com"># Histogram equalization — one line with scikit-image</span>
+equalized = exposure.<span class="c-fn">equalize_hist</span>(band)
+
+<span class="c-com"># CLAHE — adaptive equalization, avoids over-amplifying noise in flat regions</span>
+clahe = exposure.<span class="c-fn">equalize_adapthist</span>(band / band.<span class="c-fn">max</span>(), clip_limit=0.03)</code></pre>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">03.2 / Spatial Filtering</div>
+  <h2 class="section-title">Convolution: the operation behind every filter</h2>
+  <p class="section-intro">Spatial filters change a pixel's value based on its neighbours, using a small moving window ("kernel" or "mask"). This single mechanism — convolution — implements smoothing, sharpening, noise removal, and edge detection, just by changing the numbers in the kernel.</p>
+
+  <div class="figure-row">
+    <div class="figure">
+      <img src="img/enh-convolution-process1.jpg" alt="Convolution process step 1, kernel placed on window">
+      <figcaption>A small kernel (e.g. 3×3) is placed over each pixel neighbourhood in turn.</figcaption>
+    </div>
+    <div class="figure">
+      <img src="img/enh-convolution-process2.jpg" alt="Convolution process step 2, weighted sum computed">
+      <figcaption>Each neighbouring DN is multiplied by the corresponding kernel weight, and the results are summed — that sum becomes the new central pixel's value.</figcaption>
+    </div>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula">BV<sub>out</sub> = &Sigma;&Sigma; (kernel &times; window) &divide; &Sigma;(kernel)</div>
+    <div class="formula-note">The heart of spatial filtering — a weighted average of a pixel's neighbourhood. A uniform kernel of all 1s produces smoothing; a kernel with negative side-weights and a large positive centre produces sharpening.</div>
+  </div>
+
+  <div class="figure-row">
+    <div class="figure">
+      <img src="img/enh-lowpass-mean-filter.jpg" alt="Low pass mean filter results at different kernel sizes">
+      <figcaption><strong>Low-pass (smoothing) filter</strong> — averages neighbours, suppressing high-frequency detail and noise. Larger kernels (3×3 → 5×5 → 7×7) blur progressively more.</figcaption>
+    </div>
+    <div class="figure">
+      <img src="img/enh-highpass-filtering.jpg" alt="High pass filtering example">
+      <figcaption><strong>High-pass (sharpening) filter</strong> — accentuates rapid local changes, making edges and fine detail more prominent at the cost of amplifying noise.</figcaption>
+    </div>
+  </div>
+
+  <div class="figure-row">
+    <div class="figure">
+      <img src="img/enh-edge-detection-zerosum.jpg" alt="Edge detection zero-sum kernel example">
+      <figcaption><strong>Edge detection</strong> kernels sum to zero — flat, uniform regions output near-zero, while sharp brightness transitions (edges) produce strong positive or negative responses.</figcaption>
+    </div>
+    <div class="figure">
+      <img src="img/enh-edge-detectors-compare.jpg" alt="Comparison of Roberts, Sobel, Prewitt edge detectors">
+      <figcaption>Different edge-detector kernels (Roberts, Sobel, Prewitt) each weight neighbouring pixels differently — producing similar but distinguishable edge maps from the same source image.</figcaption>
+    </div>
+  </div>
+
+  <div class="figure">
+    <img src="img/enh-sobel-operator.jpg" alt="Sobel operator formula and kernels">
+    <figcaption>The Sobel operator — separate horizontal and vertical kernels are convolved independently, then combined (X² + Y²)^0.5 to give edge magnitude regardless of orientation.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
+    </figcaption>
+  </div>
+
+  <div class="code-block">
+    <div class="code-head"><span>spatial_filters.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><code><span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+<span class="c-kw">from</span> scipy.ndimage <span class="c-kw">import</span> convolve, sobel
+
+<span class="c-com"># Low-pass 3x3 mean filter — smoothing</span>
+mean_kernel = np.<span class="c-fn">ones</span>((3,3)) / 9
+smoothed = <span class="c-fn">convolve</span>(band, mean_kernel)
+
+<span class="c-com"># High-pass sharpening kernel</span>
+sharpen_kernel = np.array([[ 0,-1, 0],
+                            [-1, 5,-1],
+                            [ 0,-1, 0]])
+sharpened = <span class="c-fn">convolve</span>(band, sharpen_kernel)
+
+<span class="c-com"># Sobel edge detection — magnitude of gradient in X and Y</span>
+edges_x = <span class="c-fn">sobel</span>(band, axis=0)
+edges_y = <span class="c-fn">sobel</span>(band, axis=1)
+edge_magnitude = np.<span class="c-fn">hypot</span>(edges_x, edges_y)</code></pre>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">03.3 / Band Math — Ratios &amp; Indices</div>
+  <h2 class="section-title">Combining bands reveals what single bands hide</h2>
+  <p class="section-intro">Band ratios divide one band by another, pixel-by-pixel. This cancels out effects that influence all bands roughly equally (topographic shading, seasonal illumination differences) while amplifying the specific spectral contrast between the two chosen bands (RS.2).</p>
+
+  <div class="figure">
+    <img src="img/enh-band-ratio-example.jpg" alt="Band ratio real geological example">
+    <figcaption>Real example — geological mapping by band ratio: ratio images using different band pairs (3/1, 5/7, 5/4) each highlight different mineral/rock boundaries invisible in any single band.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
+    </figcaption>
+  </div>
+
+  <div class="figure">
+    <img src="img/enh-vegetation-indices.jpg" alt="Vegetation indices NDVI RVI TVI real example">
+    <figcaption>The most common vegetation indices — Ratio Vegetation Index (RVI = NIR/Red), NDVI, and Transformed Vegetation Index — applied to a real scene, each producing a slightly different but strongly correlated vegetation-vigour map.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
+    </figcaption>
+  </div>
+
+  <div class="code-block">
+    <div class="code-head"><span>compute_ndvi.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><code><span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+
+red = image[2].<span class="c-fn">astype</span>(<span class="c-str">"float32"</span>)
+nir = image[3].<span class="c-fn">astype</span>(<span class="c-str">"float32"</span>)
+
+ndvi = (nir - red) / (nir + red + 1e-6)     <span class="c-com"># epsilon avoids divide-by-zero</span>
+
+<span class="c-fn">print</span>(<span class="c-fn">f</span><span class="c-str">"Mean NDVI: {ndvi.mean():.3f}"</span>)
+<span class="c-fn">print</span>(<span class="c-fn">f</span><span class="c-str">"Healthy vegetation pixels (NDVI>0.5): {(ndvi>0.5).sum()}"</span>)
+
+plt.<span class="c-fn">imshow</span>(ndvi, cmap=<span class="c-str">"RdYlGn"</span>, vmin=-1, vmax=1)
+plt.<span class="c-fn">colorbar</span>(label=<span class="c-str">"NDVI"</span>)</code></pre>
+    <div class="out"># Mean NDVI: 0.412<br># Healthy vegetation pixels (NDVI&gt;0.5): 184,302</div>
+  </div>
+
+  <div class="section-label" style="margin-top:8px;">03.4 / Principal Component Analysis</div>
+  <h2 class="section-title">Compressing correlated bands into independent ones</h2>
+  <p class="section-intro">Adjacent spectral bands are often highly correlated — a bright pixel in the red band is usually bright in green too. PCA finds new axes (principal components) along which the data varies most, decorrelating the bands. PC1 typically captures overall brightness; later components often isolate subtle features buried in the correlation.</p>
+
+  <div class="figure">
+    <img src="img/enh-pca-intro.jpg" alt="PCA graphical conceptualization">
+    <figcaption>Graphically, PCA rotates the coordinate axes so the new Band 1' captures maximum variance, and Band 2' (orthogonal to it) captures the remaining variance not explained by Band 1'.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
+    </figcaption>
+  </div>
+  <div class="figure">
+    <img src="img/enh-pca-real-example.jpg" alt="PCA real example PC1 PC3 color composite">
+    <figcaption>Real PCA output: PC1 (mostly brightness/topography), PC3, and a false-colour composite built from three principal components — subtle features invisible in the raw bands often become visible in the later PCs.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
+    </figcaption>
+  </div>
+
+  <div class="code-block">
+    <div class="code-head"><span>pca_bands.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><code><span class="c-kw">from</span> sklearn.decomposition <span class="c-kw">import</span> PCA
+<span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+
+bands, rows, cols = image.shape
+pixels = image.<span class="c-fn">reshape</span>(bands, -1).T        <span class="c-com"># shape: (rows*cols, bands)</span>
+
+pca = <span class="c-fn">PCA</span>(n_components=bands)
+components = pca.<span class="c-fn">fit_transform</span>(pixels)
+<span class="c-fn">print</span>(<span class="c-str">"Variance explained per PC:"</span>, pca.explained_variance_ratio_)
+
+pc_image = components.T.<span class="c-fn">reshape</span>(bands, rows, cols)  <span class="c-com"># back to image shape</span></code></pre>
+    <div class="out"># Variance explained per PC: [0.891 0.081 0.021 0.007]</div>
+  </div>
+
+  <div class="try-it">
+    <div class="ti-label">Try It Yourself</div>
+    <p>In the output above, PC1 alone explains 89% of the variance across four bands — that's the "correlated brightness" everything shares. PC2 through PC4 hold the remaining 11%, but that's often exactly where the interesting, band-specific differences live. This is why PCA is a common step before classification (IP.4): fewer, decorrelated inputs, same information.</p>
+  </div>
+
+  <div class="key-takeaways">
+    <div class="kt-label">Key Takeaways</div>
+    <ul>
+      <li><strong>Contrast stretching</strong> remaps a narrow DN range to the full display range — linear (min-max, percentile-cutoff, std-dev) or non-linear (log, histogram equalization).</li>
+      <li><strong>Spatial filtering</strong> is convolution with a kernel: uniform kernels smooth (low-pass), centre-weighted kernels sharpen (high-pass), zero-sum kernels detect edges (Sobel, Roberts, Prewitt).</li>
+      <li><strong>Band ratios</strong> cancel shared effects (topography, illumination) and amplify the spectral contrast between two chosen bands — the basis of NDVI and geological ratio mapping.</li>
+      <li><strong>PCA</strong> decorrelates bands into independent components ranked by variance explained, often revealing detail buried by inter-band correlation.</li>
+      <li>All of this is ordinary array math — every technique above is a handful of lines with NumPy, SciPy, scikit-image, or scikit-learn.</li>
+    </ul>
+  </div>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>

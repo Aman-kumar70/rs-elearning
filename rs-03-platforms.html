@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orbits & Scanning — RS.3</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="page-hero">
+  <div class="chapter-badge">Track A · RS.3 of 6</div>
+  <h1>Orbits &amp; <span>Scanning</span></h1>
+  <p class="hero-intro">A satellite's orbit decides what it can see, how often, and at what time of day — before a single photon is even captured. Get the orbit wrong for your application and no amount of clever image processing will fix it.</p>
+  <div class="chapter-progress"><span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span><span></span></div>
+</header>
+
+<section class="content-section reveal">
+  <div class="section-label">03.1 / Orbit Types</div>
+  <h2 class="section-title">Two ways to orbit Earth</h2>
+
+  <div class="www-grid">
+    <div class="www-card what">
+      <div class="www-label">What</div>
+      <p>Almost every Earth-observation satellite uses one of two orbit families: low-altitude <strong>polar/sun-synchronous</strong> orbits, or very-high-altitude <strong>geostationary</strong> orbits directly above the equator.</p>
+    </div>
+    <div class="www-card why">
+      <div class="www-label">Why</div>
+      <p>They solve opposite problems. Polar orbits give you high spatial resolution and full global coverage over days/weeks. Geostationary orbits give you the same view, continuously, forever — perfect for watching a storm develop hour by hour, useless for mapping fine detail.</p>
+    </div>
+    <div class="www-card how">
+      <div class="www-label">How</div>
+      <p>Orbit altitude and inclination are chosen so gravity balances the satellite's speed at the right period — 90 minutes at 700–800 km (polar), or exactly 24 hours at ~36,000 km (geostationary, matching Earth's own rotation so the satellite appears fixed).</p>
+    </div>
+  </div>
+
+  <div class="widget-panel">
+    <div class="orbit-toggle">
+      <div class="orbit-btn active" data-orbit="leo">Polar / Sun-Synchronous (LEO)</div>
+      <div class="orbit-btn" data-orbit="geo">Geostationary (GEO)</div>
+    </div>
+    <div class="orbit-svg-wrap">
+      <svg viewBox="0 0 600 420" id="orbit-svg">
+        <defs>
+          <radialGradient id="earth-grad" cx="35%" cy="35%">
+            <stop offset="0%" stop-color="#3b82f6"/>
+            <stop offset="70%" stop-color="#1e40af"/>
+            <stop offset="100%" stop-color="#0c1230"/>
+          </radialGradient>
+        </defs>
+        <circle cx="300" cy="210" r="80" fill="url(#earth-grad)" stroke="rgba(45,212,191,0.2)" stroke-width="1"/>
+        <path d="M260,180 Q280,170 300,175 Q310,185 305,200 Q295,210 280,205 Z" fill="rgba(74,222,128,0.3)"/>
+        <path d="M315,195 Q335,190 340,210 Q330,225 320,220 Z" fill="rgba(74,222,128,0.3)"/>
+        <path d="M270,230 Q285,235 290,250 Q280,260 270,250 Z" fill="rgba(74,222,128,0.3)"/>
+        <g id="leo-orbit">
+          <ellipse cx="300" cy="210" rx="80" ry="130" fill="none" stroke="rgba(245,166,35,0.5)" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <g id="leo-sat"><rect x="-6" y="-4" width="12" height="8" fill="#ddd" rx="1"/><rect x="-14" y="-1.5" width="6" height="3" fill="#4488ff"/><rect x="8" y="-1.5" width="6" height="3" fill="#4488ff"/><circle cx="0" cy="-8" r="2" fill="#f5a623"/></g>
+        </g>
+        <g id="geo-orbit" style="display:none;">
+          <ellipse cx="300" cy="210" rx="260" ry="260" fill="none" stroke="rgba(45,212,191,0.4)" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <g id="geo-sat"><rect x="-6" y="-4" width="12" height="8" fill="#ddd" rx="1"/><rect x="-14" y="-1.5" width="6" height="3" fill="#4488ff"/><rect x="8" y="-1.5" width="6" height="3" fill="#4488ff"/><circle cx="0" cy="-8" r="2" fill="#2dd4bf"/></g>
+          <path d="M300,210 L120,50 L480,50 Z" fill="rgba(45,212,191,0.05)" stroke="rgba(45,212,191,0.2)" stroke-width="1" stroke-dasharray="2,2"/>
+        </g>
+        <text x="300" y="360" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8893b5">EARTH</text>
+        <text x="300" y="40" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#5a6789" id="orbit-label">POLAR ORBIT ~700-800 km</text>
+      </svg>
+    </div>
+    <div class="orbit-info" id="orbit-info">
+      <h4 id="orbit-title">Polar / Sun-Synchronous Orbit (LEO)</h4>
+      <p id="orbit-desc">The satellite orbits north-south at 700-800 km altitude while Earth rotates beneath it (west-east). It crosses the equator at ~10:30 AM local time — always the same local sun-time. This provides consistent lighting conditions for comparing images over time.</p>
+      <div class="orbit-stats" id="orbit-stats">
+        <div class="orbit-stat"><span class="label">Altitude</span><span class="val">700-800 km</span></div>
+        <div class="orbit-stat"><span class="label">Orbital Period</span><span class="val">~90 minutes</span></div>
+        <div class="orbit-stat"><span class="label">Inclination</span><span class="val">~98.7°</span></div>
+        <div class="orbit-stat"><span class="label">Coverage</span><span class="val">Global</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula">T = 2&pi; &radic;(a&sup3;/&mu;)</div>
+    <div class="formula-note">Kepler's Third Law: orbital period T depends only on the semi-major axis a (~ altitude + Earth's radius) and Earth's gravitational parameter &mu; (3.986×10⁵ km³/s²). Plug in a ≈ 7,150 km (700 km altitude) and you get T ≈ 98 minutes — that's why Landsat and Sentinel-2 orbit roughly every 90–100 minutes, ~14–15 times a day.</div>
+  </div>
+
+  <div class="tech-detail">
+    <div class="label">Key Terms You Must Know</div>
+    <p><strong>Swath:</strong> The strip of Earth's surface imaged in one pass. <strong>Revisit Time:</strong> Time between two images of the same area. <strong>Repeat Cycle:</strong> Time between two identical orbits. <strong>Inclination:</strong> Angle between the orbital plane and the equator — polar orbit inclination sits between 80° and 100°. <strong>Period:</strong> Time for one full orbit.</p>
+  </div>
+
+  <div class="sensor-comparison">
+    <div class="sensor-card passive">
+      <div class="sensor-type">Passive Sensor</div>
+      <h3>📷 Like a Camera</h3>
+      <p>Measures radiant energy reflected or emitted by the Earth-atmosphere system. Relies on sunlight — only works during daytime and can be blocked by clouds.</p>
+      <p>Converted to bio-geophysical quantities like temperature, precipitation, and soil moisture.</p>
+      <div class="examples"><span class="example-tag">Landsat OLI/TIRS</span><span class="example-tag">Terra MODIS</span><span class="example-tag">GPM GMI</span><span class="example-tag">GRACE</span></div>
+    </div>
+    <div class="sensor-card active-s">
+      <div class="sensor-type">Active Sensor</div>
+      <h3>🔦 Like a Flashlight</h3>
+      <p>Provides its own energy source. Mostly microwave — penetrates clouds and works day or night.</p>
+      <p>Applications include meteorology, surface elevation mapping, ocean wind speed measurement.</p>
+      <div class="examples"><span class="example-tag">LiDAR (ICESat-2)</span><span class="example-tag">RADAR (Sentinel-1)</span><span class="example-tag">Scatterometer</span><span class="example-tag">Laser Altimeter</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">03.2 / How Sensors Scan</div>
+  <h2 class="section-title">Whisk broom vs push broom</h2>
+  <p class="section-intro">Once a satellite is in the right orbit, it still needs to build a 2D image line by line as it flies forward. Two mechanisms dominate — the difference matters for reliability and image quality.</p>
+
+  <div class="scan-grid">
+    <div class="scan-card">
+      <div class="scan-type">Whisk Broom</div>
+      <h3>🧹 Rotating Mirror Scanner</h3>
+      <p>A rotating mirror sweeps side-to-side, collecting data line by line perpendicular to flight direction. Scan arc typically 90°–120°. Uses forward motion to build the 2D image.</p>
+      <svg class="scan-svg" viewBox="0 0 280 120">
+        <rect x="120" y="10" width="40" height="20" fill="#ddd" rx="2"/>
+        <text x="140" y="8" text-anchor="middle" font-size="9" fill="#8893b5" font-family="monospace">Satellite</text>
+        <path d="M140,30 Q60,60 20,110" fill="none" stroke="rgba(245,166,35,0.5)" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <path d="M140,30 Q140,60 140,110" fill="none" stroke="rgba(245,166,35,0.5)" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <path d="M140,30 Q220,60 260,110" fill="none" stroke="rgba(245,166,35,0.5)" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="140" y="118" text-anchor="middle" font-size="8" fill="#5a6789" font-family="monospace">Scan arc (~90-120°)</text>
+      </svg>
+      <div class="examples"><span class="example-tag">Landsat MSS</span><span class="example-tag">Landsat TM</span><span class="example-tag">NOAA AVHRR</span></div>
+    </div>
+    <div class="scan-card">
+      <div class="scan-type">Push Broom</div>
+      <h3>🧹 CCD Linear Array</h3>
+      <p>A linear array of charge-coupled devices (CCDs) positioned end-to-end. No moving mirror — the entire line is captured at once. Simpler, more reliable, longer-lasting.</p>
+      <svg class="scan-svg" viewBox="0 0 280 120">
+        <rect x="100" y="10" width="80" height="20" fill="#ddd" rx="2"/>
+        <text x="140" y="8" text-anchor="middle" font-size="9" fill="#8893b5" font-family="monospace">Satellite with CCD array</text>
+        <line x1="100" y1="30" x2="100" y2="110" stroke="rgba(45,212,191,0.4)" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="120" y1="30" x2="120" y2="110" stroke="rgba(45,212,191,0.4)" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="140" y1="30" x2="140" y2="110" stroke="rgba(45,212,191,0.4)" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="160" y1="30" x2="160" y2="110" stroke="rgba(45,212,191,0.4)" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="180" y1="30" x2="180" y2="110" stroke="rgba(45,212,191,0.4)" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="140" y="118" text-anchor="middle" font-size="8" fill="#5a6789" font-family="monospace">Linear CCD array (no moving parts)</text>
+      </svg>
+      <div class="examples"><span class="example-tag">IRS LISS-III</span><span class="example-tag">IRS LISS-IV</span><span class="example-tag">SPOT series</span><span class="example-tag">Sentinel-2</span></div>
+    </div>
+  </div>
+
+  <div class="tech-detail">
+    <div class="label">Why This Matters for Image Processing</div>
+    <p>Whisk-broom mirrors that wear unevenly cause <strong>line striping / banding</strong> — a systematic radiometric error you'll learn to correct in IP.2. Push-broom sensors instead suffer from individual dead or miscalibrated detector elements, causing <strong>line dropout</strong>. Knowing which scanning mechanism produced your image tells you which correction to expect.</p>
+  </div>
+
+  <div class="key-takeaways">
+    <div class="kt-label">Key Takeaways</div>
+    <ul>
+      <li><strong>Sun-synchronous (LEO)</strong> satellites at 700–800 km orbit pole-to-pole, crossing each spot at the same local time — ideal for consistent, comparable global monitoring.</li>
+      <li><strong>Geostationary (GEO)</strong> satellites at ~36,000 km hover over one spot, viewing ~45% of Earth continuously — ideal for weather.</li>
+      <li>Orbital period follows <strong>Kepler's Third Law</strong> — altitude alone determines how often a satellite passes overhead.</li>
+      <li><strong>Passive sensors</strong> need sunlight; <strong>active sensors</strong> (RADAR, LiDAR) make their own signal and work day/night, through clouds.</li>
+      <li><strong>Whisk broom</strong> = rotating mirror (→ striping errors); <strong>push broom</strong> = CCD array, no moving parts (→ dropout errors, but higher reliability).</li>
+    </ul>
+  </div>
+</section>
+
+<script src="app.js"></script>
+<script>
+(function() {
+  const orbitData = {
+    leo: { title: 'Polar / Sun-Synchronous Orbit (LEO)', desc: 'The satellite orbits north-south at 700-800 km altitude while Earth rotates beneath it (west-east). It crosses the equator at ~10:30 AM local time — always the same local sun-time. This provides consistent lighting conditions for comparing images over time.', stats: [{label:'Altitude',val:'700-800 km'},{label:'Orbital Period',val:'~90 minutes'},{label:'Inclination',val:'~98.7°'},{label:'Coverage',val:'Global'}], label:'POLAR ORBIT ~700-800 km' },
+    geo: { title: 'Geostationary Orbit (GEO)', desc: 'The satellite orbits at ~36,000 km over the equator with the same rotation period as Earth (24 hours). It appears to hover over a fixed spot. This enables continuous monitoring of the same hemisphere — perfect for weather forecasting and communications.', stats: [{label:'Altitude',val:'~36,000 km'},{label:'Orbital Period',val:'24 hours'},{label:'Inclination',val:'~0°'},{label:'Coverage',val:'~45% of Earth'}], label:'GEOSTATIONARY ORBIT ~36,000 km' }
+  };
+  let currentOrbit = 'leo', animFrame = null, angle = 0;
+  const btns = document.querySelectorAll('.orbit-btn');
+  const orbitLabel = document.getElementById('orbit-label');
+  function updateOrbit() {
+    const data = orbitData[currentOrbit];
+    document.getElementById('leo-orbit').style.display = currentOrbit === 'leo' ? '' : 'none';
+    document.getElementById('geo-orbit').style.display = currentOrbit === 'geo' ? '' : 'none';
+    orbitLabel.textContent = data.label;
+    document.getElementById('orbit-title').textContent = data.title;
+    document.getElementById('orbit-desc').textContent = data.desc;
+    document.getElementById('orbit-stats').innerHTML = data.stats.map(s => `<div class="orbit-stat"><span class="label">${s.label}</span><span class="val">${s.val}</span></div>`).join('');
+    btns.forEach(b => b.classList.toggle('active', b.dataset.orbit === currentOrbit));
+  }
+  function animateOrbit() {
+    const sat = document.getElementById(currentOrbit === 'leo' ? 'leo-sat' : 'geo-sat');
+    if (!sat) { animFrame = requestAnimationFrame(animateOrbit); return; }
+    angle += currentOrbit === 'leo' ? 0.015 : 0.008;
+    const rx = currentOrbit === 'leo' ? 80 : 260, ry = currentOrbit === 'leo' ? 130 : 260;
+    const x = 300 + rx * Math.cos(angle), y = 210 + ry * Math.sin(angle);
+    sat.setAttribute('transform', `translate(${x}, ${y}) rotate(${angle * 180 / Math.PI + 90})`);
+    animFrame = requestAnimationFrame(animateOrbit);
+  }
+  btns.forEach(btn => { btn.addEventListener('click', () => { currentOrbit = btn.dataset.orbit; updateOrbit(); }); });
+  updateOrbit(); animateOrbit();
+})();
+</script>
+</body>
+</html>
