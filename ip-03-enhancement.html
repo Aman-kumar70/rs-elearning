@@ -35,7 +35,14 @@
   </div>
 
   <div class="figure">
-    <img src="img/enh-minmax-stretch-example.jpg" alt="Min-max stretch worked example with real DN values">
+    <div class="figure-img-wrap"><img src="img/enh-minmax-stretch-formula.jpg" alt="Min-max stretch transfer function and worked table"></div>
+    <figcaption>The min-max stretch transfer function plotted (Y = aX + b) alongside a worked numeric table — the same linear remap you'll see coded as one line of NumPy below.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
+    </figcaption>
+  </div>
+
+  <div class="figure">
+    <div class="figure-img-wrap"><img src="img/enh-minmax-stretch-example.jpg" alt="Min-max stretch worked example with real DN values"></div>
     <figcaption>A worked min-max stretch: original DN values (left) are linearly remapped to fill 0–255, visibly increasing contrast between values that were previously nearly indistinguishable.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun — "Digital Image Processing: Image Enhancement," Dr. Poonam S. Tiwari</span>
     </figcaption>
@@ -47,21 +54,21 @@
   </div>
 
   <div class="figure">
-    <img src="img/enh-before-after-contrast.jpg" alt="Before and after effects of contrast stretching, real satellite image">
+    <div class="figure-img-wrap"><img src="img/enh-before-after-contrast.jpg" alt="Before and after effects of contrast stretching, real satellite image"></div>
     <figcaption>Before and after: the same scene, before stretching (flat, low-contrast) and after (features clearly separable) — this single operation often does more for visual interpretability than anything else in this chapter.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
     </figcaption>
   </div>
 
   <div class="figure">
-    <img src="img/enh-histogram-equalization.jpg" alt="Histogram equalization explanation">
+    <div class="figure-img-wrap"><img src="img/enh-histogram-equalization.jpg" alt="Histogram equalization explanation"></div>
     <figcaption><strong>Histogram equalization</strong> — a non-linear stretch that redistributes DN values so the output histogram is as uniform (flat) as possible, automatically giving the most contrast to the most populated brightness ranges. Can be too aggressive for imagery with important information in dark shadow or bright cloud areas.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
     </figcaption>
   </div>
 
   <div class="figure">
-    <img src="img/enh-colaba-mumbai-example.jpg" alt="Colaba Mumbai real histogram equalization example">
+    <div class="figure-img-wrap"><img src="img/enh-colaba-mumbai-example.jpg" alt="Colaba Mumbai real histogram equalization example"></div>
     <figcaption>Real example — Colaba, Mumbai: original image and histogram (left) vs. equalized image and histogram (right). The equalized histogram is visibly flatter, and urban/coastal detail becomes far easier to distinguish.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
     </figcaption>
@@ -83,6 +90,13 @@ equalized = exposure.<span class="c-fn">equalize_hist</span>(band)
 <span class="c-com"># CLAHE — adaptive equalization, avoids over-amplifying noise in flat regions</span>
 clahe = exposure.<span class="c-fn">equalize_adapthist</span>(band / band.<span class="c-fn">max</span>(), clip_limit=0.03)</code></pre>
   </div>
+
+  <div class="figure">
+    <div class="figure-img-wrap"><img src="img/enh-density-slicing.jpg" alt="Density slicing real example"></div>
+    <figcaption><strong>Density slicing</strong> — a related, even simpler technique: instead of a smooth stretch, the continuous grey range is sliced into discrete intervals, each shown as a flat colour. It's the fastest way to make a single band (like a thermal band) instantly readable, at the cost of losing fine gradation within each slice.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
+    </figcaption>
+  </div>
 </section>
 
 <section class="content-section reveal">
@@ -92,11 +106,11 @@ clahe = exposure.<span class="c-fn">equalize_adapthist</span>(band / band.<span 
 
   <div class="figure-row">
     <div class="figure">
-      <img src="img/enh-convolution-process1.jpg" alt="Convolution process step 1, kernel placed on window">
+      <div class="figure-img-wrap"><img src="img/enh-convolution-process1.jpg" alt="Convolution process step 1, kernel placed on window"></div>
       <figcaption>A small kernel (e.g. 3×3) is placed over each pixel neighbourhood in turn.</figcaption>
     </div>
     <div class="figure">
-      <img src="img/enh-convolution-process2.jpg" alt="Convolution process step 2, weighted sum computed">
+      <div class="figure-img-wrap"><img src="img/enh-convolution-process2.jpg" alt="Convolution process step 2, weighted sum computed"></div>
       <figcaption>Each neighbouring DN is multiplied by the corresponding kernel weight, and the results are summed — that sum becomes the new central pixel's value.</figcaption>
     </div>
   </div>
@@ -106,30 +120,38 @@ clahe = exposure.<span class="c-fn">equalize_adapthist</span>(band / band.<span 
     <div class="formula-note">The heart of spatial filtering — a weighted average of a pixel's neighbourhood. A uniform kernel of all 1s produces smoothing; a kernel with negative side-weights and a large positive centre produces sharpening.</div>
   </div>
 
+  <div class="plain-english">
+    <div class="pe-icon">💡</div>
+    <div class="pe-body">
+      <div class="pe-label">Plain English</div>
+      <p>Imagine asking each pixel "what do you think your new value should be?" and it answers by polling its neighbours and averaging their opinions — that's smoothing (blur). Now imagine it instead asks "how different am I from my neighbours?" and boosts itself when it disagrees strongly with them — that's edge detection (it lights up exactly where things change fast, like a coastline or a road edge, and stays quiet everywhere flat and uniform).</p>
+    </div>
+  </div>
+
   <div class="figure-row">
     <div class="figure">
-      <img src="img/enh-lowpass-mean-filter.jpg" alt="Low pass mean filter results at different kernel sizes">
+      <div class="figure-img-wrap"><img src="img/enh-lowpass-mean-filter.jpg" alt="Low pass mean filter results at different kernel sizes"></div>
       <figcaption><strong>Low-pass (smoothing) filter</strong> — averages neighbours, suppressing high-frequency detail and noise. Larger kernels (3×3 → 5×5 → 7×7) blur progressively more.</figcaption>
     </div>
     <div class="figure">
-      <img src="img/enh-highpass-filtering.jpg" alt="High pass filtering example">
+      <div class="figure-img-wrap"><img src="img/enh-highpass-filtering.jpg" alt="High pass filtering example"></div>
       <figcaption><strong>High-pass (sharpening) filter</strong> — accentuates rapid local changes, making edges and fine detail more prominent at the cost of amplifying noise.</figcaption>
     </div>
   </div>
 
   <div class="figure-row">
     <div class="figure">
-      <img src="img/enh-edge-detection-zerosum.jpg" alt="Edge detection zero-sum kernel example">
+      <div class="figure-img-wrap"><img src="img/enh-edge-detection-zerosum.jpg" alt="Edge detection zero-sum kernel example"></div>
       <figcaption><strong>Edge detection</strong> kernels sum to zero — flat, uniform regions output near-zero, while sharp brightness transitions (edges) produce strong positive or negative responses.</figcaption>
     </div>
     <div class="figure">
-      <img src="img/enh-edge-detectors-compare.jpg" alt="Comparison of Roberts, Sobel, Prewitt edge detectors">
+      <div class="figure-img-wrap"><img src="img/enh-edge-detectors-compare.jpg" alt="Comparison of Roberts, Sobel, Prewitt edge detectors"></div>
       <figcaption>Different edge-detector kernels (Roberts, Sobel, Prewitt) each weight neighbouring pixels differently — producing similar but distinguishable edge maps from the same source image.</figcaption>
     </div>
   </div>
 
   <div class="figure">
-    <img src="img/enh-sobel-operator.jpg" alt="Sobel operator formula and kernels">
+    <div class="figure-img-wrap"><img src="img/enh-sobel-operator.jpg" alt="Sobel operator formula and kernels"></div>
     <figcaption>The Sobel operator — separate horizontal and vertical kernels are convolved independently, then combined (X² + Y²)^0.5 to give edge magnitude regardless of orientation.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
     </figcaption>
@@ -163,14 +185,14 @@ edge_magnitude = np.<span class="c-fn">hypot</span>(edges_x, edges_y)</code></pr
   <p class="section-intro">Band ratios divide one band by another, pixel-by-pixel. This cancels out effects that influence all bands roughly equally (topographic shading, seasonal illumination differences) while amplifying the specific spectral contrast between the two chosen bands (RS.2).</p>
 
   <div class="figure">
-    <img src="img/enh-band-ratio-example.jpg" alt="Band ratio real geological example">
+    <div class="figure-img-wrap"><img src="img/enh-band-ratio-example.jpg" alt="Band ratio real geological example"></div>
     <figcaption>Real example — geological mapping by band ratio: ratio images using different band pairs (3/1, 5/7, 5/4) each highlight different mineral/rock boundaries invisible in any single band.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
     </figcaption>
   </div>
 
   <div class="figure">
-    <img src="img/enh-vegetation-indices.jpg" alt="Vegetation indices NDVI RVI TVI real example">
+    <div class="figure-img-wrap"><img src="img/enh-vegetation-indices.jpg" alt="Vegetation indices NDVI RVI TVI real example"></div>
     <figcaption>The most common vegetation indices — Ratio Vegetation Index (RVI = NIR/Red), NDVI, and Transformed Vegetation Index — applied to a real scene, each producing a slightly different but strongly correlated vegetation-vigour map.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
     </figcaption>
@@ -198,13 +220,21 @@ plt.<span class="c-fn">colorbar</span>(label=<span class="c-str">"NDVI"</span>)<
   <p class="section-intro">Adjacent spectral bands are often highly correlated — a bright pixel in the red band is usually bright in green too. PCA finds new axes (principal components) along which the data varies most, decorrelating the bands. PC1 typically captures overall brightness; later components often isolate subtle features buried in the correlation.</p>
 
   <div class="figure">
-    <img src="img/enh-pca-intro.jpg" alt="PCA graphical conceptualization">
+    <div class="figure-img-wrap"><img src="img/enh-pca-intro.jpg" alt="PCA graphical conceptualization"></div>
     <figcaption>Graphically, PCA rotates the coordinate axes so the new Band 1' captures maximum variance, and Band 2' (orthogonal to it) captures the remaining variance not explained by Band 1'.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
     </figcaption>
   </div>
+
+  <div class="plain-english">
+    <div class="pe-icon">💡</div>
+    <div class="pe-body">
+      <div class="pe-label">Plain English</div>
+      <p>Imagine packing a suitcase where most of your clothes are variations on "blue jeans" — lots of near-duplicate information. PCA is like repacking that suitcase so the first bag holds everything the outfits have in common (mostly: "these are jeans" = PC1, usually overall brightness), and the second bag holds only what's left over and genuinely different between outfits (PC2, PC3...). You haven't lost anything — you've just reorganized so the interesting, non-repetitive differences are easier to find instead of buried under repetition.</p>
+    </div>
+  </div>
   <div class="figure">
-    <img src="img/enh-pca-real-example.jpg" alt="PCA real example PC1 PC3 color composite">
+    <div class="figure-img-wrap"><img src="img/enh-pca-real-example.jpg" alt="PCA real example PC1 PC3 color composite"></div>
     <figcaption>Real PCA output: PC1 (mostly brightness/topography), PC3, and a false-colour composite built from three principal components — subtle features invisible in the raw bands often become visible in the later PCs.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Poonam S. Tiwari</span>
     </figcaption>

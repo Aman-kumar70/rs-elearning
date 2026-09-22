@@ -35,7 +35,7 @@
   </div>
 
   <div class="figure">
-    <img src="img/sig-vegetation-ideal-curve.jpg" alt="Ideal spectral reflectance curve of healthy vegetation, from IIRS lecture">
+    <div class="figure-img-wrap"><img src="img/sig-vegetation-ideal-curve.jpg" alt="Ideal spectral reflectance curve of healthy vegetation, from IIRS lecture"></div>
     <figcaption>The classic "peak-and-valley" curve of healthy vegetation: low reflectance in blue and red (chlorophyll absorption), a small green peak (why plants look green), and a sharp jump into the near-infrared.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun — "Spectral Signatures and Image Interpretation," Dr. Hina Pande</span>
     </figcaption>
@@ -61,13 +61,13 @@
 
   <div class="figure-row">
     <div class="figure">
-      <img src="img/sig-needleleaf-broadleaf.jpg" alt="Needle-leaf vs broad-leaf canopy reflectance">
+      <div class="figure-img-wrap"><img src="img/sig-needleleaf-broadleaf.jpg" alt="Needle-leaf vs broad-leaf canopy reflectance"></div>
       <figcaption>Needle-leaf (coniferous) canopies reflect noticeably less NIR than broad-leaf (deciduous) canopies — leaf shape and internal structure change the signature even within "vegetation."
         <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
       </figcaption>
     </div>
     <div class="figure">
-      <img src="img/sig-healthy-infected-plants.jpg" alt="Healthy vs infected/stressed plants reflectance curve">
+      <div class="figure-img-wrap"><img src="img/sig-healthy-infected-plants.jpg" alt="Healthy vs infected/stressed plants reflectance curve"></div>
       <figcaption>Healthy vs. stressed/infected plants: the stressed curve drops sharply in the NIR plateau well before any visible colour change appears — the basis for early crop-disease and drought detection.
         <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
       </figcaption>
@@ -125,15 +125,30 @@ plt.savefig(<span class="c-str">'signatures.png'</span>, dpi=150)</code></pre>
     </div>
   </div>
 
+  <div class="figure-row">
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/sig-soil-moisture-curve.jpg" alt="Soil moisture effect on reflectance curve"></div>
+      <figcaption>Wet soil vs. dry soil: moisture lowers reflectance across the whole curve without changing its shape — the single biggest factor in how bright or dark bare ground appears in any image.
+        <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
+      </figcaption>
+    </div>
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/sig-water-reflectance.jpg" alt="Water spectral reflectance behaviour"></div>
+      <figcaption>Water's reflectance collapses to near-zero beyond the visible range — the sharp visible/NIR contrast at a shoreline is exactly why NIR is the easiest band for mapping water bodies.
+        <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
+      </figcaption>
+    </div>
+  </div>
+
   <div class="figure">
-    <img src="img/sig-landsat-multiband-real.jpg" alt="Same scene imaged in different Landsat bands">
+    <div class="figure-img-wrap"><img src="img/sig-landsat-multiband-real.jpg" alt="Same scene imaged in different Landsat bands"></div>
     <figcaption>The same landscape, imaged in seven different bands (0.45 µm through 2.35 µm). Notice how features that are invisible or low-contrast in one band become obvious in another — that's the spectral signature at work, band by band.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
     </figcaption>
   </div>
 
   <div class="figure">
-    <img src="img/sig-band-table-applications.jpg" alt="Landsat band table with principal applications">
+    <div class="figure-img-wrap"><img src="img/sig-band-table-applications.jpg" alt="Landsat band table with principal applications"></div>
     <figcaption>A practical band-selection reference: which wavelength range to reach for depending on what you're trying to see — coastal water clarity, vegetation vigour, soil/vegetation moisture, mineral discrimination, or thermal anomalies.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
     </figcaption>

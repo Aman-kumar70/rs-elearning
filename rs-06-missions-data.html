@@ -101,6 +101,14 @@
     <p>Data ships at different processing stages. <strong>L0/L1</strong>: raw or minimally-processed telemetry — not geo-referenced, essentially engineering data. <strong>L2</strong>: converted to a geophysical quantity (surface reflectance), calibrated and geo-referenced — the level you generally want for analysis. <strong>L3/L4</strong>: mapped onto a uniform grid, quality-controlled, sometimes combined with models (e.g. NDVI composites). For almost any project, look for "L2A" (Sentinel-2) or "Collection 2 Level-2" (Landsat) — atmospherically corrected, ready to use.</p>
   </div>
 
+  <div class="plain-english">
+    <div class="pe-icon">💡</div>
+    <div class="pe-body">
+      <div class="pe-label">Plain English</div>
+      <p>Think of a supermarket meal kit. <strong>L0/L1</strong> is raw ingredients straight from the farm — flour, eggs, raw wheat — technically food, but you can't eat it yet. <strong>L2</strong> is a meal kit with pre-measured, washed, calibrated ingredients — ready to cook, comparable across brands. <strong>L3/L4</strong> is the fully cooked, plated meal — just serve it. Almost nobody wants raw wheat (L0/L1); almost everybody wants at least the meal kit (L2) or better.</p>
+    </div>
+  </div>
+
   <div class="code-block">
     <div class="code-head"><span>search_and_download.py — programmatic access via STAC</span><div class="dots"><span></span><span></span><span></span></div></div>
     <pre><code><span class="c-com"># Most modern archives (Copernicus, USGS, Planetary Computer) expose a</span>

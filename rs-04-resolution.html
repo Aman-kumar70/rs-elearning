@@ -52,15 +52,31 @@
     <p>Spatial resolution is defined by the <strong>Instantaneous Field of View (IFOV)</strong>: &beta; = a/f (radians), where <strong>a</strong> is detector dimension and <strong>f</strong> is focal length. The <strong>Instantaneous Ground Field of View (IGFOV)</strong> = IFOV × h, where <strong>h</strong> is flying height. To get finer spatial resolution: smaller detector, longer focal length, or lower orbit.</p>
   </div>
 
+  <div class="figure">
+    <div class="figure-img-wrap"><img src="img/res-ifov-diagram.jpg" alt="IFOV diagram showing detector, focal length, swath and ground resolution element"></div>
+    <figcaption>The geometry behind every spatial-resolution number you'll ever see: a detector of width <em>a</em>, a lens of focal length <em>f</em>, viewed from height <em>h</em>, projects onto a ground patch — the Ground Resolution Element — that becomes one pixel.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun — "Earth Observation Platforms and Sensors," Shri Vinay Kumar</span>
+    </figcaption>
+  </div>
+
+  <div class="plain-english">
+    <div class="pe-icon">💡</div>
+    <div class="pe-body">
+      <div class="pe-label">Plain English</div>
+      <p>Think of IFOV like the beam of a flashlight pointed at the ground from an airplane. A narrower beam (smaller detector, or a zoomed-in lens) lights up a smaller, more detailed patch of ground — that patch is your pixel. Fly higher, and even a narrow beam spreads out to cover more ground, so your pixel gets bigger and blurrier. That's the whole trade-off in one sentence: <strong>closer or more zoomed-in = smaller, sharper pixels; farther away = bigger, blurrier pixels.</strong></p>
+    </div>
+  </div>
+
+
   <div class="figure-row">
     <div class="figure">
-      <img src="img/res-spatial-resolution-real.jpg" alt="Same area at different spatial resolutions, real imagery">
+      <div class="figure-img-wrap"><img src="img/res-spatial-resolution-real.jpg" alt="Same area at different spatial resolutions, real imagery"></div>
       <figcaption>The same ground area at progressively coarser spatial resolution — notice how quickly individual features (roads, buildings, field boundaries) disappear as pixel size grows.
         <span class="fig-credit">Source: IIRS-ISRO Dehradun — "Earth Observation Platforms and Sensors," Shri Vinay Kumar</span>
       </figcaption>
     </div>
     <div class="figure">
-      <img src="img/res-spectral-resolution-real.jpg" alt="Same scene at different spectral resolutions, real imagery">
+      <div class="figure-img-wrap"><img src="img/res-spectral-resolution-real.jpg" alt="Same scene at different spectral resolutions, real imagery"></div>
       <figcaption>Spectral resolution in practice: broader bands blend distinct materials together, while narrower bands separate features (like mineral types or crop varieties) that look identical in broadband imagery.
         <span class="fig-credit">Source: IIRS-ISRO Dehradun, Shri Vinay Kumar</span>
       </figcaption>
@@ -121,7 +137,7 @@
   </div>
 
   <div class="figure">
-    <img src="img/res-radiometric-resolution-real.jpg" alt="Radiometric resolution comparison, real imagery">
+    <div class="figure-img-wrap"><img src="img/res-radiometric-resolution-real.jpg" alt="Radiometric resolution comparison, real imagery"></div>
     <figcaption>The practical impact of radiometric resolution: at low bit-depth, detail inside shadows and bright areas is simply gone — clipped to a single flat value — no amount of enhancement can recover data that was never recorded.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Shri Vinay Kumar</span>
     </figcaption>
@@ -133,7 +149,7 @@
   <h2 class="section-title">Application guide &amp; the fundamental trade-off</h2>
 
   <div class="figure">
-    <img src="img/res-application-vs-resolution.jpg" alt="Application requirements vs achievable resolution, real slide">
+    <div class="figure-img-wrap"><img src="img/res-application-vs-resolution.jpg" alt="Application requirements vs achievable resolution, real slide"></div>
     <figcaption>Matching resolution to application: military surveillance needs sub-metre detail but can accept long revisit times; weather forecasting needs the opposite — frequent hourly imaging at kilometre-scale detail.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Shri Vinay Kumar</span>
     </figcaption>

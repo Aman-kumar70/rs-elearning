@@ -35,7 +35,7 @@
   </div>
 
   <div class="figure">
-    <img src="img/dip-radiometric-errors.jpg" alt="Causes of radiometric errors, IIRS slide">
+    <div class="figure-img-wrap"><img src="img/dip-radiometric-errors.jpg" alt="Causes of radiometric errors, IIRS slide"></div>
     <figcaption>Radiometric errors originate in the sensor itself (detector miscalibration), the atmosphere (scattering/absorption), and geometry of illumination (sun angle, topography).
       <span class="fig-credit">Source: IIRS-ISRO Dehradun — "Digital Image Processing: Basic Concepts," Ms. Minakshi Kumar</span>
     </figcaption>
@@ -48,11 +48,11 @@
 
   <div class="figure-row">
     <div class="figure">
-      <img src="img/dip-line-dropout.jpg" alt="Line dropout error example">
+      <div class="figure-img-wrap"><img src="img/dip-line-dropout.jpg" alt="Line dropout error example"></div>
       <figcaption><strong>Line dropout</strong> — an entire scan line records zero or garbage values because a detector failed momentarily. Common in push-broom sensors (RS.3) when one CCD element malfunctions.</figcaption>
     </div>
     <div class="figure">
-      <img src="img/dip-line-striping.jpg" alt="Line striping / banding error example">
+      <div class="figure-img-wrap"><img src="img/dip-line-striping.jpg" alt="Line striping / banding error example"></div>
       <figcaption><strong>Line striping / banding</strong> — one detector is systematically miscalibrated relative to the others, so every Nth line is consistently brighter or darker. Common in whisk-broom sensors (RS.3) as mirror elements wear differently.</figcaption>
     </div>
   </div>
@@ -74,7 +74,7 @@
   </div>
 
   <div class="figure">
-    <img src="img/dip-haze-correction.jpg" alt="Haze correction using dark object subtraction">
+    <div class="figure-img-wrap"><img src="img/dip-haze-correction.jpg" alt="Haze correction using dark object subtraction"></div>
     <figcaption><strong>Atmospheric haze</strong> scatters extra light into the sensor uniformly across a scene, artificially raising every DN. Dark Object Subtraction (DOS) finds the darkest pixel in the image (theoretically should read ~0, e.g. a deep shadow or clear water body) and subtracts its DN from every pixel in that band.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Ms. Minakshi Kumar</span>
     </figcaption>
@@ -92,7 +92,7 @@
   </div>
 
   <div class="figure">
-    <img src="img/dip-sun-angle-correction.jpg" alt="Sun angle correction diagram">
+    <div class="figure-img-wrap"><img src="img/dip-sun-angle-correction.jpg" alt="Sun angle correction diagram"></div>
     <figcaption><strong>Sun angle correction</strong> normalizes for the Sun's elevation angle at capture time, so two images of the same place taken in different seasons (different sun angles) become radiometrically comparable — essential for any change-detection or time-series work.</figcaption>
   </div>
 </section>
@@ -103,7 +103,7 @@
   <p class="section-intro">Geometric distortion comes from Earth's rotation during the scan, sensor viewing angle, platform velocity variations, and terrain relief. The fix: rectify the image onto a real map coordinate system.</p>
 
   <div class="figure">
-    <img src="img/dip-geometric-error-diagram.jpg" alt="Geometric error and correction diagram">
+    <div class="figure-img-wrap"><img src="img/dip-geometric-error-diagram.jpg" alt="Geometric error and correction diagram"></div>
     <figcaption>Raw satellite imagery is distorted relative to a true map projection; rectification warps it back onto correct ground coordinates.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Ms. Minakshi Kumar</span>
     </figcaption>
@@ -120,29 +120,56 @@
   </div>
 
   <div class="figure">
-    <img src="img/dip-ground-control-points.jpg" alt="Ground control points example">
+    <div class="figure-img-wrap"><img src="img/dip-ground-control-points.jpg" alt="Ground control points example"></div>
     <figcaption>Ground Control Points (GCPs) — features precisely identifiable in both the raw image and a reference map (road intersections, bridges, field corners). More, well-distributed GCPs give a more reliable transformation.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Ms. Minakshi Kumar</span>
     </figcaption>
+  </div>
+
+  <div class="plain-english">
+    <div class="pe-icon">💡</div>
+    <div class="pe-body">
+      <div class="pe-label">Plain English</div>
+      <p>Imagine stretching a slightly warped photo to match a known-accurate map, like fitting a wrinkled sticker onto a phone screen. You pin down a handful of points you're sure about — "this road crossing in the photo is exactly here on the map" — and stretch/rotate everything else to make those pins line up. The more pins (GCPs) you use, and the more spread out they are, the less wrinkled and more accurate the final fit.</p>
+    </div>
   </div>
 
   <div class="section-label" style="margin-top:24px;">02.4 / Resampling</div>
   <h2 class="section-title">Filling in the new grid</h2>
   <p class="section-intro">Once the transformation is known, the corrected image needs pixel values on a brand-new grid — a process called resampling / intensity interpolation. Three methods dominate:</p>
 
+  <div class="figure">
+    <div class="figure-img-wrap"><img src="img/dip-resampling-intro.jpg" alt="Intensity interpolation resampling overview"></div>
+    <figcaption>Once the output grid is warped and no longer lines up with the input pixel grid, every output cell needs a brightness value assigned from its nearby input pixels — that assignment process is resampling.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Ms. Minakshi Kumar</span>
+    </figcaption>
+  </div>
+
   <div class="figure-row">
     <div class="figure">
-      <img src="img/dip-nearest-neighbor.jpg" alt="Nearest neighbor resampling">
+      <div class="figure-img-wrap"><img src="img/dip-nearest-neighbor.jpg" alt="Nearest neighbor resampling"></div>
       <figcaption><strong>Nearest Neighbour</strong> — copies the value of the closest original pixel. Fast, preserves original DN values exactly (important for classification), but can look blocky.</figcaption>
     </div>
     <div class="figure">
-      <img src="img/dip-bilinear-cubic.jpg" alt="Bilinear and cubic convolution resampling">
-      <figcaption><strong>Bilinear</strong> averages the 4 nearest pixels; <strong>cubic convolution</strong> uses the nearest 16, producing the smoothest result. Both alter original DN values — avoid before classification, prefer for visual output.</figcaption>
+      <div class="figure-img-wrap"><img src="img/dip-bilinear-interpolation.jpg" alt="Bilinear interpolation resampling"></div>
+      <figcaption><strong>Bilinear</strong> averages the 4 nearest pixels, producing a smoother result than nearest neighbour. Alters original DN values — prefer nearest neighbour before classification, bilinear for visual display.</figcaption>
+    </div>
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/dip-cubic-convolution.jpg" alt="Cubic convolution resampling"></div>
+      <figcaption><strong>Cubic convolution</strong> uses the nearest 16 pixels for the smoothest result of the three methods — at the highest computational cost.</figcaption>
+    </div>
+  </div>
+
+  <div class="plain-english">
+    <div class="pe-icon">💡</div>
+    <div class="pe-body">
+      <div class="pe-label">Plain English</div>
+      <p>Resizing a corrected image is like resizing a digital photo, and you're choosing how new pixels get invented. <strong>Nearest neighbour</strong> just copies the closest original pixel — blocky, but never invents a value that wasn't really measured. <strong>Bilinear</strong> blends the 4 closest pixels — smoother, like a gentle blur. <strong>Cubic</strong> blends 16 — smoothest of all, like a photo-editing "smart resize." For a map you'll look at, smoother is nicer. For data you're about to classify (IP.4), you want the honest, un-blended original values — so nearest neighbour wins there.</p>
     </div>
   </div>
 
   <div class="figure">
-    <img src="img/dip-dakpathar-real-example.jpg" alt="Dakpathar Barrage satellite image rectification example">
+    <div class="figure-img-wrap"><img src="img/dip-dakpathar-real-example.jpg" alt="Dakpathar Barrage satellite image rectification example"></div>
     <figcaption>A real example: the Dakpathar Barrage satellite image before and after geometric rectification — note how linear features (the barrage itself, roads) straighten and align correctly with true ground geometry.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Ms. Minakshi Kumar</span>
     </figcaption>
