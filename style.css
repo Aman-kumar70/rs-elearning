@@ -2321,3 +2321,674 @@ input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; background: v
   font-weight: 700;
 }
 
+/* ================================================================
+   RS-04: INTERACTIVE IFOV & OPTICAL GEOMETRY LAB
+   ================================================================ */
+.ifov-lab-card,
+.spectral-lab-card,
+.radiometric-lab-card,
+.tradeoff-lab-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 28px 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.lab-pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(245, 166, 35, 0.12);
+  color: var(--amber);
+  border: 1px solid rgba(245, 166, 35, 0.28);
+  margin-bottom: 8px;
+}
+
+.ifov-preset-row,
+.spec-target-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+  padding: 12px;
+  background: var(--surface-2);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ifov-preset-label,
+.spec-target-lbl,
+.is-sensor-lbl {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+}
+
+.ifov-preset-chips,
+.spec-target-chips,
+.is-sensor-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ifov-chip,
+.spec-target-chip,
+.sensor-chip {
+  background: var(--surface);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ifov-chip:hover,
+.spec-target-chip:hover {
+  background: var(--surface-2);
+  color: #fff;
+  border-color: var(--amber);
+}
+
+.ifov-chip.active {
+  background: rgba(245, 166, 35, 0.18);
+  color: var(--amber);
+  border-color: var(--amber);
+  font-weight: 600;
+}
+
+.spec-target-chip.active {
+  background: rgba(45, 212, 191, 0.18);
+  color: var(--teal);
+  border-color: var(--teal);
+  font-weight: 600;
+}
+
+.sensor-chip {
+  cursor: default;
+  background: rgba(255, 255, 255, 0.04);
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.ifov-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 16px;
+}
+
+@media (max-width: 860px) {
+  .ifov-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ifov-canvas-box {
+  position: relative;
+  background: #030712;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#ifov-canvas {
+  width: 100%;
+  height: 380px;
+  display: block;
+}
+
+.ifov-canvas-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.ifov-controls-box {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ifov-slider-group {
+  background: var(--surface-2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.ifov-slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+.ifov-val-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #fff;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.ifov-slider-group input[type="range"] {
+  width: 100%;
+  accent-color: var(--amber);
+}
+
+.ifov-range-hints {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--text-faint);
+  margin-top: 4px;
+}
+
+.ifov-math-card {
+  background: #0b1126;
+  border: 1px solid rgba(45, 212, 191, 0.25);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.ifov-calc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.ifov-calc-item {
+  font-family: var(--font-mono);
+}
+
+.ifov-calc-item .ci-lbl {
+  display: block;
+  font-size: 9.5px;
+  color: var(--text-faint);
+  margin-bottom: 2px;
+}
+
+.ifov-calc-item .ci-val {
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.ifov-resolvable-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px;
+  border-radius: 6px;
+  border-left: 3px solid var(--amber);
+}
+
+.res-target-icon {
+  font-size: 24px;
+}
+
+.res-target-desc {
+  font-size: 0.84rem;
+  color: var(--text-dim);
+  line-height: 1.35;
+}
+
+.res-target-desc strong {
+  color: #fff;
+}
+
+/* ================================================================
+   RS-04: INTERACTIVE SPECTRAL RESOLUTION & HYPERSPECTRAL LAB
+   ================================================================ */
+.spectral-mode-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+@media (max-width: 768px) {
+  .spectral-mode-tabs {
+    grid-template-columns: 1fr;
+  }
+}
+
+.spec-mode-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.spec-mode-btn:hover {
+  border-color: var(--teal);
+  background: rgba(45, 212, 191, 0.05);
+}
+
+.spec-mode-btn.active {
+  background: rgba(45, 212, 191, 0.12);
+  border-color: var(--teal);
+  box-shadow: 0 0 16px rgba(45, 212, 191, 0.15);
+}
+
+.spec-mode-btn .sm-title {
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: #fff;
+}
+
+.spec-mode-btn.active .sm-title {
+  color: var(--teal);
+}
+
+.spec-mode-btn .sm-sub {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.25;
+}
+
+.spectral-grid-layout {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 20px;
+  margin-top: 16px;
+}
+
+@media (max-width: 900px) {
+  .spectral-grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.spectral-chart-card,
+.spectral-cube-card {
+  background: #070c1e;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.chart-header-bar,
+.cube-header-bar,
+.rad-scene-header,
+.telemetry-header,
+.tcb-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.spec-badge,
+.cube-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  background: rgba(45, 212, 191, 0.15);
+  color: var(--teal);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.cube-canvas-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #030712;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 12px;
+}
+
+#cube-canvas {
+  width: 100%;
+  max-width: 320px;
+  height: 200px;
+  display: block;
+}
+
+.spec-discrim-verdict {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px 12px;
+  border-radius: 6px;
+  border-left: 3px solid var(--teal);
+}
+
+.verdict-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.verdict-body strong {
+  display: block;
+  font-size: 0.86rem;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.verdict-body p {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* ================================================================
+   RS-04: INTERACTIVE RADIOMETRIC DYNAMIC RANGE LAB
+   ================================================================ */
+.bit-depth-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.bit-btn {
+  flex: 1;
+  min-width: 130px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bit-btn:hover {
+  border-color: var(--blue);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.bit-btn.active {
+  background: rgba(59, 130, 246, 0.16);
+  border-color: var(--blue);
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.2);
+}
+
+.bb-title {
+  display: block;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fff;
+  font-family: var(--font-mono);
+}
+
+.bit-btn.active .bb-title {
+  color: var(--blue);
+}
+
+.bb-desc {
+  display: block;
+  font-size: 0.76rem;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.rad-interactive-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .rad-interactive-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rad-scene-card,
+.rad-telemetry-card {
+  background: #070c1e;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.rad-canvas-container {
+  position: relative;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#rad-scene-canvas {
+  width: 100%;
+  height: 280px;
+  display: block;
+}
+
+.rad-loupe-info {
+  background: rgba(11, 17, 38, 0.92);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+.rli-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--blue);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.rad-hist-canvas-wrap {
+  background: #030712;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+#rad-hist-canvas {
+  width: 100%;
+  height: 150px;
+  display: block;
+}
+
+.rad-metrics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rm-item {
+  background: var(--surface-2);
+  padding: 8px 10px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+}
+
+.rm-lbl {
+  color: var(--text-dim);
+}
+
+.rm-val {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ================================================================
+   RS-04: INTERACTIVE APPLICATION TRADE-OFF MATCHER
+   ================================================================ */
+.app-scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.app-scenario-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.app-scenario-btn:hover {
+  border-color: var(--amber);
+  background: rgba(245, 166, 35, 0.08);
+}
+
+.app-scenario-btn.active {
+  background: rgba(245, 166, 35, 0.16);
+  border-color: var(--amber);
+  box-shadow: 0 0 14px rgba(245, 166, 35, 0.18);
+}
+
+.as-icon {
+  font-size: 22px;
+}
+
+.as-text strong {
+  display: block;
+  font-size: 0.86rem;
+  color: #fff;
+}
+
+.app-scenario-btn.active .as-text strong {
+  color: var(--amber);
+}
+
+.as-text small {
+  display: block;
+  font-size: 0.74rem;
+  color: var(--text-dim);
+  line-height: 1.2;
+}
+
+.tradeoff-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 20px;
+  margin-top: 16px;
+}
+
+@media (max-width: 860px) {
+  .tradeoff-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tradeoff-chart-box,
+.tradeoff-intel-box {
+  background: #070c1e;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.intel-banner {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.intel-specs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.is-spec {
+  background: var(--surface-2);
+  padding: 8px 10px;
+  border-radius: 6px;
+}
+
+.is-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.is-val {
+  font-size: 0.84rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.intel-rationale {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 0.84rem;
+  color: var(--text-dim);
+  line-height: 1.45;
+  margin-bottom: 14px;
+  border-left: 3px solid var(--amber);
+}
+
+.intel-rationale strong {
+  color: #fff;
+}
+
+.intel-sensors {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
