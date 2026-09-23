@@ -143,6 +143,17 @@
     </div>
   </div>
 
+  <!-- AUTHENTIC IFOV OPTICAL GEOMETRY DIAGRAM -->
+  <div class="figure">
+    <div class="figure-img-wrap">
+      <img src="img/res-ifov-diagram.jpg" alt="Instantaneous Field of View IFOV optical geometry diagram from IIRS lecture">
+    </div>
+    <figcaption>
+      <strong>Sensor Optics: The Instantaneous Field of View (IFOV) Geometry.</strong>
+      The geometric projection of a single detector element through the focal optics: Angular IFOV is determined strictly by detector pitch <em>a</em> and focal length <em>f</em> (&beta; = a / f). The ground resolution cell dimension <em>D</em> (or IGFOV) expands linearly with platform altitude <em>H</em> (D = &beta; &times; H).
+      <span class="fig-credit">Source: ISRO IIRS Dehradun &mdash; "Fundamentals of Remote Sensing"</span>
+    </figcaption>
+  </div>
 
   <!-- INTERACTIVE SPATIAL RESOLUTION: JUXTAPOSE BEFORE/AFTER SLIDER -->
   <div class="spatial-juxtapose-card">
@@ -188,6 +199,125 @@
         <div class="j-val" id="jux-meta-right-val">30m / pixel &middot; 900 m&sup2; (9&times; area)</div>
         <div style="font-size:0.8rem; color:var(--text-dim); margin-top:4px;" id="jux-meta-right-desc">Urban streets blend into single mixed pixels; only large avenues and fields resolve.</div>
       </div>
+    </div>
+  </div>
+
+  <!-- AUTHENTIC ISRO RESOLUTION STEP-LADDER GALLERY -->
+  <div class="res-ladder-wrap">
+    <div class="res-ladder-header">
+      <div class="lab-pill">ISRO Operational Missions</div>
+      <h3>The Spatial Resolution Ladder: Real Earth Observation Step-by-Step</h3>
+      <p>Synthetic blur tests simulate resolution in software, but operational satellite payloads reveal true optical physics. Below is the exact same geographic scene captured across ISRO's operational sensor hierarchy &mdash; from regional synoptic monitoring down to sub-meter cadastral surveillance.</p>
+    </div>
+
+    <div class="res-ladder-grid">
+      <!-- 1. AWiFS 56m -->
+      <div class="res-ladder-card">
+        <div class="res-ladder-thumb">
+          <img src="img/res-isro-ladder-awifs-56m.jpg" alt="IRS Resourcesat AWiFS 56 meter spatial resolution">
+          <span class="res-ladder-badge coarse">56 m GSD</span>
+        </div>
+        <div class="res-ladder-info">
+          <div>
+            <h4>AWiFS (Advanced Wide Field)</h4>
+            <span class="sensor-tag">IRS-P6 / Resourcesat-1 &amp; 2</span>
+            <p><strong>Resolved Features:</strong> 740 km wide swath captures statewide vegetation vigor, major river drainage networks, and regional drought anomalies. Individual city streets blend into regional averages.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Landsat ETM+ 30m -->
+      <div class="res-ladder-card">
+        <div class="res-ladder-thumb">
+          <img src="img/res-isro-ladder-etm-30m.jpg" alt="Landsat-7 ETM+ 30 meter spatial resolution">
+          <span class="res-ladder-badge coarse">30 m GSD</span>
+        </div>
+        <div class="res-ladder-info">
+          <div>
+            <h4>ETM+ / OLI (Landsat Series)</h4>
+            <span class="sensor-tag">Landsat 7 / 8 / 9</span>
+            <p><strong>Resolved Features:</strong> Agricultural field parcel boundaries, township outlines, multi-lane highways, and water reservoirs. Mixed urban pixels dominate residential zones.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. LISS-III 23.5m -->
+      <div class="res-ladder-card">
+        <div class="res-ladder-thumb">
+          <img src="img/res-isro-ladder-liss3-23m.jpg" alt="IRS LISS-III 23.5 meter spatial resolution">
+          <span class="res-ladder-badge medium">23.5 m GSD</span>
+        </div>
+        <div class="res-ladder-info">
+          <div>
+            <h4>LISS-III (Linear Self-Scanning)</h4>
+            <span class="sensor-tag">IRS-1C / 1D &amp; Resourcesat-1/2</span>
+            <p><strong>Resolved Features:</strong> Village settlements, secondary canal networks, distinct forest stand boundaries, and agricultural plot clusters across a 141 km swath.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. LISS-IV 5.8m -->
+      <div class="res-ladder-card">
+        <div class="res-ladder-thumb">
+          <img src="img/res-isro-ladder-liss4-5m.jpg" alt="IRS Resourcesat LISS-IV 5.8 meter spatial resolution">
+          <span class="res-ladder-badge fine">5.8 m GSD</span>
+        </div>
+        <div class="res-ladder-info">
+          <div>
+            <h4>LISS-IV Multispectral</h4>
+            <span class="sensor-tag">Resourcesat-1 / 2 / 2A</span>
+            <p><strong>Resolved Features:</strong> Arterial city avenues, individual farming plots, factory compounds, and airport runway layouts. Bridges across rivers are clearly demarcated.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Cartosat-1 2.5m -->
+      <div class="res-ladder-card">
+        <div class="res-ladder-thumb">
+          <img src="img/res-isro-ladder-carto1-2m.jpg" alt="ISRO Cartosat-1 2.5 meter stereo panchromatic">
+          <span class="res-ladder-badge fine">2.5 m GSD</span>
+        </div>
+        <div class="res-ladder-info">
+          <div>
+            <h4>Cartosat-1 Stereo PAN</h4>
+            <span class="sensor-tag">IRS-P5 (Fore +26&deg; / Aft -5&deg;)</span>
+            <p><strong>Resolved Features:</strong> Individual building footprints, suburban residential layouts, and two-lane tarmac roads. Enables national-scale 3D Digital Elevation Models (CartoDEM).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Cartosat-2 0.8m Sub-Meter -->
+      <div class="res-ladder-card">
+        <div class="res-ladder-thumb">
+          <img src="img/res-isro-ladder-carto2-submeter.jpg" alt="ISRO Cartosat-2 0.8 meter sub-meter panchromatic">
+          <span class="res-ladder-badge submeter">0.8 m GSD</span>
+        </div>
+        <div class="res-ladder-info">
+          <div>
+            <h4>Cartosat-2 High-Agility PAN</h4>
+            <span class="sensor-tag">Cartosat-2 Series (ISRO)</span>
+            <p><strong>Resolved Features:</strong> Individual passenger vehicles on highways, road centerlines, aircraft on taxiways, roof HVAC structures, and cadastral property boundaries.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. QuickBird 0.6m -->
+      <div class="res-ladder-card">
+        <div class="res-ladder-thumb">
+          <img src="img/res-isro-ladder-quickbird.jpg" alt="QuickBird 0.6 meter ultra high spatial resolution">
+          <span class="res-ladder-badge submeter">0.6 m GSD</span>
+        </div>
+        <div class="res-ladder-info">
+          <div>
+            <h4>QuickBird Commercial VHR</h4>
+            <span class="sensor-tag">DigitalGlobe / VHR Constellation</span>
+            <p><strong>Resolved Features:</strong> Precise road markings, parking stall divisions, small trees, footpaths, and structural roof edges for ultra-detailed urban cadastre.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 14px; text-align: right;">
+      <span class="fig-credit">Source: ISRO IIRS Dehradun &mdash; "Earth Observation Platforms and Sensors", Shri Vinay Kumar</span>
     </div>
   </div>
 
@@ -248,6 +378,30 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- AUTHENTIC DISASTER MONITORING: TEMPORAL FLOOD INUNDATION -->
+  <div class="figure">
+    <div class="figure-img-wrap dark">
+      <div class="compare-pair-grid">
+        <div class="compare-item">
+          <img src="img/res-temporal-preflood.jpg" alt="Pre-flood baseline satellite image of river course">
+          <span class="compare-label-badge pre">Pass 1 &middot; Pre-Flood Baseline (Dry River Bed)</span>
+        </div>
+        <div class="compare-item">
+          <img src="img/res-temporal-postflood.jpg" alt="Post-flood peak inundation satellite image of inundated floodplains">
+          <span class="compare-label-badge post">Pass 2 &middot; Peak Monsoon Surge (Submerged Agricultural Plains)</span>
+        </div>
+      </div>
+    </div>
+    <figcaption>
+      <strong>Operational Disaster Management: Why Temporal Revisit Frequency Saves Lives.</strong>
+      Extreme weather events and flood inundations evolve within 24 to 72 hours.
+      Left: <em>Pre-Flood Baseline</em> shows a normal dry-season river channel with exposed sandbars and bordering farm plots.
+      Right: <em>Peak Flood Surge</em> shows the river breaching embankments, submerging thousands of hectares of agrarian land (dark inundated pixels).
+      If a satellite has a 16-day revisit period (like a single Landsat spacecraft), the entire flood crest can peak and drain away completely unrecorded between passes. Rapid temporal revisit (1&ndash;2 days via MODIS/VIIRS, or multi-satellite constellations like Sentinel-1 SAR and Sentinel-2) is essential to provide national disaster management agencies with actionable emergency evacuation and relief maps.
+      <span class="fig-credit">Source: ISRO IIRS / Disaster Management Support Programme (DMSP), Dr. Hina Pande</span>
+    </figcaption>
   </div>
 
   <!-- INTERACTIVE SPECTRAL RESOLUTION & HYPERSPECTRAL DATA CUBE LAB -->
@@ -317,6 +471,18 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- AUTHENTIC SENSOR SPECTRAL SAMPLING FIGURE -->
+  <div class="figure">
+    <div class="figure-img-wrap">
+      <img src="img/res-spectral-resolution-real.jpg" alt="Comparison of spectral band sampling: Panchromatic vs Multispectral vs Hyperspectral">
+    </div>
+    <figcaption>
+      <strong>Authentic Sensor Band Sampling: Panchromatic vs. Multispectral vs. Hyperspectral.</strong>
+      Notice how <em>Panchromatic</em> integrates all visible/NIR energy into a single broad DN value (yielding high spatial resolution and photon counts, but zero wavelength discrimination). <em>Multispectral sensors</em> (e.g. IRS LISS-III, Landsat OLI, Sentinel-2) sample discrete spectral windows (&Delta;&lambda; &asymp; 60&ndash;100 nm), capturing broad signature envelopes. <em>Hyperspectral sensors</em> (e.g. AVIRIS-NG, EnMAP, NASA EMIT) slice the spectrum into hundreds of contiguous narrow channels (&Delta;&lambda; &asymp; 5&ndash;10 nm), pinpointing exact molecular absorption dips in minerals, canopy nitrogen, and plant pigments.
+      <span class="fig-credit">Source: ISRO IIRS Dehradun &mdash; "Earth Observation Platforms and Sensors", Shri Vinay Kumar</span>
+    </figcaption>
   </div>
 </section>
 
@@ -446,6 +612,21 @@
       </div>
     </div>
   </div>
+
+  <!-- AUTHENTIC RADIOMETRIC QUANTIZATION: AIRPORT RUNWAY -->
+  <div class="figure">
+    <div class="figure-img-wrap dark">
+      <img src="img/res-real-radiometric-runway.jpg" alt="Airport runway satellite image degraded across 8-bit, 4-bit, and 1-bit quantization levels">
+    </div>
+    <figcaption>
+      <strong>Authentic Radiometric Resolution Degradation: Airport Runway &amp; Apron Complex.</strong>
+      This classic ISRO IIRS lecture comparison demonstrates how quantization levels affect subtle target contrast and feature detectability:
+      <br>&bull; <strong>8-bit (256 Grey Levels):</strong> Tarmac surface variations, taxiway edge lines, painted runway thresholds, aircraft markings, and grassy verges are crisply separated with smooth grayscale graduation.
+      <br>&bull; <strong>4-bit (16 Grey Levels):</strong> Severe false contouring (posterization) appears. Continuous radiance gradients across concrete paving are crushed into harsh stepped bands, and faint surface painted lines vanish into the background.
+      <br>&bull; <strong>1-bit (2 Levels / Binary):</strong> Every pixel is forced into either 0 (black) or 1 (white). All internal grayscale graduation is destroyed; only harsh high-contrast threshold boundaries survive.
+      <span class="fig-credit">Source: ISRO IIRS Dehradun &mdash; "Image Interpretation and Digital Processing", Dr. Hina Pande</span>
+    </figcaption>
+  </div>
 </section>
 
 <section class="content-section reveal">
@@ -569,9 +750,46 @@
     </table>
   </div>
 
+  <!-- AUTHENTIC SUB-METER CADASTRAL & INFRASTRUCTURE IMAGERY -->
+  <div class="figure-row">
+    <div class="figure">
+      <div class="figure-img-wrap dark">
+        <img src="img/res-cartosat-hyderabad.jpg" alt="ISRO Cartosat sub-meter satellite image of Hyderabad urban infrastructure">
+      </div>
+      <figcaption>
+        <strong>Sub-Meter Urban Cadastral Mapping: ISRO Cartosat over Hyderabad.</strong>
+        At sub-meter Ground Sample Distance (GSD), multi-lane flyover junctions, building footprints, and vehicle parking lots are distinctly resolved, providing municipal corporations with base maps for property tax GIS and road widening.
+        <span class="fig-credit">Source: ISRO NRSC / Cartosat-2 Series, Shri Vinay Kumar</span>
+      </figcaption>
+    </div>
+    <div class="figure">
+      <div class="figure-img-wrap dark">
+        <img src="img/res-cartosat-bangalore.jpg" alt="ISRO Cartosat sub-meter satellite image of Bangalore airport infrastructure">
+      </div>
+      <figcaption>
+        <strong>High-Resolution Transportation Infrastructure: Bangalore Airport.</strong>
+        Cartosat sub-meter imaging resolves runway edge markings, taxiway high-speed turnoffs, passenger terminal gates, and parked commercial airliners for national aerospace asset monitoring.
+        <span class="fig-credit">Source: ISRO NRSC / Cartosat-2 Series, Shri Vinay Kumar</span>
+      </figcaption>
+    </div>
+  </div>
+
   <div class="tech-detail">
     <div class="label">The Resolution Trade-off</div>
-    <p>It is very difficult to obtain high spatial, spectral, temporal, and radiometric resolution all at once. A 0.25m satellite typically has a narrow swath and long revisit time. A weather satellite with hourly revisit (GOES/INSAT) has kilometre-scale pixels. Every satellite embodies a deliberate compromise — you pick the one that matches your application.</p>
+    <p>It is very difficult to obtain high spatial, spectral, temporal, and radiometric resolution all at once. A 0.25m satellite typically has a narrow swath and long revisit time. A weather satellite with hourly revisit (GOES/INSAT) has kilometre-scale pixels. Every satellite embodies a deliberate compromise &mdash; you pick the one that matches your application.</p>
+  </div>
+
+  <!-- AUTHENTIC APPLICATION VS RESOLUTION HIERARCHY MATRIX -->
+  <div class="figure">
+    <div class="figure-img-wrap">
+      <img src="img/res-application-vs-resolution.jpg" alt="Application hierarchy vs spatial and temporal resolution requirements">
+    </div>
+    <figcaption>
+      <strong>The Remote Sensing Application vs. Resolution Trade-Off Hierarchy.</strong>
+      No single mission can optimize all four parameters simultaneously.
+      Global meteorological &amp; oceanographic systems require high temporal revisit (hourly to daily) over continental scales, accepting kilometre-scale pixels. Conversely, urban cadastre, structural damage assessment, and precision civil engineering demand sub-meter spatial detail, operating with narrower swath widths and longer revisit cycles.
+      <span class="fig-credit">Source: ISRO IIRS Dehradun &mdash; "Earth Observation Platforms and Sensors", Shri Vinay Kumar</span>
+    </figcaption>
   </div>
 
   <div class="key-takeaways">
