@@ -68,19 +68,117 @@
   </div>
 
 
-  <div class="figure-row">
-    <div class="figure">
-      <div class="figure-img-wrap"><img src="img/res-spatial-resolution-real.jpg" alt="Same area at different spatial resolutions, real imagery"></div>
-      <figcaption>The same ground area at progressively coarser spatial resolution — notice how quickly individual features (roads, buildings, field boundaries) disappear as pixel size grows.
-        <span class="fig-credit">Source: IIRS-ISRO Dehradun — "Earth Observation Platforms and Sensors," Shri Vinay Kumar</span>
-      </figcaption>
+  <!-- INTERACTIVE SPATIAL RESOLUTION: JUXTAPOSE BEFORE/AFTER SLIDER -->
+  <div class="spatial-juxtapose-card">
+    <div class="juxtapose-header">
+      <div>
+        <h3>Interactive Spatial Resolution: "Before &amp; After" Slider</h3>
+        <p>Drag the slider divider horizontally across the same city landscape to see how detail degrades as pixel size increases from 10m (Sentinel-2) to 30m (Landsat) and 250m (MODIS).</p>
+      </div>
     </div>
-    <div class="figure">
-      <div class="figure-img-wrap"><img src="img/res-spectral-resolution-real.jpg" alt="Same scene at different spectral resolutions, real imagery"></div>
-      <figcaption>Spectral resolution in practice: broader bands blend distinct materials together, while narrower bands separate features (like mineral types or crop varieties) that look identical in broadband imagery.
-        <span class="fig-credit">Source: IIRS-ISRO Dehradun, Shri Vinay Kumar</span>
-      </figcaption>
+
+    <!-- Satellite Pair Selector -->
+    <div class="juxtapose-pair-selector">
+      <button type="button" class="jux-btn active" data-pair="s2-l8">Sentinel-2 (10m) vs Landsat-8/9 (30m)</button>
+      <button type="button" class="jux-btn" data-pair="l8-modis">Landsat-8/9 (30m) vs MODIS (250m)</button>
+      <button type="button" class="jux-btn" data-pair="carto-s2">Cartosat-3 (1m) vs Sentinel-2 (10m)</button>
     </div>
+
+    <!-- Juxtapose Viewport -->
+    <div class="juxtapose-viewport" id="juxtapose-viewport">
+      <!-- Base Canvas (Right side / Coarser) -->
+      <canvas id="jux-canvas-base" class="juxtapose-canvas-base"></canvas>
+
+      <!-- Overlay Wrap (Left side / Finer) with clipping -->
+      <div class="juxtapose-overlay-wrap" id="jux-overlay-wrap">
+        <canvas id="jux-canvas-overlay" class="juxtapose-canvas-overlay"></canvas>
+        <div class="juxtapose-handle" id="jux-handle">&#10094;&#10095;</div>
+      </div>
+
+      <!-- Live Floating Badges -->
+      <div class="jux-badge left" id="jux-badge-left">10m &middot; Sentinel-2 MSI</div>
+      <div class="jux-badge right" id="jux-badge-right">30m &middot; Landsat-8/9 OLI</div>
+    </div>
+
+    <!-- Live Telemetry Readout -->
+    <div class="juxtapose-telemetry">
+      <div class="jux-stat-card left">
+        <div class="j-label" id="jux-meta-left-lbl">Left Sensor (Finer)</div>
+        <div class="j-val" id="jux-meta-left-val">10m / pixel &middot; 100 m&sup2;</div>
+        <div style="font-size:0.8rem; color:var(--text-dim); margin-top:4px;" id="jux-meta-left-desc">Shows individual city streets, buildings, and field boundaries.</div>
+      </div>
+      <div class="jux-stat-card right">
+        <div class="j-label" id="jux-meta-right-lbl">Right Sensor (Coarser)</div>
+        <div class="j-val" id="jux-meta-right-val">30m / pixel &middot; 900 m&sup2; (9&times; area)</div>
+        <div style="font-size:0.8rem; color:var(--text-dim); margin-top:4px;" id="jux-meta-right-desc">Urban streets blend into single mixed pixels; only large avenues and fields resolve.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE TEMPORAL RESOLUTION: MINI-CALENDAR FLYOVER TRACKER -->
+  <div class="temporal-sim-card">
+    <div class="temporal-header">
+      <div>
+        <h3>Temporal Resolution: Orbit Revisit Calendar Simulator</h3>
+        <p>A satellite cannot be everywhere at once. Select a satellite and click "Animate Month" to see how often its orbital path allows it to photograph the exact same target area on the ground.</p>
+      </div>
+    </div>
+
+    <!-- Satellite Selection Buttons -->
+    <div class="temporal-sat-picker">
+      <button type="button" class="temp-sat-btn active" data-sat="sentinel2">Sentinel-2 Constellation (5-day revisit)</button>
+      <button type="button" class="temp-sat-btn" data-sat="landsat">Landsat 8/9 Constellation (8-day revisit)</button>
+      <button type="button" class="temp-sat-btn" data-sat="modis">MODIS Terra &amp; Aqua (1–2 day revisit)</button>
+      <button type="button" class="temp-sat-btn" data-sat="insat">INSAT-3D / GOES (Continuous 15-min)</button>
+      <button type="button" class="temp-sat-btn" data-sat="sar">Sentinel-1 SAR (6-day all-weather)</button>
+    </div>
+
+    <!-- Calendar Month Simulation View -->
+    <div class="calendar-sim-box">
+      <div class="calendar-top-bar">
+        <div class="calendar-target-info">
+          <span>Target Ground Location:</span>
+          <span class="coord">Hyderabad Region (17.385&deg; N, 78.486&deg; E)</span>
+        </div>
+        <div class="calendar-anim-controls">
+          <button type="button" class="cal-play-btn" id="btn-play-calendar">&#9654; Animate Month Timeline</button>
+        </div>
+      </div>
+
+      <!-- Weekday headers -->
+      <div class="calendar-weekdays">
+        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+      </div>
+
+      <!-- 30 Calendar Day Cells -->
+      <div class="calendar-days-grid" id="calendar-days-grid">
+        <!-- Dynamically rendered day cells -->
+      </div>
+
+      <!-- Event Acquisition Log Bar -->
+      <div class="calendar-log-box" id="calendar-log-box">
+        <div class="cal-log-text" id="cal-log-text">
+          Select a satellite or click <strong>Animate Month Timeline</strong> to observe orbital passes.
+        </div>
+        <div class="cal-log-stat">
+          <div class="cal-stat-item">
+            <span class="cs-lbl">Monthly Passes</span>
+            <span class="cs-val" id="stat-monthly-passes">6 Passes / Month</span>
+          </div>
+          <div class="cal-stat-item">
+            <span class="cs-lbl">Cloud Risk</span>
+            <span class="cs-val" id="stat-cloud-risk">~35% Loss (Optical)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="figure">
+    <div class="figure-img-wrap"><img src="img/res-spectral-resolution-real.jpg" alt="Same scene at different spectral resolutions, real imagery"></div>
+    <figcaption>Spectral resolution in practice: broader bands blend distinct materials together, while narrower bands separate features (like mineral types or crop varieties) that look identical in broadband imagery.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Shri Vinay Kumar</span>
+    </figcaption>
   </div>
 </section>
 
@@ -256,6 +354,439 @@
     container.appendChild(card);
   });
 })();
-</script>
+
+// ================================================================
+// SPATIAL RESOLUTION JUXTAPOSE SLIDER ENGINE
+// ================================================================
+(function() {
+  const viewport = document.getElementById('juxtapose-viewport');
+  const overlayWrap = document.getElementById('jux-overlay-wrap');
+  const baseCanvas = document.getElementById('jux-canvas-base');
+  const overlayCanvas = document.getElementById('jux-canvas-overlay');
+  const handle = document.getElementById('jux-handle');
+  if (!viewport || !overlayWrap || !baseCanvas || !overlayCanvas) return;
+
+  const bCtx = baseCanvas.getContext('2d');
+  const oCtx = overlayCanvas.getContext('2d');
+
+  let currentPair = 's2-l8';
+  let isDragging = false;
+  let splitPct = 50;
+
+  const pairConfig = {
+    's2-l8': {
+      leftBadge: '10m · Sentinel-2 MSI',
+      rightBadge: '30m · Landsat-8/9 OLI',
+      leftRes: 10,
+      rightRes: 30,
+      leftMeta: { val: '10m / pixel · 100 m²', desc: 'Shows individual city streets, buildings, and field boundaries.' },
+      rightMeta: { val: '30m / pixel · 900 m² (9× area)', desc: 'Urban streets blend into single mixed pixels; only large avenues and fields resolve.' }
+    },
+    'l8-modis': {
+      leftBadge: '30m · Landsat-8/9 OLI',
+      rightBadge: '250m · MODIS Terra/Aqua',
+      leftRes: 30,
+      rightRes: 250,
+      leftMeta: { val: '30m / pixel · 900 m²', desc: 'Agricultural fields, city limits, and water reservoirs clearly distinct.' },
+      rightMeta: { val: '250m / pixel · 62,500 m² (69× area)', desc: 'Entire city is compressed into ~4 coarse blocks; runways & bridges disappear entirely.' }
+    },
+    'carto-s2': {
+      leftBadge: '1m · Cartosat-3 PAN',
+      rightBadge: '10m · Sentinel-2 MSI',
+      leftRes: 1,
+      rightRes: 10,
+      leftMeta: { val: '1m / pixel · 1 m²', desc: 'Sharp sub-meter detail: individual parked aircraft on tarmac, road lanes, houses.' },
+      rightMeta: { val: '10m / pixel · 100 m² (100× area)', desc: 'Aircraft blur into grey smudges; runway centerline vanishes; only boundary remains.' }
+    }
+  };
+
+  // High-resolution procedural urban landscape generator (City + Airport + River)
+  function drawHighResScene(ctx, w, h) {
+    // Background terrain (agriculture fields & suburbs)
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(0, 0, w, h);
+
+    // Diagonal winding river
+    ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = w * 0.08;
+    ctx.beginPath();
+    ctx.moveTo(w * 0.05, 0);
+    ctx.bezierCurveTo(w * 0.4, h * 0.35, w * 0.2, h * 0.65, w * 0.75, h);
+    ctx.stroke();
+
+    // Sandbanks along river
+    ctx.strokeStyle = '#ca8a04';
+    ctx.lineWidth = w * 0.015;
+    ctx.beginPath();
+    ctx.moveTo(w * 0.08, 0);
+    ctx.bezierCurveTo(w * 0.42, h * 0.35, w * 0.23, h * 0.65, w * 0.77, h);
+    ctx.stroke();
+
+    // Agricultural grid patches (left side)
+    const fieldColors = ['#15803d', '#166534', '#a16207', '#4d7c0f', '#047857'];
+    for (let r = 0; r < 5; r++) {
+      for (let c = 0; c < 4; c++) {
+        ctx.fillStyle = fieldColors[(r * 4 + c) % fieldColors.length];
+        ctx.fillRect(w * 0.02 + c * (w * 0.07), h * 0.45 + r * (h * 0.09), w * 0.062, h * 0.078);
+      }
+    }
+
+    // Dense Urban Grid / City Blocks (top-right)
+    ctx.fillStyle = '#475569';
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const bx = w * 0.52 + c * (w * 0.05);
+        const by = h * 0.05 + r * (h * 0.05);
+        ctx.fillStyle = (r + c) % 3 === 0 ? '#94a3b8' : '#64748b';
+        ctx.fillRect(bx, by, w * 0.04, h * 0.038);
+      }
+    }
+
+    // Main Highways (roads with bridge over river)
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = w * 0.018;
+    ctx.beginPath();
+    ctx.moveTo(0, h * 0.4);
+    ctx.lineTo(w, h * 0.4);
+    ctx.moveTo(w * 0.5, 0);
+    ctx.lineTo(w * 0.5, h);
+    ctx.stroke();
+
+    // Airport Complex (bottom-right)
+    const airX = w * 0.48;
+    const airY = h * 0.62;
+    // Tarmac
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(airX, airY, w * 0.48, h * 0.34);
+
+    // Primary Runways
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(airX + w * 0.04, airY + h * 0.06, w * 0.4, h * 0.05);
+    ctx.fillRect(airX + w * 0.04, airY + h * 0.18, w * 0.35, h * 0.045);
+
+    // Runway Centerline dashes (sub-meter detail)
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 6]);
+    ctx.beginPath();
+    ctx.moveTo(airX + w * 0.04, airY + h * 0.085);
+    ctx.lineTo(airX + w * 0.44, airY + h * 0.085);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Parked Airplanes on apron
+    ctx.fillStyle = '#ffffff';
+    for (let i = 0; i < 5; i++) {
+      const ax = airX + w * 0.08 + i * (w * 0.06);
+      const ay = airY + h * 0.28;
+      // Fuselage + wings
+      ctx.fillRect(ax - 2, ay - 6, 4, 12);
+      ctx.fillRect(ax - 7, ay - 2, 14, 3);
+    }
+  }
+
+  // Downsample high-res canvas into discrete blocky pixels
+  function renderPixelated(targetCtx, w, h, pixelSizeMeters) {
+    // Map meter resolution to canvas pixel block size
+    // 1m -> 1px, 10m -> 5px, 30m -> 15px, 250m -> 75px
+    let blockSize = 1;
+    if (pixelSizeMeters === 1) blockSize = 1;
+    else if (pixelSizeMeters === 10) blockSize = 6;
+    else if (pixelSizeMeters === 30) blockSize = 18;
+    else if (pixelSizeMeters === 250) blockSize = 80;
+
+    if (blockSize <= 1) {
+      drawHighResScene(targetCtx, w, h);
+      return;
+    }
+
+    // Render offscreen at full resolution first
+    const off = document.createElement('canvas');
+    off.width = w;
+    off.height = h;
+    const offCtx = off.getContext('2d');
+    drawHighResScene(offCtx, w, h);
+
+    const cols = Math.ceil(w / blockSize);
+    const rows = Math.ceil(h / blockSize);
+
+    // Downsample by averaging inside block
+    const imgData = offCtx.getImageData(0, 0, w, h).data;
+    targetCtx.clearRect(0, 0, w, h);
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const startX = c * blockSize;
+        const startY = r * blockSize;
+
+        // Sample center of block
+        const sampleX = Math.min(w - 1, startX + Math.floor(blockSize / 2));
+        const sampleY = Math.min(h - 1, startY + Math.floor(blockSize / 2));
+        const idx = (sampleY * w + sampleX) * 4;
+
+        targetCtx.fillStyle = `rgb(${imgData[idx]}, ${imgData[idx+1]}, ${imgData[idx+2]})`;
+        targetCtx.fillRect(startX, startY, blockSize, blockSize);
+
+        // Draw faint pixel grid border for coarse resolutions (30m & 250m)
+        if (blockSize >= 18) {
+          targetCtx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+          targetCtx.lineWidth = 1;
+          targetCtx.strokeRect(startX, startY, blockSize, blockSize);
+        }
+      }
+    }
+  }
+
+  function resizeAndRender() {
+    const w = viewport.clientWidth;
+    const h = viewport.clientHeight;
+    baseCanvas.width = w;
+    baseCanvas.height = h;
+    overlayCanvas.width = w;
+    overlayCanvas.height = h;
+
+    const cfg = pairConfig[currentPair];
+    // Base (Right = Coarser)
+    renderPixelated(bCtx, w, h, cfg.rightRes);
+    // Overlay (Left = Finer)
+    renderPixelated(oCtx, w, h, cfg.leftRes);
+
+    updateSplit(splitPct);
+  }
+
+  function updateSplit(pct) {
+    splitPct = Math.max(0, Math.min(100, pct));
+    overlayWrap.style.width = splitPct + '%';
+  }
+
+  // Dragging event handlers
+  function handleMove(clientX) {
+    const rect = viewport.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const pct = (x / rect.width) * 100;
+    updateSplit(pct);
+  }
+
+  viewport.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    handleMove(e.clientX);
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (isDragging) handleMove(e.clientX);
+  });
+  window.addEventListener('mouseup', () => { isDragging = false; });
+
+  viewport.addEventListener('touchstart', (e) => {
+    isDragging = true;
+    handleMove(e.touches[0].clientX);
+  }, { passive: true });
+  window.addEventListener('touchmove', (e) => {
+    if (isDragging) handleMove(e.touches[0].clientX);
+  }, { passive: true });
+  window.addEventListener('touchend', () => { isDragging = false; });
+
+  // Satellite pair selector buttons
+  const pairBtns = document.querySelectorAll('.jux-btn');
+  const bLeft = document.getElementById('jux-badge-left');
+  const bRight = document.getElementById('jux-badge-right');
+  const metaLeftVal = document.getElementById('jux-meta-left-val');
+  const metaLeftDesc = document.getElementById('jux-meta-left-desc');
+  const metaRightVal = document.getElementById('jux-meta-right-val');
+  const metaRightDesc = document.getElementById('jux-meta-right-desc');
+
+  pairBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      pairBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPair = btn.dataset.pair;
+      const cfg = pairConfig[currentPair];
+
+      bLeft.textContent = cfg.leftBadge;
+      bRight.textContent = cfg.rightBadge;
+      metaLeftVal.innerHTML = cfg.leftMeta.val;
+      metaLeftDesc.textContent = cfg.leftMeta.desc;
+      metaRightVal.innerHTML = cfg.rightMeta.val;
+      metaRightDesc.textContent = cfg.rightMeta.desc;
+
+      resizeAndRender();
+    });
+  });
+
+  window.addEventListener('resize', resizeAndRender);
+  resizeAndRender();
+})();
+
+// ================================================================
+// TEMPORAL RESOLUTION: MINI-CALENDAR FLYOVER TRACKER ENGINE
+// ================================================================
+(function() {
+  const calGrid = document.getElementById('calendar-days-grid');
+  const playBtn = document.getElementById('btn-play-calendar');
+  const logText = document.getElementById('cal-log-text');
+  const statPasses = document.getElementById('stat-monthly-passes');
+  const statCloud = document.getElementById('stat-cloud-risk');
+  const satBtns = document.querySelectorAll('.temp-sat-btn');
+  if (!calGrid) return;
+
+  const satSchedules = {
+    sentinel2: {
+      name: 'Sentinel-2A & 2B Constellation',
+      revisit: '5 days',
+      passDays: [2, 7, 12, 17, 22, 27],
+      monthlyPasses: '6 Passes / Month',
+      cloudRisk: '~35% Loss (Optical)',
+      type: 'Sun-Synchronous Multi-Spectral',
+      swath: '290 km',
+      cloudDays: [7, 17], // Simulated cloudy days
+      note: '5-day revisit achieved by phasing two identical satellites (2A + 2B) 180° apart in the same polar orbit.'
+    },
+    landsat: {
+      name: 'Landsat 8 & 9 Constellation',
+      revisit: '8 days',
+      passDays: [3, 11, 19, 27],
+      monthlyPasses: '4 Passes / Month',
+      cloudRisk: '~35% Loss (Optical)',
+      type: 'Sun-Synchronous Multispectral/Thermal',
+      swath: '185 km',
+      cloudDays: [11],
+      note: 'A single Landsat revisits every 16 days. Operating Landsat 8 and 9 together offsets their orbits by 8 days.'
+    },
+    modis: {
+      name: 'MODIS (Terra & Aqua)',
+      revisit: '1–2 days',
+      passDays: [1, 2, 4, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19, 20, 22, 23, 25, 26, 28, 29],
+      monthlyPasses: '20 Passes / Month',
+      cloudRisk: '~30% Loss (Optical)',
+      type: 'Coarse Wide-Swath Global Monitor',
+      swath: '2,330 km',
+      cloudDays: [5, 14, 22],
+      note: 'Gigantic 2,330 km swath sweeps the entire globe every 1–2 days, trading 250m resolution for near-daily global coverage.'
+    },
+    insat: {
+      name: 'INSAT-3D / 3DR Imager (GEO)',
+      revisit: 'Continuous (15-min scans)',
+      passDays: Array.from({length: 30}, (_, i) => i + 1), // All 30 days
+      monthlyPasses: '2,880 Scans / Month (96/day)',
+      cloudRisk: '0% Loss (Measures clouds!)',
+      type: 'Geostationary Meteorological Imager',
+      swath: 'Full Earth Disk',
+      cloudDays: [],
+      note: 'Parked permanently over the Indian Ocean at 74°E & 82°E. Never leaves the sky, capturing storm updates every 15 minutes.'
+    },
+    sar: {
+      name: 'Sentinel-1 C-band SAR',
+      revisit: '6 days (Constellation)',
+      passDays: [1, 7, 13, 19, 25],
+      monthlyPasses: '5 Passes / Month',
+      cloudRisk: '0% Loss (Microwave All-Weather)',
+      type: 'Synthetic Aperture Radar (Active)',
+      swath: '250 km',
+      cloudDays: [7, 19], // Passes on cloudy days succeed!
+      note: 'Microwave radar pulses pierce dense monsoon rain and cloud cover. 100% of planned acquisitions succeed day or night.'
+    }
+  };
+
+  let activeSatKey = 'sentinel2';
+  let isAnimating = false;
+  let animTimer = null;
+
+  function renderCalendar() {
+    const sched = satSchedules[activeSatKey];
+    calGrid.innerHTML = '';
+    statPasses.textContent = sched.monthlyPasses;
+    statCloud.textContent = sched.cloudRisk;
+
+    for (let day = 1; day <= 30; day++) {
+      const hasPass = sched.passDays.includes(day);
+      const isCloudy = sched.cloudDays.includes(day);
+
+      const cell = document.createElement('div');
+      cell.className = `cal-day-cell ${hasPass ? 'has-pass' : ''}`;
+      cell.id = `cal-day-${day}`;
+
+      let pillText = hasPass ? '🛰️ Pass' : '—';
+      if (activeSatKey === 'insat') pillText = '24/7';
+
+      cell.innerHTML = `
+        <span class="cal-day-num">${day}</span>
+        <span class="cal-pass-pill">${pillText}</span>
+      `;
+      calGrid.appendChild(cell);
+    }
+  }
+
+  function runTimelineAnimation() {
+    if (isAnimating) {
+      clearInterval(animTimer);
+      isAnimating = false;
+      playBtn.textContent = '▶ Animate Month Timeline';
+      return;
+    }
+
+    isAnimating = true;
+    playBtn.textContent = '⏹ Stop Animation';
+    const sched = satSchedules[activeSatKey];
+    let currentDay = 1;
+
+    // Clear existing cell highlights
+    document.querySelectorAll('.cal-day-cell').forEach(c => {
+      c.classList.remove('current-step', 'pulse-pass');
+    });
+
+    animTimer = setInterval(() => {
+      if (currentDay > 30) {
+        clearInterval(animTimer);
+        isAnimating = false;
+        playBtn.textContent = '▶ Replay Month Timeline';
+        logText.innerHTML = `<strong>Month Completed:</strong> ${sched.name} completed its scheduled pass cycle over Hyderabad. Total valid acquisitions: ${sched.passDays.length - (activeSatKey === 'sar' || activeSatKey === 'insat' ? 0 : sched.cloudDays.length)}.`;
+        return;
+      }
+
+      // Highlight current step
+      document.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('current-step'));
+      const activeCell = document.getElementById(`cal-day-${currentDay}`);
+      if (activeCell) activeCell.classList.add('current-step');
+
+      const isPass = sched.passDays.includes(currentDay);
+      const isCloudy = sched.cloudDays.includes(currentDay);
+
+      if (isPass) {
+        activeCell.classList.add('pulse-pass');
+        if (activeSatKey === 'insat') {
+          logText.innerHTML = `<strong>Day ${currentDay}:</strong> INSAT-3D captured 96 continuous hemispheric scans. Cloud movement tracked in thermal infrared.`;
+        } else if (activeSatKey === 'sar') {
+          logText.innerHTML = `<strong>Day ${currentDay} Flyover:</strong> 🛰️ Sentinel-1 C-SAR pass! ${isCloudy ? 'Heavy cloud cover present, but 5.6cm radar pulses penetrate with 100% transmission.' : 'Clear weather radar scan successful.'}`;
+        } else if (isCloudy) {
+          logText.innerHTML = `<strong>Day ${currentDay} Flyover:</strong> ☁️ Optical Pass Failed: Dense monsoon clouds obscure Hyderabad. Visible/NIR data unusable. Revisit missed!`;
+        } else {
+          logText.innerHTML = `<strong>Day ${currentDay} Flyover:</strong> 🛰️ ${sched.name} pass! Crisp clear-sky multispectral acquisition captured at 10:30 AM local solar time.`;
+        }
+      } else {
+        logText.innerHTML = `<strong>Day ${currentDay}:</strong> Satellite in adjacent orbit track (${sched.revisit} revisit). Target waiting for next pass.`;
+      }
+
+      currentDay++;
+    }, 280);
+  }
+
+  playBtn.addEventListener('click', runTimelineAnimation);
+
+  satBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (isAnimating) {
+        clearInterval(animTimer);
+        isAnimating = false;
+        playBtn.textContent = '▶ Animate Month Timeline';
+      }
+      satBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeSatKey = btn.dataset.sat;
+      renderCalendar();
+      logText.innerHTML = `Switched to <strong>${satSchedules[activeSatKey].name}</strong>. Revisit period: <strong>${satSchedules[activeSatKey].revisit}</strong>. Click "Animate Month Timeline" to run flyover simulation.`;
+    });
+  });
+
+  renderCalendar();
+})();
 </body>
 </html>

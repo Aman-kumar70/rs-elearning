@@ -6,6 +6,7 @@
 <title>Spectral Signatures — RS.2</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -41,16 +42,89 @@
     </figcaption>
   </div>
 
-  <div class="widget-panel">
-    <h3>Interactive Signature Chart</h3>
-    <p class="widget-sub">Toggle materials on and off to compare their curves directly.</p>
-    <div class="signature-toggles" id="sig-toggles">
-      <div class="sig-toggle active" data-mat="veg"><span class="dot" style="background:#4ade80;"></span>Vegetation</div>
-      <div class="sig-toggle active" data-mat="soil"><span class="dot" style="background:#f5a623;"></span>Dry Soil</div>
-      <div class="sig-toggle active" data-mat="water"><span class="dot" style="background:#3b82f6;"></span>Clear Water</div>
-      <div class="sig-toggle" data-mat="snow"><span class="dot" style="background:#e6ebf5;"></span>Snow</div>
+  <div class="sig-visualizer-card">
+    <div class="sig-viz-header">
+      <div>
+        <h3>Interactive Spectral Reflectance Laboratory</h3>
+        <p>Compare reflectance fingerprints across wavelengths from visible light (0.4 µm) to short-wave infrared (2.4 µm). Check and uncheck curves to observe where they intersect and differ.</p>
+      </div>
     </div>
-    <svg viewBox="0 0 700 300" id="sig-svg" style="width:100%;"></svg>
+
+    <!-- Checkbox Toggle Controls -->
+    <div class="sig-controls-panel">
+      <span class="sig-ctrl-title">Active Curves:</span>
+      <label class="sig-checkbox-label veg active" for="chk-veg">
+        <input type="checkbox" id="chk-veg" checked>
+        <span class="sig-chk-indicator"></span>
+        <span>Healthy Vegetation</span>
+      </label>
+      <label class="sig-checkbox-label soil active" for="chk-soil">
+        <input type="checkbox" id="chk-soil" checked>
+        <span class="sig-chk-indicator"></span>
+        <span>Dry Bare Soil</span>
+      </label>
+      <label class="sig-checkbox-label water active" for="chk-water">
+        <input type="checkbox" id="chk-water" checked>
+        <span class="sig-chk-indicator"></span>
+        <span>Clear Water</span>
+      </label>
+      <label class="sig-checkbox-label turbid" for="chk-turbid">
+        <input type="checkbox" id="chk-turbid">
+        <span class="sig-chk-indicator"></span>
+        <span>Turbid / Sediment Water</span>
+      </label>
+      <label class="sig-checkbox-label stressed" for="chk-stressed">
+        <input type="checkbox" id="chk-stressed">
+        <span class="sig-chk-indicator"></span>
+        <span>Stressed Vegetation</span>
+      </label>
+    </div>
+
+    <!-- Spectral Band Region Strip -->
+    <div class="sig-band-strip">
+      <div class="sig-band-region vis">Visible (0.4 – 0.7 µm)</div>
+      <div class="sig-band-region nir">Near-Infrared / NIR (0.7 – 1.3 µm)</div>
+      <div class="sig-band-region swir1">SWIR-1 (1.55 – 1.75 µm)</div>
+      <div class="sig-band-region swir2">SWIR-2 (2.08 – 2.35 µm)</div>
+    </div>
+
+    <!-- Chart Canvas Container -->
+    <div class="sig-chart-wrapper">
+      <canvas id="sig-chart"></canvas>
+    </div>
+
+    <!-- Dynamic Intersections & Differences Inspector -->
+    <div class="sig-analysis-grid" id="sig-analysis-grid">
+      <div class="sig-insight-card" id="card-rededge">
+        <div class="sig-insight-head">
+          <div class="sig-insight-title">🌱 Red-Edge Crossover</div>
+          <span class="sig-insight-tag">&lambda; &approx; 0.69 – 0.72 &micro;m</span>
+        </div>
+        <div class="sig-insight-body">
+          <strong>Vegetation crosses Soil:</strong> In the red band (0.66 &micro;m), vegetation reflects only ~5% while soil reflects ~25%. At the Red-Edge, vegetation surges upward by over 40%, intersecting soil at ~0.70 &micro;m and leaving it far behind. This extreme contrast powers <strong>NDVI</strong>.
+        </div>
+      </div>
+
+      <div class="sig-insight-card" id="card-nirgap">
+        <div class="sig-insight-head">
+          <div class="sig-insight-title">⚡ Maximum NIR Separation</div>
+          <span class="sig-insight-tag">&lambda; &approx; 0.80 – 0.90 &micro;m</span>
+        </div>
+        <div class="sig-insight-body">
+          <strong>Maximum distance between all 3 curves:</strong> Vegetation reaches its peak reflectance (~50%), Soil sits at ~33%, and Water plummets to &lt;1% (total absorption). This makes NIR the cleanest band for automated land-water-vegetation segmentation.
+        </div>
+      </div>
+
+      <div class="sig-insight-card" id="card-swirwater">
+        <div class="sig-insight-head">
+          <div class="sig-insight-title">💧 SWIR Water Absorption Dips</div>
+          <span class="sig-insight-tag">&lambda; &approx; 1.4 &micro;m &amp; 1.9 &micro;m</span>
+        </div>
+        <div class="sig-insight-body">
+          <strong>Moisture Absorption Valleys:</strong> Deep troughs appear in the vegetation curve at 1.4 &micro;m and 1.9 &micro;m due to liquid water inside leaf cells. Dry bare soil shows no sharp dips, providing a quantitative measure of canopy moisture (NDWI).
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -174,40 +248,205 @@ plt.savefig(<span class="c-str">'signatures.png'</span>, dpi=150)</code></pre>
 <script src="app.js"></script>
 <script>
 (function() {
-  const wavelengths = [0.45, 0.55, 0.65, 0.75, 0.86, 1.0, 1.3, 1.65, 2.0, 2.3];
-  const curves = {
-    veg:   { color: '#4ade80', vals: [4,9,5,32,45,42,20,22,12,8] },
-    soil:  { color: '#f5a623', vals: [16,19,22,26,30,32,34,38,35,30] },
-    water: { color: '#3b82f6', vals: [7,6,4,2,1,0.5,0.3,0.2,0.1,0.1] },
-    snow:  { color: '#e6ebf5', vals: [80,78,76,72,65,55,20,10,6,3] }
-  };
-  const svg = document.getElementById('sig-svg');
-  const W=700,H=300,padL=40,padB=30,padT=16,padR=16;
-  const maxY = 85;
-  function xPos(i) { return padL + (i/(wavelengths.length-1)) * (W-padL-padR); }
-  function yPos(v) { return H-padB - (v/maxY) * (H-padB-padT); }
-  function render() {
-    let s = '';
-    // axes
-    s += `<line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#5a6789" stroke-width="1"/>`;
-    s += `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="#5a6789" stroke-width="1"/>`;
-    s += `<text x="${W/2}" y="${H-4}" fill="#8893b5" font-size="11" text-anchor="middle" font-family="JetBrains Mono">Wavelength (µm) &rarr;</text>`;
-    s += `<text x="14" y="${H/2}" fill="#8893b5" font-size="11" text-anchor="middle" font-family="JetBrains Mono" transform="rotate(-90 14 ${H/2})">Reflectance (%)</text>`;
-    wavelengths.forEach((wl,i) => { if(i%2===0) s += `<text x="${xPos(i)}" y="${H-padB+16}" fill="#5a6789" font-size="9" text-anchor="middle" font-family="JetBrains Mono">${wl}</text>`; });
-    document.querySelectorAll('.sig-toggle').forEach(t => {
-      const mat = t.dataset.mat;
-      if (!t.classList.contains('active')) return;
-      const c = curves[mat];
-      let path = c.vals.map((v,i) => `${i===0?'M':'L'}${xPos(i)},${yPos(v)}`).join(' ');
-      s += `<path d="${path}" fill="none" stroke="${c.color}" stroke-width="2.5"/>`;
-      c.vals.forEach((v,i) => { s += `<circle cx="${xPos(i)}" cy="${yPos(v)}" r="2.5" fill="${c.color}"/>`; });
-    });
-    svg.innerHTML = s;
-  }
-  document.querySelectorAll('.sig-toggle').forEach(t => {
-    t.addEventListener('click', () => { t.classList.toggle('active'); render(); });
+  const wavelengths = ['0.40', '0.45', '0.50', '0.55', '0.60', '0.65', '0.68', '0.72', '0.75', '0.80', '0.85', '0.90', '1.00', '1.10', '1.20', '1.30', '1.40', '1.50', '1.65', '1.80', '1.90', '2.00', '2.20', '2.40'];
+
+  // Real spectral reflectance data (%) based on IIRS-ISRO Dr. Hina Pande lecture
+  const vegData =      [4,   5,   7,   12,  8,   5,   7,   26,  42,  48,  50,  48,  46,  44,  42,  35,  14,  24,  30,  20,  8,   14,  18,  10];
+  const soilData =     [12,  14,  17,  19,  22,  25,  26,  28,  30,  32,  33,  34,  36,  37,  39,  40,  38,  41,  43,  44,  42,  44,  42,  40];
+  const waterData =    [5.5, 6.0, 5.0, 4.0, 3.0, 2.0, 1.5, 1.0, 0.7, 0.5, 0.3, 0.2, 0.1, 0.1, 0.1, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+  const turbidData =   [6.0, 8.5, 12.0,14.0,12.5,10.0, 7.5, 5.0, 3.5, 2.0, 1.2, 0.8, 0.4, 0.2, 0.1, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+  const stressedData = [6.0, 8.0, 10.0,14.0,13.0,12.0, 14.0,20.0, 24.0,27.0, 28.0,27.0, 26.0,25.0, 24.0,22.0, 18.0,28.0, 35.0,26.0, 15.0,22.0, 25.0,16.0];
+
+  const ctx = document.getElementById('sig-chart');
+  if (!ctx) return;
+
+  const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: wavelengths,
+      datasets: [
+        {
+          label: 'Healthy Vegetation',
+          data: vegData,
+          borderColor: '#4ade80',
+          backgroundColor: 'rgba(74, 222, 128, 0.08)',
+          borderWidth: 3,
+          tension: 0.35,
+          fill: true,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#4ade80',
+          hidden: false
+        },
+        {
+          label: 'Dry Bare Soil',
+          data: soilData,
+          borderColor: '#f5a623',
+          backgroundColor: 'rgba(245, 166, 35, 0.06)',
+          borderWidth: 3,
+          tension: 0.35,
+          fill: true,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#f5a623',
+          hidden: false
+        },
+        {
+          label: 'Clear Water',
+          data: waterData,
+          borderColor: '#38bdf8',
+          backgroundColor: 'rgba(56, 189, 248, 0.08)',
+          borderWidth: 3,
+          tension: 0.35,
+          fill: true,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#38bdf8',
+          hidden: false
+        },
+        {
+          label: 'Turbid / Sediment Water',
+          data: turbidData,
+          borderColor: '#2dd4bf',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [5, 4],
+          tension: 0.35,
+          fill: false,
+          pointRadius: 2,
+          pointHoverRadius: 5,
+          pointBackgroundColor: '#2dd4bf',
+          hidden: true
+        },
+        {
+          label: 'Stressed Vegetation',
+          data: stressedData,
+          borderColor: '#f43f5e',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [6, 4],
+          tension: 0.35,
+          fill: false,
+          pointRadius: 2,
+          pointHoverRadius: 5,
+          pointBackgroundColor: '#f43f5e',
+          hidden: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: '#111938',
+          titleColor: '#f5a623',
+          bodyColor: '#e6ebf5',
+          borderColor: 'rgba(120, 160, 255, 0.3)',
+          borderWidth: 1,
+          padding: 12,
+          titleFont: { family: 'JetBrains Mono', size: 12 },
+          bodyFont: { family: 'JetBrains Mono', size: 11 },
+          callbacks: {
+            title: function(items) {
+              return `Wavelength: ${items[0].label} µm`;
+            },
+            label: function(context) {
+              return ` ${context.dataset.label}: ${context.parsed.y.toFixed(1)}%`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            color: 'rgba(120, 160, 255, 0.08)'
+          },
+          ticks: {
+            color: '#8893b5',
+            font: { family: 'JetBrains Mono', size: 10 },
+            maxRotation: 0,
+            callback: function(val, idx) {
+              const wl = wavelengths[idx];
+              return (idx % 2 === 0) ? `${wl} µm` : '';
+            }
+          },
+          title: {
+            display: true,
+            text: 'Wavelength (µm) →',
+            color: '#8893b5',
+            font: { family: 'JetBrains Mono', size: 11 }
+          }
+        },
+        y: {
+          min: 0,
+          max: 60,
+          grid: {
+            color: 'rgba(120, 160, 255, 0.08)'
+          },
+          ticks: {
+            color: '#8893b5',
+            font: { family: 'JetBrains Mono', size: 10 },
+            stepSize: 10,
+            callback: function(v) { return v + '%'; }
+          },
+          title: {
+            display: true,
+            text: 'Spectral Reflectance (%)',
+            color: '#8893b5',
+            font: { family: 'JetBrains Mono', size: 11 }
+          }
+        }
+      }
+    }
   });
-  render();
+
+  // Checkbox controls handling
+  const toggles = [
+    { id: 'chk-veg', datasetIdx: 0 },
+    { id: 'chk-soil', datasetIdx: 1 },
+    { id: 'chk-water', datasetIdx: 2 },
+    { id: 'chk-turbid', datasetIdx: 3 },
+    { id: 'chk-stressed', datasetIdx: 4 }
+  ];
+
+  function updateAnalysisCards() {
+    const vegOn = document.getElementById('chk-veg')?.checked;
+    const soilOn = document.getElementById('chk-soil')?.checked;
+    const waterOn = document.getElementById('chk-water')?.checked;
+
+    const cardRedEdge = document.getElementById('card-rededge');
+    const cardNirGap = document.getElementById('card-nirgap');
+    const cardSwirWater = document.getElementById('card-swirwater');
+
+    if (cardRedEdge) cardRedEdge.style.opacity = (vegOn && soilOn) ? '1' : '0.45';
+    if (cardNirGap) cardNirGap.style.opacity = (vegOn && waterOn) ? '1' : '0.45';
+    if (cardSwirWater) cardSwirWater.style.opacity = vegOn ? '1' : '0.45';
+  }
+
+  toggles.forEach(t => {
+    const input = document.getElementById(t.id);
+    if (!input) return;
+
+    input.addEventListener('change', (e) => {
+      const parentLabel = input.closest('.sig-checkbox-label');
+      if (parentLabel) {
+        parentLabel.classList.toggle('active', e.target.checked);
+      }
+      chart.setDatasetVisibility(t.datasetIdx, e.target.checked);
+      chart.update();
+      updateAnalysisCards();
+    });
+  });
+
+  updateAnalysisCards();
 })();
 </script>
 </body>

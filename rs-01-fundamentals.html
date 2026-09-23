@@ -91,21 +91,146 @@
 
 
   <div class="section-label" style="margin-top:8px;">01.3 / The Full Spectrum</div>
-  <h2 class="section-title">Not just visible light</h2>
-  <p class="section-intro">Human eyes only detect a narrow sliver of the EM spectrum (roughly 0.4–0.7 µm). Satellite sensors are built to detect far more — and each region reveals something different about the Earth's surface. Click a band below.</p>
+  <h2 class="section-title">Not just visible light: The Remote Sensing Spectrum</h2>
+  <p class="section-intro">Human eyes only detect an extremely narrow sliver of the electromagnetic spectrum (0.4–0.7 µm). Earth observation satellites exploit wavelengths from ultraviolet to microwave radar. Slide the knob below across the full spectrum to explore each wavelength band, its atmospheric transmission, and see which satellite sensors operate in it.</p>
 
-  <div class="spectrum-bar" id="spectrum-bar">
-    <div class="spectrum-band active" data-band="visible" style="background:#3b82f6;">VISIBLE</div>
-    <div class="spectrum-band" data-band="nir" style="background:#8b1a1a;">NIR</div>
-    <div class="spectrum-band" data-band="swir" style="background:#7c2d12;">SWIR</div>
-    <div class="spectrum-band" data-band="tir" style="background:#581c87;">THERMAL IR</div>
-    <div class="spectrum-band" data-band="microwave" style="background:#0f766e;">MICROWAVE</div>
-  </div>
-  <div class="spectrum-info" id="spectrum-info">
-    <div class="band-name">Visible Light</div>
-    <div class="band-range">0.4 – 0.7 µm</div>
-    <div class="band-desc">What human eyes see: blue, green, red. Reflected sunlight only — nothing is emitted here by objects at Earth-surface temperatures. Used for true-colour imagery, basic land/water/vegetation discrimination.</div>
-    <div class="band-uses"><span class="band-use">True-colour imagery</span><span class="band-use">Water turbidity</span><span class="band-use">Urban mapping</span></div>
+  <div class="em-explorer" id="em-explorer">
+    <div class="em-header-row">
+      <div>
+        <h3>Interactive Electromagnetic Spectrum &amp; Sensor Tracker</h3>
+        <p>Drag the slider or click any band to inspect wavelength physics, atmospheric windows, and active satellite constellations.</p>
+      </div>
+      <div class="em-view-toggle">
+        <button class="em-toggle-btn active" id="btn-mode-band" type="button">Explore by Band</button>
+      </div>
+    </div>
+
+    <!-- Interactive Spectrum Slider & Bar -->
+    <div class="spectrum-slider-wrapper">
+      <div class="spectrum-bar-full" id="spectrum-bar-full">
+        <div class="spectrum-band-step" data-index="0" style="background: #3b0764;"><span class="band-abbr">GAMMA</span><span class="band-wl-hint">&lt;0.01 nm</span></div>
+        <div class="spectrum-band-step" data-index="1" style="background: #312e81;"><span class="band-abbr">X-RAY</span><span class="band-wl-hint">0.01-10 nm</span></div>
+        <div class="spectrum-band-step" data-index="2" style="background: #1e3a8a;"><span class="band-abbr">UV</span><span class="band-wl-hint">10-400 nm</span></div>
+        <div class="spectrum-band-step active" data-index="3" style="background: linear-gradient(to right, #7c3aed, #2563eb, #06b6d4, #16a34a, #eab308, #ea580c, #dc2626);"><span class="band-abbr">VISIBLE</span><span class="band-wl-hint">0.4-0.7 µm</span></div>
+        <div class="spectrum-band-step" data-index="4" style="background: #991b1b;"><span class="band-abbr">NIR</span><span class="band-wl-hint">0.7-1.3 µm</span></div>
+        <div class="spectrum-band-step" data-index="5" style="background: #c2410c;"><span class="band-abbr">SWIR</span><span class="band-wl-hint">1.3-3.0 µm</span></div>
+        <div class="spectrum-band-step" data-index="6" style="background: #701a75;"><span class="band-abbr">THERMAL IR</span><span class="band-wl-hint">3-14 µm</span></div>
+        <div class="spectrum-band-step" data-index="7" style="background: #0f766e;"><span class="band-abbr">MICROWAVE</span><span class="band-wl-hint">1 mm-1 m</span></div>
+        <div class="spectrum-band-step" data-index="8" style="background: #164e63;"><span class="band-abbr">RADIO</span><span class="band-wl-hint">&gt;1 m</span></div>
+      </div>
+
+      <!-- Atmospheric Transmission Ribbon -->
+      <div class="atmo-ribbon-wrap">
+        <div class="atmo-ribbon-title">
+          <span>Atmospheric Transmission (Opacity vs Windows)</span>
+          <span id="atmo-status-quick">Clear Window (Reflected Solar)</span>
+        </div>
+        <div class="atmo-ribbon" id="atmo-ribbon">
+          <div class="atmo-segment atmo-blocked" title="Gamma: Blocked by upper atmosphere"></div>
+          <div class="atmo-segment atmo-blocked" title="X-Ray: Absorbed by O2/N2"></div>
+          <div class="atmo-segment atmo-blocked" title="UV: Largely absorbed by ozone"></div>
+          <div class="atmo-segment atmo-open" title="Visible: Transparent optical window"></div>
+          <div class="atmo-segment atmo-open" title="NIR: High atmospheric transmission"></div>
+          <div class="atmo-segment atmo-partial" title="SWIR: Windows between H2O absorption bands"></div>
+          <div class="atmo-segment atmo-partial" title="Thermal IR: 8-14 µm window (H2O/CO2 absorption outside)"></div>
+          <div class="atmo-segment atmo-open" title="Microwave: Cloud penetrating, transparent window"></div>
+          <div class="atmo-segment atmo-open" title="Radio: Transparent down to ionospheric cutoff"></div>
+        </div>
+      </div>
+
+      <!-- Slider range input -->
+      <div class="slider-control-bar">
+        <input type="range" id="em-spectrum-slider" min="0" max="8" value="3" step="1" aria-label="Electromagnetic spectrum band selector">
+        <div class="slider-ticks" id="slider-ticks">
+          <span class="slider-tick" data-index="0">Gamma</span>
+          <span class="slider-tick" data-index="1">X-Ray</span>
+          <span class="slider-tick" data-index="2">UV</span>
+          <span class="slider-tick active" data-index="3">Visible</span>
+          <span class="slider-tick" data-index="4">NIR</span>
+          <span class="slider-tick" data-index="5">SWIR</span>
+          <span class="slider-tick" data-index="6">TIR</span>
+          <span class="slider-tick" data-index="7">Microwave</span>
+          <span class="slider-tick" data-index="8">Radio</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard: Band Telemetry Card + Sensors Constellation Matrix -->
+    <div class="em-dashboard">
+      <!-- Left: Band Details Card -->
+      <div class="band-details-card" id="band-details-card">
+        <div class="band-meta-head">
+          <div class="b-name" id="b-name">Visible Light</div>
+          <div class="b-tag" id="b-range">0.4 – 0.7 µm (400 – 700 nm)</div>
+        </div>
+
+        <div class="band-metrics-grid">
+          <div class="b-metric">
+            <div class="bm-label">Frequency (&nu;)</div>
+            <div class="bm-value" id="b-freq">430 – 750 THz</div>
+          </div>
+          <div class="b-metric">
+            <div class="bm-label">Photon Energy (E)</div>
+            <div class="bm-value" id="b-energy">1.8 – 3.1 eV</div>
+          </div>
+          <div class="b-metric">
+            <div class="bm-label">Radiation Origin</div>
+            <div class="bm-value" id="b-origin">Solar Reflected</div>
+          </div>
+        </div>
+
+        <div class="band-desc-text" id="b-desc">
+          What human eyes perceive: Blue (0.4–0.5 µm), Green (0.5–0.6 µm), and Red (0.6–0.7 µm). In remote sensing, red is strongly absorbed by chlorophyll for photosynthesis, while green is reflected, giving healthy plants their color.
+        </div>
+
+        <div class="band-atmo-status window" id="b-atmo-box">
+          <span style="font-size: 16px;">🌤️</span>
+          <span id="b-atmo-desc"><strong>Optical Atmospheric Window:</strong> High transmission through the atmosphere. Susceptible to Rayleigh scattering (which makes the sky blue) and cloud obscuration.</span>
+        </div>
+
+        <div class="band-uses-tags" id="b-uses">
+          <span class="band-use-pill">True-Colour RGB Composites</span>
+          <span class="band-use-pill">Chlorophyll Absorption</span>
+          <span class="band-use-pill">Water Turbidity &amp; Bathymetry</span>
+          <span class="band-use-pill">Urban &amp; Infrastructure Mapping</span>
+        </div>
+      </div>
+
+      <!-- Right: Satellite Sensors Constellation Matrix -->
+      <div class="sensors-panel">
+        <div class="sensors-panel-head">
+          <h4>🛰️ Operating Satellite Sensors</h4>
+          <span class="active-count" id="active-sensor-count">6 Active in this Band</span>
+        </div>
+
+        <!-- Interactive Quick-Filter Chips for Constellations -->
+        <div class="sensor-filter-row" title="Click a sensor to highlight its operational spectrum bands">
+          <span style="font-family:var(--font-mono); font-size:10px; color:var(--text-faint); margin-right:4px; align-self:center;">Filter by Sensor:</span>
+          <button type="button" class="sensor-chip" data-sensor="sentinel2">Sentinel-2 MSI</button>
+          <button type="button" class="sensor-chip" data-sensor="landsat">Landsat 8/9</button>
+          <button type="button" class="sensor-chip" data-sensor="resourcesat">Resourcesat-2A</button>
+          <button type="button" class="sensor-chip" data-sensor="cartosat">Cartosat-3</button>
+          <button type="button" class="sensor-chip" data-sensor="sentinel1">Sentinel-1 SAR</button>
+          <button type="button" class="sensor-chip" data-sensor="nisar">NISAR</button>
+          <button type="button" class="sensor-chip" data-sensor="modis">MODIS</button>
+        </div>
+
+        <div class="sensors-list" id="sensors-list">
+          <!-- Dynamically populated sensor cards -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ISRO / NASA ARSET Pedagogical Insight -->
+    <div class="slide-pedagogy-callout">
+      <div class="callout-icon">💡</div>
+      <div>
+        <h5>Why Do Remote Sensing Satellites Avoid Gamma, X-Ray, and Most UV?</h5>
+        <p>
+          High-energy photons (Gamma, X-Rays) are virtually 100% absorbed by nitrogen, oxygen, and the ozone layer in the upper atmosphere. Furthermore, the Sun emits comparatively little energy in these wavelengths relative to the visible and infrared peak. Satellites designed for Earth observation place their detectors exclusively within <strong>atmospheric windows</strong> (0.4–2.5 µm, 8–14 µm, and microwave) where radiation can transit from surface to space with minimal atmospheric attenuation.
+        </p>
+      </div>
+    </div>
   </div>
 
   <div class="tech-detail">
@@ -191,28 +316,354 @@
 })();
 
 (function() {
-  const bandData = {
-    visible: { name: 'Visible Light', range: '0.4 – 0.7 µm', desc: 'What human eyes see: blue, green, red. Reflected sunlight only. Used for true-colour imagery, basic land/water/vegetation discrimination.', uses: ['True-colour imagery','Water turbidity','Urban mapping'] },
-    nir: { name: 'Near-Infrared (NIR)', range: '0.7 – 1.3 µm', desc: 'Invisible to human eyes. Healthy vegetation reflects NIR very strongly because of leaf cell structure — this is the single most useful band for vegetation monitoring (it drives NDVI).', uses: ['Vegetation health (NDVI)','Biomass estimation','Land/water boundary'] },
-    swir: { name: 'Short-Wave Infrared (SWIR)', range: '1.3 – 3 µm', desc: 'Sensitive to moisture content in soil and vegetation, and to certain minerals. Water absorbs strongly here, so wet vegetation and dry vegetation look very different.', uses: ['Moisture content','Mineral & rock mapping','Burned area mapping'] },
-    tir: { name: 'Thermal Infrared', range: '3 – 14 µm', desc: 'Not reflected sunlight — this is energy directly emitted by objects because of their temperature. Used to measure surface temperature, day or night.', uses: ['Land surface temperature','Urban heat islands','Volcanic/fire monitoring'] },
-    microwave: { name: 'Microwave (Radar)', range: '1 mm – 1 m', desc: 'Passes through clouds, smoke, and works day or night. Mostly used actively (RADAR) — the sensor sends its own pulse and measures the return, revealing surface roughness and moisture rather than colour.', uses: ['All-weather flood mapping','Soil moisture','Ship/oil-spill detection'] }
+  const spectrumData = [
+    {
+      index: 0,
+      abbr: "GAMMA",
+      name: "Gamma Rays",
+      range: "< 0.01 nm (< 10⁻¹¹ m)",
+      freq: "> 30 EHz (> 3×10¹⁹ Hz)",
+      energy: "> 100 keV",
+      origin: "Nuclear transitions & cosmic phenomena",
+      desc: "The shortest wavelength and most energetic form of electromagnetic radiation. Photons are ionizing and dangerous. They are naturally produced on Earth only by radioactive decay and high-altitude lightning strikes (Terrestrial Gamma-ray Flashes).",
+      atmoClass: "blocked",
+      atmoShort: "100% Blocked by Atmosphere",
+      atmoDesc: "<strong>Completely Blocked:</strong> Gamma rays interact via photoelectric absorption, Compton scattering, and pair production in the upper atmosphere. None reach the Earth's surface.",
+      uses: ["Astrophysical high-energy bursts", "Lunar & Martian surface geochemistry (gamma spectrometers)", "Nuclear materials monitoring"],
+      activeSensors: [],
+      inactiveReason: "Earth observation satellites cannot use Gamma rays. The atmosphere is totally opaque, and photons are ionizing and destructive rather than reflective."
+    },
+    {
+      index: 1,
+      abbr: "X-RAY",
+      name: "X-Rays",
+      range: "0.01 – 10 nm",
+      freq: "30 PHz – 30 EHz (3×10¹⁶ – 3×10¹⁹ Hz)",
+      energy: "120 eV – 120 keV",
+      origin: "Inner-shell atomic transitions & deceleration",
+      desc: "High-energy radiation capable of penetrating soft tissue. Solar X-rays ionize nitrogen and oxygen in the upper atmosphere (thermosphere/ionosphere), shielding the biosphere from harm.",
+      atmoClass: "blocked",
+      atmoShort: "100% Blocked by Atmosphere",
+      atmoDesc: "<strong>Completely Blocked:</strong> Atmospheric molecular nitrogen (N₂) and oxygen (O₂) absorb virtually 100% of extraterrestrial X-rays before they reach the ground.",
+      uses: ["Space astronomy (Chandra, AstroSat)", "Solar flare flux monitoring (GOES XRS)", "Medical diagnostic radiography"],
+      activeSensors: [],
+      inactiveReason: "Atmosphere absorbs all incoming and surface-reflected X-rays. Earth surface features do not reflect X-rays."
+    },
+    {
+      index: 2,
+      abbr: "UV",
+      name: "Ultraviolet (UV)",
+      range: "10 – 400 nm (0.01 – 0.4 µm)",
+      freq: "750 THz – 30 PHz",
+      energy: "3.1 – 124 eV",
+      origin: "Solar emission & valence electron transitions",
+      desc: "Spans UV-C (100–280 nm), UV-B (280–315 nm), and UV-A (315–400 nm). Shorter wavelengths are absorbed by stratospheric ozone (O₃). Shorter visible/UV wavelengths also undergo extreme Rayleigh scattering (proportional to 1/λ⁴), producing a dense atmospheric haze.",
+      atmoClass: "blocked",
+      atmoShort: "Largely Blocked / Heavy Rayleigh Scattering",
+      atmoDesc: "<strong>Severe Atmospheric Absorption:</strong> Stratospheric ozone absorbs UV-C and UV-B. Near-UV (320–400 nm) partially penetrates but suffers intense molecular scattering, making clear surface imaging impractical.",
+      uses: ["Stratospheric & total column Ozone (O₃) mapping", "Sulfur dioxide (SO₂) volcanic plume tracking", "Nitrogen dioxide (NO₂) tropospheric air quality"],
+      activeSensors: [
+        { id: "tropomi", name: "Sentinel-5P (TROPOMI)", agency: "ESA / Copernicus", bands: "UV1 (270-300nm), UV2 (300-320nm)", note: "Monitors global ozone layer thickness and volcanic SO₂ aerosol plumes daily." },
+        { id: "omi", name: "Aura (OMI)", agency: "NASA / KNMI", bands: "UV1 (264-311nm), UV2 (307-383nm)", note: "Continuous global record of atmospheric ozone, UV index, and aerosols since 2004." }
+      ],
+      inactiveReason: "Surface remote sensing avoids UV due to intense atmospheric haze. Satellites in UV operate as atmospheric sounders, looking at gas backscatter."
+    },
+    {
+      index: 3,
+      abbr: "VISIBLE",
+      name: "Visible Light",
+      range: "0.4 – 0.7 µm (400 – 700 nm)",
+      freq: "430 – 750 THz",
+      energy: "1.8 – 3.1 eV",
+      origin: "Solar irradiance peak (reflected sunlight)",
+      desc: "The only region human eyes perceive: Blue (0.4–0.5 µm), Green (0.5–0.6 µm), and Red (0.6–0.7 µm). In remote sensing, red light is heavily absorbed by chlorophyll-a and b for photosynthesis, while green is reflected, giving healthy plants their characteristic green hue.",
+      atmoClass: "window",
+      atmoShort: "Clear Optical Atmospheric Window",
+      atmoDesc: "<strong>Optical Atmospheric Window:</strong> High atmospheric transmission between 0.4 and 0.7 µm. Clear daylight imaging is possible, though clouds and Rayleigh scattering (blue haze) still occur.",
+      uses: ["True-Colour RGB Natural Photography", "Chlorophyll absorption in Red (665 nm)", "Coastal bathymetry & water turbidity in Blue (490 nm)", "Cadastral and infrastructure mapping"],
+      activeSensors: [
+        { id: "sentinel2", name: "Sentinel-2 MSI", agency: "ESA / Copernicus", bands: "B1 Coastal (443nm), B2 Blue (490nm, 10m), B3 Green (560nm, 10m), B4 Red (665nm, 10m)", note: "10-meter spatial resolution provides unmatched detail for public European & global land observation." },
+        { id: "landsat", name: "Landsat 8/9 (OLI)", agency: "NASA / USGS", bands: "B1 Coastal (443nm), B2 Blue (482nm), B3 Green (561nm), B4 Red (655nm, 30m)", note: "Calibrated 30-meter multispectral radiometric benchmark with continuous data since 1972." },
+        { id: "resourcesat", name: "Resourcesat-2A (LISS-IV & AWiFS)", agency: "ISRO", bands: "B2 Green (520-590nm), B3 Red (620-680nm)", note: "LISS-IV delivers crisp 5.8m multispectral imagery across India for crop acreage and rural planning." },
+        { id: "cartosat", name: "Cartosat-3", agency: "ISRO", bands: "Panchromatic (0.25m, 450-750nm), HRMX 4-band VIS/NIR (1.0m)", note: "India's highest resolution optical civilian satellite for urban infrastructure and cadastral surveys." },
+        { id: "modis", name: "MODIS (Terra & Aqua)", agency: "NASA", bands: "B1 Red (645nm, 250m), B3 Blue (469nm, 500m), B4 Green (555nm, 500m)", note: "Daily 1-2 day global revisit monitoring biosphere phenology and ocean color." }
+      ]
+    },
+    {
+      index: 4,
+      abbr: "NIR",
+      name: "Near-Infrared (NIR)",
+      range: "0.7 – 1.3 µm (700 – 1300 nm)",
+      freq: "230 – 430 THz",
+      energy: "0.95 – 1.8 eV",
+      origin: "Solar reflected (spongy mesophyll scattering)",
+      desc: "Completely invisible to human vision. Healthy green vegetation reflects 40–60% of NIR radiation due to multiple refractive scattering inside the spongy mesophyll leaf tissue ('NIR Plateau'). Clear deep water absorbs NIR radiation almost totally, creating razor-sharp land-water boundaries.",
+      atmoClass: "window",
+      atmoShort: "High Transmission Solar Window",
+      atmoDesc: "<strong>Solar Reflectance Window:</strong> Wide transparent window between water vapor absorption bands at 0.9 µm and 1.1 µm. Outstanding contrast between vegetation, soil, and water bodies.",
+      uses: ["Normalized Difference Vegetation Index (NDVI)", "Canopy biomass & physiological vigor assessment", "Sharp land-water boundary delineation", "Standard False-Colour Composites (FCC: NIR=Red, Red=Green, Green=Blue)"],
+      activeSensors: [
+        { id: "sentinel2", name: "Sentinel-2 MSI", agency: "ESA / Copernicus", bands: "B5, B6, B7 (Red Edge: 705, 740, 783nm), B8 NIR (842nm, 10m), B8A Narrow NIR (865nm, 20m)", note: "Specialized 'Red-Edge' channels detect vegetation chlorophyll stress days before visible browning." },
+        { id: "landsat", name: "Landsat 8/9 (OLI)", agency: "NASA / USGS", bands: "B5 NIR (865nm, 30m)", note: "The primary band powering the 50-year Landsat global vegetation index archive." },
+        { id: "resourcesat", name: "Resourcesat-2A (LISS-III / LISS-IV / AWiFS)", agency: "ISRO", bands: "B4 NIR (770-860nm)", note: "Workhorse band for the FASAL agricultural forecasting project and National Forest Cover assessments." },
+        { id: "cartosat", name: "Cartosat-3", agency: "ISRO", bands: "HRMX B4 NIR (770-860nm, 1.0m resolution)", note: "Sub-meter multispectral analysis of individual tree canopies and urban micro-greenery." },
+        { id: "modis", name: "MODIS (Terra & Aqua)", agency: "NASA", bands: "B2 NIR (858nm, 250m resolution)", note: "Global 250m daily NIR band driving international drought indices and vegetation dynamics." }
+      ]
+    },
+    {
+      index: 5,
+      abbr: "SWIR",
+      name: "Short-Wave Infrared (SWIR)",
+      range: "1.3 – 3.0 µm (1300 – 3000 nm)",
+      freq: "100 – 230 THz",
+      energy: "0.41 – 0.95 eV",
+      origin: "Solar reflected (molecular vibrations & water absorption)",
+      desc: "SWIR radiation interacts directly with liquid water molecules in plant cells and soil. Water absorbs strongly at 1.4 µm and 1.9 µm. Consequently, healthy moisture-rich crops absorb SWIR, whereas dry, drought-stressed vegetation or bare dry soil reflects it brightly.",
+      atmoClass: "partial",
+      atmoShort: "Windows between H₂O & CO₂ Absorption Gaps",
+      atmoDesc: "<strong>Selective Windows:</strong> Atmosphere exhibits total absorption 'notches' at 1.4 µm and 1.9 µm due to atmospheric water vapor. Satellite sensors place bands precisely in the clear windows around 1.6 µm (SWIR-1) and 2.2 µm (SWIR-2).",
+      uses: ["Plant canopy & soil moisture (NDWI / NDMI)", "Burn scar delineation & Normalized Burn Ratio (NBR)", "Lithological mineral exploration (clays, carbonates, hydroxyl)", "Snow vs. White Cloud discrimination (snow absorbs SWIR, clouds reflect it)"],
+      activeSensors: [
+        { id: "sentinel2", name: "Sentinel-2 MSI", agency: "ESA / Copernicus", bands: "B11 SWIR-1 (1.61 µm, 20m), B12 SWIR-2 (2.19 µm, 20m), B10 Cirrus (1.375 µm, 60m)", note: "Essential for post-wildfire burn severity mapping and distinguishing cirrus clouds from snowpack." },
+        { id: "landsat", name: "Landsat 8/9 (OLI)", agency: "NASA / USGS", bands: "B6 SWIR-1 (1.61 µm, 30m), B7 SWIR-2 (2.20 µm, 30m), B9 Cirrus (1.37 µm, 30m)", note: "B6 and B7 are standard worldwide for geological mapping and agricultural water stress." },
+        { id: "resourcesat", name: "Resourcesat-2A (AWiFS & LISS-III)", agency: "ISRO", bands: "B5 SWIR (1.55-1.70 µm, 23.5m / 56m)", note: "Critical for national drought monitoring (NADAMS) and snow cover extent in the Himalayas." },
+        { id: "modis", name: "MODIS (Terra & Aqua)", agency: "NASA", bands: "B6 (1.64 µm), B7 (2.13 µm)", note: "Provides real-time global snow and ice mapping products." }
+      ]
+    },
+    {
+      index: 6,
+      abbr: "TIR",
+      name: "Thermal Infrared (TIR)",
+      range: "3.0 – 14 µm (3000 – 14000 nm)",
+      freq: "21.4 – 100 THz",
+      energy: "0.089 – 0.41 eV",
+      origin: "Terrestrial thermal emission (Earth's blackbody peak ~9.7 µm)",
+      desc: "Unlike visible, NIR, and SWIR which record reflected sunlight, Thermal IR measures radiation directly EMITTED by the Earth's surface due to its kinetic temperature (governed by Planck's Radiation Law, Stefan-Boltzmann Law, and Wien's Law). Operates identically day or night.",
+      atmoClass: "partial",
+      atmoShort: "Thermal Window (8 – 14 µm)",
+      atmoDesc: "<strong>Thermal Atmospheric Window:</strong> The atmosphere has a wide window between 8 and 14 µm (with an ozone absorption band at 9.6 µm). A secondary window exists at 3.5–4.0 µm for detecting intense thermal sources like wildfires and volcanic eruptions.",
+      uses: ["Land Surface Temperature (LST) quantitative retrieval", "Urban Heat Island (UHI) microclimate modeling", "Wildfire & active volcanic lava hotspot tracking", "Sea Surface Temperature (SST) for cyclone intensity tracking"],
+      activeSensors: [
+        { id: "landsat", name: "Landsat 8/9 (TIRS)", agency: "NASA / USGS", bands: "B10 TIRS-1 (10.6-11.2 µm, 100m resampled to 30m), B11 TIRS-2 (11.5-12.5 µm)", note: "Split-window dual thermal bands allow rigorous atmospheric correction for surface temperature." },
+        { id: "modis", name: "MODIS (Terra & Aqua)", agency: "NASA", bands: "B31 (11.0 µm, 1km), B32 (12.0 µm, 1km), B21/22 Mid-IR (3.9 µm)", note: "Global Sea Surface Temperature (SST) benchmark and real-time active fire detection system." },
+        { id: "insat", name: "INSAT-3D / 3DR (Imager)", agency: "ISRO", bands: "TIR-1 (10.3-11.3 µm), TIR-2 (11.5-12.5 µm), MIR (3.8-4.0 µm)", note: "Geostationary imager delivering thermal cloud top and surface temperature scans every 15 minutes." }
+      ]
+    },
+    {
+      index: 7,
+      abbr: "MICROWAVE",
+      name: "Microwave / RADAR",
+      range: "1 mm – 1 m (1,000 – 1,000,000 µm)",
+      freq: "300 MHz – 300 GHz",
+      energy: "1.24 µeV – 1.24 meV",
+      origin: "Active coherent pulse generation (SAR) & passive microwave emission",
+      desc: "Long wavelength radiation capable of completely penetrating clouds, dense haze, fog, smoke, and light rainfall. Active Synthetic Aperture Radar (SAR) transmits coherent pulses and measures the backscattered amplitude and phase, providing information on surface roughness, moisture, and dielectric properties.",
+      atmoClass: "window",
+      atmoShort: "All-Weather, Cloud-Penetrating Window",
+      atmoDesc: "<strong>100% All-Weather Transparency:</strong> Rain droplets and clouds are orders of magnitude smaller than microwave wavelengths (preventing Rayleigh scattering). Operates 24/7 in total darkness or heavy storm conditions.",
+      uses: ["All-weather emergency flood extent & disaster mapping", "Soil moisture and crop canopy roughness estimation", "Interferometric SAR (InSAR) for millimeter-level earthquake & subsidence ground displacement", "Polar ice sheet motion and maritime vessel detection"],
+      activeSensors: [
+        { id: "sentinel1", name: "Sentinel-1 SAR", agency: "ESA / Copernicus", bands: "C-band (5.405 GHz / λ ≈ 5.55 cm)", note: "Dual-polarization (VV+VH) all-weather SAR with rapid 6-12 day global repeat and 250km swath." },
+        { id: "nisar", name: "NISAR (NASA-ISRO SAR)", agency: "NASA / ISRO", bands: "Dual L-band (1.25 GHz / 24 cm, NASA) & S-band (3.2 GHz / 9.3 cm, ISRO)", note: "Flagship dual-frequency polarimetric InSAR for global ecosystem biomass, cryosphere dynamics, and seismic deformation." },
+        { id: "risat", name: "EOS-04 / RISAT-1A", agency: "ISRO", bands: "C-band (5.35 GHz / 5.6 cm)", note: "Operational Indian C-band SAR specialized for kharif monsoon paddy mapping, flood tracking, and defense surveillance." },
+        { id: "alos", name: "ALOS-2 / ALOS-4 PALSAR-2", agency: "JAXA", bands: "L-band (1.27 GHz / λ ≈ 23.6 cm)", note: "Longer L-band waves penetrate forest canopies down to tree trunks and soil surface." }
+      ]
+    },
+    {
+      index: 8,
+      abbr: "RADIO",
+      name: "Radio Waves",
+      range: "> 1 m (> 1000 mm)",
+      freq: "< 300 MHz",
+      energy: "< 1.24 µeV",
+      origin: "Oscillating electrical currents & astronomical radio sources",
+      desc: "The longest waves in the electromagnetic spectrum, with very low photon energy. Standard imaging radar antennas would need to be kilometers wide to resolve ground targets at these wavelengths; however, GNSS satellite radio signals are used passively for reflectometry.",
+      atmoClass: "window",
+      atmoShort: "Transparent down to Ionospheric Cutoff (~10–30 MHz)",
+      atmoDesc: "<strong>Atmospheric Transparency:</strong> The neutral atmosphere is completely transparent. Waves below ~10–30 MHz are reflected by ionospheric plasma, making low-frequency radio astronomy only possible from space.",
+      uses: ["GNSS Reflectometry (CYGNSS constellation for ocean wind speeds through hurricanes)", "Telemetry, Tracking and Command (TT&C) satellite communication", "Cosmic radio astronomy (e.g. Giant Metrewave Radio Telescope - GMRT Pune)"],
+      activeSensors: [
+        { id: "cygnss", name: "CYGNSS (8 Microsatellites)", agency: "NASA", bands: "GPS L1 signals of opportunity (1.575 GHz / 19 cm)", note: "Measures GPS radio signal forward-scatter off the sea surface to calculate cyclone wind speeds." }
+      ],
+      inactiveReason: "Standard imaging Earth observation sensors are not built in VHF/HF radio bands due to diffraction limits and massive required antenna dimensions."
+    }
+  ];
+
+  // Sensor mapping to band indices
+  const sensorBandMap = {
+    sentinel2: [3, 4, 5],
+    landsat: [3, 4, 5, 6],
+    resourcesat: [3, 4, 5],
+    cartosat: [3, 4],
+    sentinel1: [7],
+    nisar: [7],
+    modis: [3, 4, 5, 6]
   };
-  const bands = document.querySelectorAll('.spectrum-band');
-  const info = document.getElementById('spectrum-info');
-  bands.forEach(b => {
-    b.addEventListener('click', () => {
-      bands.forEach(x => x.classList.remove('active'));
-      b.classList.add('active');
-      const d = bandData[b.dataset.band];
-      info.style.opacity = 0;
-      setTimeout(() => {
-        info.innerHTML = `<div class="band-name">${d.name}</div><div class="band-range">${d.range}</div><div class="band-desc">${d.desc}</div><div class="band-uses">${d.uses.map(u=>`<span class="band-use">${u}</span>`).join('')}</div>`;
-        info.style.opacity = 1;
-      }, 150);
+
+  // DOM Elements
+  const slider = document.getElementById('em-spectrum-slider');
+  const bandSteps = document.querySelectorAll('.spectrum-band-step');
+  const ticks = document.querySelectorAll('.slider-tick');
+  const atmoQuick = document.getElementById('atmo-status-quick');
+  const bName = document.getElementById('b-name');
+  const bRange = document.getElementById('b-range');
+  const bFreq = document.getElementById('b-freq');
+  const bEnergy = document.getElementById('b-energy');
+  const bOrigin = document.getElementById('b-origin');
+  const bDesc = document.getElementById('b-desc');
+  const bAtmoBox = document.getElementById('b-atmo-box');
+  const bAtmoDesc = document.getElementById('b-atmo-desc');
+  const bUses = document.getElementById('b-uses');
+  const sensorsList = document.getElementById('sensors-list');
+  const sensorCount = document.getElementById('active-sensor-count');
+  const sensorChips = document.querySelectorAll('.sensor-chip');
+
+  if (!slider) return;
+
+  let activeFilterSensor = null;
+
+  function updateSpectrumUI(index) {
+    const data = spectrumData[index];
+    if (!data) return;
+
+    // Update active band steps on spectrum bar
+    bandSteps.forEach(step => {
+      const stepIdx = parseInt(step.dataset.index);
+      step.classList.toggle('active', stepIdx === index);
+    });
+
+    // Update slider ticks
+    ticks.forEach(tick => {
+      const tickIdx = parseInt(tick.dataset.index);
+      tick.classList.toggle('active', tickIdx === index);
+    });
+
+    // Update Telemetry Header
+    bName.textContent = data.name;
+    bRange.textContent = data.range;
+    bFreq.textContent = data.freq;
+    bEnergy.textContent = data.energy;
+    bOrigin.textContent = data.origin;
+    bDesc.textContent = data.desc;
+
+    // Atmospheric Status Box
+    bAtmoBox.className = `band-atmo-status ${data.atmoClass}`;
+    bAtmoDesc.innerHTML = data.atmoDesc;
+    atmoQuick.textContent = data.atmoShort;
+
+    // Applications pills
+    bUses.innerHTML = data.uses.map(u => `<span class="band-use-pill">${u}</span>`).join('');
+
+    // Update Sensors List
+    renderSensorsList(data);
+  }
+
+  function renderSensorsList(bandData) {
+    sensorsList.innerHTML = '';
+
+    if (bandData.activeSensors.length === 0) {
+      sensorCount.textContent = '0 Active in this Band';
+      sensorCount.style.background = 'rgba(239, 68, 68, 0.15)';
+      sensorCount.style.color = '#f87171';
+      sensorCount.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+
+      const emptyNotice = document.createElement('div');
+      emptyNotice.className = 'sensor-item';
+      emptyNotice.style.borderLeft = '3px solid var(--red)';
+      emptyNotice.innerHTML = `
+        <div class="sensor-item-top">
+          <span class="sensor-item-name" style="color:#fca5a5;">No Surface Imaging Sensors</span>
+          <span class="sensor-item-agency">Physical Constraint</span>
+        </div>
+        <div class="sensor-item-desc">${bandData.inactiveReason}</div>
+      `;
+      sensorsList.appendChild(emptyNotice);
+      return;
+    }
+
+    sensorCount.textContent = `${bandData.activeSensors.length} Operating Sensor${bandData.activeSensors.length > 1 ? 's' : ''}`;
+    sensorCount.style.background = 'var(--teal-dim)';
+    sensorCount.style.color = 'var(--teal)';
+    sensorCount.style.borderColor = 'rgba(45, 212, 191, 0.3)';
+
+    bandData.activeSensors.forEach(s => {
+      const card = document.createElement('div');
+      const isFilteredMatch = activeFilterSensor ? (s.id === activeFilterSensor) : true;
+      card.className = `sensor-item active ${activeFilterSensor && !isFilteredMatch ? 'dimmed' : ''}`;
+      card.innerHTML = `
+        <div class="sensor-item-top">
+          <span class="sensor-item-name">${s.name}</span>
+          <span class="sensor-item-agency">${s.agency}</span>
+        </div>
+        <div class="sensor-item-band-detail">${s.bands}</div>
+        <div class="sensor-item-desc">${s.note}</div>
+      `;
+      sensorsList.appendChild(card);
+    });
+  }
+
+  // Slider change event
+  slider.addEventListener('input', (e) => {
+    const idx = parseInt(e.target.value);
+    updateSpectrumUI(idx);
+  });
+
+  // Clicking on spectrum bar segments
+  bandSteps.forEach(step => {
+    step.addEventListener('click', () => {
+      const idx = parseInt(step.dataset.index);
+      slider.value = idx;
+      updateSpectrumUI(idx);
     });
   });
+
+  // Clicking on slider ticks
+  ticks.forEach(tick => {
+    tick.addEventListener('click', () => {
+      const idx = parseInt(tick.dataset.index);
+      slider.value = idx;
+      updateSpectrumUI(idx);
+    });
+  });
+
+  // Sensor Quick-Filter Chips
+  sensorChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const sensorKey = chip.dataset.sensor;
+      if (activeFilterSensor === sensorKey) {
+        // Toggle off filter
+        activeFilterSensor = null;
+        chip.classList.remove('active-chip');
+        bandSteps.forEach(step => step.classList.remove('sensor-highlight'));
+      } else {
+        sensorChips.forEach(c => c.classList.remove('active-chip'));
+        chip.classList.add('active-chip');
+        activeFilterSensor = sensorKey;
+
+        // Highlight operational bands on the spectrum bar
+        const operationalBands = sensorBandMap[sensorKey] || [];
+        bandSteps.forEach(step => {
+          const stepIdx = parseInt(step.dataset.index);
+          step.classList.toggle('sensor-highlight', operationalBands.includes(stepIdx));
+        });
+
+        // Automatically slide to the first operational band if current band is not in it
+        const currentIdx = parseInt(slider.value);
+        if (!operationalBands.includes(currentIdx) && operationalBands.length > 0) {
+          slider.value = operationalBands[0];
+          updateSpectrumUI(operationalBands[0]);
+          return;
+        }
+      }
+
+      updateSpectrumUI(parseInt(slider.value));
+    });
+  });
+
+  // Initial render on Visible Light (Index 3)
+  updateSpectrumUI(3);
 })();
+
 </script>
 </body>
 </html>
