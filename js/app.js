@@ -29,15 +29,17 @@ const ALL_PAGES = [
 ];
 
 function currentPageFile() {
-  const p = window.location.pathname.split('/').pop() || 'index.html';
-  return p === '' ? 'index.html' : p;
+  const p = window.location.pathname;
+  // Remove leading slash and trailing slash, return path relative to root
+  const path = p.replace(/^\//, '').replace(/\/$/, '') || 'index.html';
+  return path === '' ? 'index.html' : path;
 }
 
 function buildDropdown(track, label, cls) {
   const current = currentPageFile();
   const hasCurrent = track.some(p => p.file === current);
   const items = track.map(p => `
-    <a href="${p.file}" class="${p.file === current ? 'current' : ''}">
+    <a href="/${p.file}" class="${p.file === current ? 'current' : ''}">
       <span class="dn-num">${p.num}</span>${p.short}
     </a>`).join('');
   return `
@@ -54,13 +56,13 @@ function buildNav() {
   const quizCls = current === 'pages/quiz.html' ? 'current' : '';
   return `
     <nav class="site-nav" id="siteNav">
-      <a class="nav-logo" href="index.html">RS·IP GUIDE</a>
+      <a class="nav-logo" href="/index.html">RS·IP GUIDE</a>
       <div class="nav-links">
-        <a href="index.html" class="${homeCls}">Home</a>
+        <a href="/index.html" class="${homeCls}">Home</a>
         ${buildDropdown(RS_TRACK, 'Remote Sensing')}
         ${buildDropdown(IP_TRACK, 'Image Processing')}
-        <a href="pages/applications.html" class="${appCls}">Applications</a>
-        <a href="pages/quiz.html" class="nav-quiz ${quizCls}">Quiz</a>
+        <a href="/pages/applications.html" class="${appCls}">Applications</a>
+        <a href="/pages/quiz.html" class="nav-quiz ${quizCls}">Quiz</a>
       </div>
     </nav>`;
 }
@@ -84,8 +86,8 @@ function buildPrevNext() {
   const prev = idx > 0 ? ALL_PAGES.find(p => p.file === combined[idx-1].file) : null;
   const next = idx < combined.length - 1 ? ALL_PAGES.find(p => p.file === combined[idx+1].file) : null;
   let html = '<div class="page-nav">';
-  html += prev ? `<a class="prev" href="${prev.file}"><span class="pn-label">Previous</span><span class="pn-title">${prev.title}</span></a>` : '<span></span>';
-  html += next ? `<a class="next" href="${next.file}"><span class="pn-label">Next</span><span class="pn-title">${next.title}</span></a>` : '<span></span>';
+  html += prev ? `<a class="prev" href="/${prev.file}"><span class="pn-label">Previous</span><span class="pn-title">${prev.title}</span></a>` : '<span></span>';
+  html += next ? `<a class="next" href="/${next.file}"><span class="pn-label">Next</span><span class="pn-title">${next.title}</span></a>` : '<span></span>';
   html += '</div>';
   return html;
 }
