@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Remote Sensing &amp; Image Processing — Interactive Guide</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/style.css">
 <script type="importmap">
 {
   "imports": {
@@ -39,7 +39,7 @@
   </p>
 
   <div class="track-split">
-    <a class="track-card rs" href="rs-01-fundamentals.html">
+    <a class="track-card rs" href="pages/remote-sensing/fundamentals.html">
       <div class="track-kicker">Track A · Six Chapters</div>
       <h2>Remote Sensing Fundamentals</h2>
       <p class="track-desc">How electromagnetic energy travels from the Sun to a sensor, why materials look different in different wavelengths, how orbits and resolution trade off against each other, and how to actually read a satellite image.</p>
@@ -54,7 +54,7 @@
       <div class="tc-cta">Start Track A &rarr;</div>
     </a>
 
-    <a class="track-card ip" href="ip-01-basics.html">
+    <a class="track-card ip" href="pages/image-processing/basics.html">
       <div class="track-kicker">Track B · Five Chapters</div>
       <h2>Digital Image Processing</h2>
       <p class="track-desc">What a digital image actually is, how to fix radiometric and geometric errors, how to enhance and filter images, how classification algorithms turn pixels into land-cover maps — with working Python code throughout.</p>
@@ -70,14 +70,14 @@
   </div>
 
   <div class="topic-grid">
-    <a class="topic-card" href="applications.html">
+    <a class="topic-card" href="pages/applications.html">
       <div class="tc-num">★</div>
       <div class="tc-chip" style="background: var(--amber-dim); color: var(--amber);">Practical</div>
       <h3>Real-World Applications</h3>
       <p>Crop monitoring, flood mapping through clouds with SAR, deforestation tracking, urban growth, glacier retreat — with the actual bands, indices and workflow used for each, and code you can run.</p>
       <div class="tc-cta">Open &rarr;</div>
     </a>
-    <a class="topic-card" href="quiz.html">
+    <a class="topic-card" href="pages/quiz.html">
       <div class="tc-num">✓</div>
       <div class="tc-chip" style="background: var(--purple-dim); color: var(--purple);">Test Yourself</div>
       <h3>Knowledge Check</h3>
@@ -97,7 +97,7 @@
   </div>
 </section>
 
-<script src="app.js"></script>
+<script src="js/app.js"></script>
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
