@@ -4,6 +4,7 @@
    ================================================================ */
 
 const RS_TRACK = [
+  { file: 'pages/remote-sensing/intro.html',          short: 'Introduction',   title: 'Intro to Remote Sensing',        num: 'RS.0' },
   { file: 'pages/remote-sensing/fundamentals.html',   short: 'Fundamentals',   title: 'What Is Remote Sensing?',        num: 'RS.1' },
   { file: 'pages/remote-sensing/signatures.html',     short: 'Signatures',     title: 'Spectral Signatures',            num: 'RS.2' },
   { file: 'pages/remote-sensing/platforms.html',      short: 'Platforms',      title: 'Orbits & Scanning',               num: 'RS.3' },
