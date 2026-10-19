@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spectral Signatures — RS.2</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="../../css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -36,7 +36,7 @@
   </div>
 
   <div class="figure">
-    <div class="figure-img-wrap"><img src="img/sig-vegetation-ideal-curve.jpg" alt="Ideal spectral reflectance curve of healthy vegetation, from IIRS lecture"></div>
+    <div class="figure-img-wrap"><img src="../../assets/images/remote-sensing/signatures/sig-vegetation-ideal-curve.jpg" alt="Ideal spectral reflectance curve of healthy vegetation, from IIRS lecture"></div>
     <figcaption>The classic "peak-and-valley" curve of healthy vegetation: low reflectance in blue and red (chlorophyll absorption), a small green peak (why plants look green), and a sharp jump into the near-infrared.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun — "Spectral Signatures and Image Interpretation," Dr. Hina Pande</span>
     </figcaption>
@@ -135,13 +135,13 @@
 
   <div class="figure-row">
     <div class="figure">
-      <div class="figure-img-wrap"><img src="img/sig-needleleaf-broadleaf.jpg" alt="Needle-leaf vs broad-leaf canopy reflectance"></div>
+      <div class="figure-img-wrap"><img src="../../assets/images/remote-sensing/signatures/sig-needleleaf-broadleaf.jpg" alt="Needle-leaf vs broad-leaf canopy reflectance"></div>
       <figcaption>Needle-leaf (coniferous) canopies reflect noticeably less NIR than broad-leaf (deciduous) canopies — leaf shape and internal structure change the signature even within "vegetation."
         <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
       </figcaption>
     </div>
     <div class="figure">
-      <div class="figure-img-wrap"><img src="img/sig-healthy-infected-plants.jpg" alt="Healthy vs infected/stressed plants reflectance curve"></div>
+      <div class="figure-img-wrap"><img src="../../assets/images/remote-sensing/signatures/sig-healthy-infected-plants.jpg" alt="Healthy vs infected/stressed plants reflectance curve"></div>
       <figcaption>Healthy vs. stressed/infected plants: the stressed curve drops sharply in the NIR plateau well before any visible colour change appears — the basis for early crop-disease and drought detection.
         <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
       </figcaption>
@@ -201,13 +201,13 @@ plt.savefig(<span class="c-str">'signatures.png'</span>, dpi=150)</code></pre>
 
   <div class="figure-row">
     <div class="figure">
-      <div class="figure-img-wrap"><img src="img/sig-soil-moisture-curve.jpg" alt="Soil moisture effect on reflectance curve"></div>
+      <div class="figure-img-wrap"><img src="../../assets/images/remote-sensing/signatures/sig-soil-moisture-curve.jpg" alt="Soil moisture effect on reflectance curve"></div>
       <figcaption>Wet soil vs. dry soil: moisture lowers reflectance across the whole curve without changing its shape — the single biggest factor in how bright or dark bare ground appears in any image.
         <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
       </figcaption>
     </div>
     <div class="figure">
-      <div class="figure-img-wrap"><img src="img/sig-water-reflectance.jpg" alt="Water spectral reflectance behaviour"></div>
+      <div class="figure-img-wrap"><img src="../../assets/images/remote-sensing/signatures/sig-water-reflectance.jpg" alt="Water spectral reflectance behaviour"></div>
       <figcaption>Water's reflectance collapses to near-zero beyond the visible range — the sharp visible/NIR contrast at a shoreline is exactly why NIR is the easiest band for mapping water bodies.
         <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
       </figcaption>
@@ -215,14 +215,14 @@ plt.savefig(<span class="c-str">'signatures.png'</span>, dpi=150)</code></pre>
   </div>
 
   <div class="figure">
-    <div class="figure-img-wrap"><img src="img/sig-landsat-multiband-real.jpg" alt="Same scene imaged in different Landsat bands"></div>
+    <div class="figure-img-wrap"><img src="../../assets/images/remote-sensing/signatures/sig-landsat-multiband-real.jpg" alt="Same scene imaged in different Landsat bands"></div>
     <figcaption>The same landscape, imaged in seven different bands (0.45 µm through 2.35 µm). Notice how features that are invisible or low-contrast in one band become obvious in another — that's the spectral signature at work, band by band.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
     </figcaption>
   </div>
 
   <div class="figure">
-    <div class="figure-img-wrap"><img src="img/sig-band-table-applications.jpg" alt="Landsat band table with principal applications"></div>
+    <div class="figure-img-wrap"><img src="../../assets/images/remote-sensing/signatures/sig-band-table-applications.jpg" alt="Landsat band table with principal applications"></div>
     <figcaption>A practical band-selection reference: which wavelength range to reach for depending on what you're trying to see — coastal water clarity, vegetation vigour, soil/vegetation moisture, mineral discrimination, or thermal anomalies.
       <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
     </figcaption>
@@ -231,13 +231,13 @@ plt.savefig(<span class="c-str">'signatures.png'</span>, dpi=150)</code></pre>
   <!-- AUTHENTIC SATELLITE DATA: TRUE COLOR VS FALSE COLOR COMPOSITE (FCC) -->
   <div class="figure-row">
     <div class="figure">
-      <div class="figure-img-wrap"><img src="img/sig-truecolor-natural.jpg" alt="Landsat True Color Natural RGB composite"></div>
+      <div class="figure-img-wrap"><img src="../../assets/images/remote-sensing/signatures/sig-truecolor-natural.jpg" alt="Landsat True Color Natural RGB composite"></div>
       <figcaption><strong>True-Colour Composite (Bands 3, 2, 1 as R, G, B):</strong> Replicates human eye perception. Vegetation appears green, soil is brown/tan, and water is blue. Notice that subtle differences between healthy crops and stressed trees are difficult to distinguish.
         <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
       </figcaption>
     </div>
     <div class="figure">
-      <div class="figure-img-wrap"><img src="img/sig-falsecolor-fcc.jpg" alt="Landsat Standard False Color Infrared FCC composite"></div>
+      <div class="figure-img-wrap"><img src="../../assets/images/remote-sensing/signatures/sig-falsecolor-fcc.jpg" alt="Landsat Standard False Color Infrared FCC composite"></div>
       <figcaption><strong>Standard False-Colour Composite (Bands 4, 3, 2 as R, G, B):</strong> Assigns high-reflectance Near-Infrared (Band 4) to the Red channel. Healthy vegetation glows intense scarlet red; turbid water turns cyan-blue; deep clear water turns pitch black.
         <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
       </figcaption>
@@ -261,7 +261,7 @@ plt.savefig(<span class="c-str">'signatures.png'</span>, dpi=150)</code></pre>
   </div>
 </section>
 
-<script src="app.js"></script>
+<script src="../../js/app.js"></script>
 <script>
 (function() {
   const wavelengths = ['0.40', '0.45', '0.50', '0.55', '0.60', '0.65', '0.68', '0.72', '0.75', '0.80', '0.85', '0.90', '1.00', '1.10', '1.20', '1.30', '1.40', '1.50', '1.65', '1.80', '1.90', '2.00', '2.20', '2.40'];

@@ -4,40 +4,43 @@
    ================================================================ */
 
 const RS_TRACK = [
-  { file: 'rs-01-fundamentals.html',   short: 'Fundamentals',   title: 'What Is Remote Sensing?',        num: 'RS.1' },
-  { file: 'rs-02-signatures.html',     short: 'Signatures',     title: 'Spectral Signatures',            num: 'RS.2' },
-  { file: 'rs-03-platforms.html',      short: 'Platforms',      title: 'Orbits & Scanning',               num: 'RS.3' },
-  { file: 'rs-04-resolution.html',     short: 'Resolution',     title: 'The Four Resolutions',            num: 'RS.4' },
-  { file: 'rs-05-interpretation.html', short: 'Interpretation', title: 'Reading a Satellite Image',       num: 'RS.5' },
-  { file: 'rs-06-missions-data.html',  short: 'Missions & Data',title: 'Satellites & Free Data',          num: 'RS.6' },
+  { file: 'pages/remote-sensing/intro.html',          short: 'Introduction',   title: 'Intro to Remote Sensing',        num: 'RS.0' },
+  { file: 'pages/remote-sensing/fundamentals.html',   short: 'Fundamentals',   title: 'What Is Remote Sensing?',        num: 'RS.1' },
+  { file: 'pages/remote-sensing/signatures.html',     short: 'Signatures',     title: 'Spectral Signatures',            num: 'RS.2' },
+  { file: 'pages/remote-sensing/platforms.html',      short: 'Platforms',      title: 'Orbits & Scanning',               num: 'RS.3' },
+  { file: 'pages/remote-sensing/resolution.html',     short: 'Resolution',     title: 'The Four Resolutions',            num: 'RS.4' },
+  { file: 'pages/remote-sensing/interpretation.html', short: 'Interpretation', title: 'Reading a Satellite Image',       num: 'RS.5' },
+  { file: 'pages/remote-sensing/missions-data.html',  short: 'Missions & Data',title: 'Satellites & Free Data',          num: 'RS.6' },
 ];
 
 const IP_TRACK = [
-  { file: 'ip-01-basics.html',         short: 'Digital Images', title: 'What Is a Digital Image?',       num: 'IP.1' },
-  { file: 'ip-02-preprocessing.html',  short: 'Preprocessing',  title: 'Radiometric & Geometric Correction', num: 'IP.2' },
-  { file: 'ip-03-enhancement.html',    short: 'Enhancement',    title: 'Contrast, Filtering & Indices',   num: 'IP.3' },
-  { file: 'ip-04-classification.html', short: 'Classification', title: 'Turning Pixels Into Classes',     num: 'IP.4' },
-  { file: 'ip-05-python-lab.html',     short: 'Python Lab',     title: 'A Real NDVI + Classification Workflow', num: 'IP.5' },
+  { file: 'pages/image-processing/basics.html',         short: 'Digital Images', title: 'What Is a Digital Image?',       num: 'IP.1' },
+  { file: 'pages/image-processing/preprocessing.html',  short: 'Preprocessing',  title: 'Radiometric & Geometric Correction', num: 'IP.2' },
+  { file: 'pages/image-processing/enhancement.html',    short: 'Enhancement',    title: 'Contrast, Filtering & Indices',   num: 'IP.3' },
+  { file: 'pages/image-processing/classification.html', short: 'Classification', title: 'Turning Pixels Into Classes',     num: 'IP.4' },
+  { file: 'pages/image-processing/python-lab.html',     short: 'Python Lab',     title: 'A Real NDVI + Classification Workflow', num: 'IP.5' },
 ];
 
 const ALL_PAGES = [
   { file: 'index.html', short: 'Home', title: 'Home', num: null, track: null },
   ...RS_TRACK.map(p => ({ ...p, track: 'rs' })),
   ...IP_TRACK.map(p => ({ ...p, track: 'ip' })),
-  { file: 'applications.html', short: 'Applications', title: 'Real-World Applications', num: null, track: null },
-  { file: 'quiz.html', short: 'Quiz', title: 'Knowledge Check', num: null, track: null },
+  { file: 'pages/applications.html', short: 'Applications', title: 'Real-World Applications', num: null, track: null },
+  { file: 'pages/quiz.html', short: 'Quiz', title: 'Knowledge Check', num: null, track: null },
 ];
 
 function currentPageFile() {
-  const p = window.location.pathname.split('/').pop() || 'index.html';
-  return p === '' ? 'index.html' : p;
+  const p = window.location.pathname;
+  // Remove leading slash and trailing slash, return path relative to root
+  const path = p.replace(/^\//, '').replace(/\/$/, '') || 'index.html';
+  return path === '' ? 'index.html' : path;
 }
 
 function buildDropdown(track, label, cls) {
   const current = currentPageFile();
   const hasCurrent = track.some(p => p.file === current);
   const items = track.map(p => `
-    <a href="${p.file}" class="${p.file === current ? 'current' : ''}">
+    <a href="/${p.file}" class="${p.file === current ? 'current' : ''}">
       <span class="dn-num">${p.num}</span>${p.short}
     </a>`).join('');
   return `
@@ -50,17 +53,17 @@ function buildDropdown(track, label, cls) {
 function buildNav() {
   const current = currentPageFile();
   const homeCls = current === 'index.html' ? 'current' : '';
-  const appCls = current === 'applications.html' ? 'current' : '';
-  const quizCls = current === 'quiz.html' ? 'current' : '';
+  const appCls = current === 'pages/applications.html' ? 'current' : '';
+  const quizCls = current === 'pages/quiz.html' ? 'current' : '';
   return `
     <nav class="site-nav" id="siteNav">
-      <a class="nav-logo" href="index.html">RS·IP GUIDE</a>
+      <a class="nav-logo" href="/index.html">RS·IP GUIDE</a>
       <div class="nav-links">
-        <a href="index.html" class="${homeCls}">Home</a>
+        <a href="/index.html" class="${homeCls}">Home</a>
         ${buildDropdown(RS_TRACK, 'Remote Sensing')}
         ${buildDropdown(IP_TRACK, 'Image Processing')}
-        <a href="applications.html" class="${appCls}">Applications</a>
-        <a href="quiz.html" class="nav-quiz ${quizCls}">Quiz</a>
+        <a href="/pages/applications.html" class="${appCls}">Applications</a>
+        <a href="/pages/quiz.html" class="nav-quiz ${quizCls}">Quiz</a>
       </div>
     </nav>`;
 }
@@ -78,14 +81,14 @@ function buildFooter() {
 
 function buildPrevNext() {
   const current = currentPageFile();
-  const combined = [{file:'index.html'}, ...RS_TRACK, ...IP_TRACK, {file:'applications.html'}, {file:'quiz.html'}];
+  const combined = [{file:'index.html'}, ...RS_TRACK, ...IP_TRACK, {file:'pages/applications.html'}, {file:'pages/quiz.html'}];
   const idx = combined.findIndex(p => p.file === current);
   if (idx === -1) return '';
   const prev = idx > 0 ? ALL_PAGES.find(p => p.file === combined[idx-1].file) : null;
   const next = idx < combined.length - 1 ? ALL_PAGES.find(p => p.file === combined[idx+1].file) : null;
   let html = '<div class="page-nav">';
-  html += prev ? `<a class="prev" href="${prev.file}"><span class="pn-label">Previous</span><span class="pn-title">${prev.title}</span></a>` : '<span></span>';
-  html += next ? `<a class="next" href="${next.file}"><span class="pn-label">Next</span><span class="pn-title">${next.title}</span></a>` : '<span></span>';
+  html += prev ? `<a class="prev" href="/${prev.file}"><span class="pn-label">Previous</span><span class="pn-title">${prev.title}</span></a>` : '<span></span>';
+  html += next ? `<a class="next" href="/${next.file}"><span class="pn-label">Next</span><span class="pn-title">${next.title}</span></a>` : '<span></span>';
   html += '</div>';
   return html;
 }

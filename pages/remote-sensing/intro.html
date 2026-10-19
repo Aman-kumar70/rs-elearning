@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intro to Remote Sensing — RS.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+
+<header class="page-hero">
+  <div class="chapter-badge">Track A · RS.0 — Introduction</div>
+  <h1>Intro to <span>Remote Sensing</span></h1>
+  <p class="hero-intro">Remote sensing is how we study the Earth without touching it. This chapter lays the groundwork for Track A: what remote sensing is, the six-component process behind every satellite image, the real-world problems it is used to solve, and what it can and can't do.</p>
+  <div class="chapter-progress"><span class="now"></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+</header>
+
+<section class="content-section reveal">
+  <div class="section-label">00.1 / The Idea</div>
+  <h2 class="section-title">What is remote sensing?</h2>
+  <p class="section-intro" style="max-width: 760px; margin-bottom: 8px;">
+    Remote sensing is the science of collecting information about an object, area, or phenomenon without physically touching it.
+    It collects information by detecting and measuring electromagnetic energy reflected, emitted, or scattered by objects using sensors mounted on satellites, aircraft, drones, or other platforms.
+  </p>
+
+  <div class="tech-detail">
+    <div class="label">Example</div>
+    <p>A satellite takes an image of a forest from space. By studying the image, scientists can estimate forest cover without visiting every part of the forest.</p>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">00.2 / Animation</div>
+  <h2 class="section-title">The process, animated</h2>
+
+  <div class="anim-frame">
+    <div class="af-play">&#9654;</div>
+    <div class="af-title">Animation — to be provided</div>
+    <p>This space is reserved for the chapter animation: a walkthrough of the six-component process described below. It will be added here once provided.</p>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">00.3 / The Process</div>
+  <h2 class="section-title">The six components of the remote sensing process</h2>
+
+  <div class="step-grid">
+    <div class="step-card">
+      <div class="sc-num">COMPONENT 1</div>
+      <h4>Energy source</h4>
+      <p>Supplies electromagnetic energy. The Sun is the main source for most optical satellite images.</p>
+    </div>
+    <div class="step-card">
+      <div class="sc-num">COMPONENT 2</div>
+      <h4>Atmosphere</h4>
+      <p>Radiation passes through gases, aerosols, and clouds that may scatter or absorb it.</p>
+    </div>
+    <div class="step-card">
+      <div class="sc-num">COMPONENT 3</div>
+      <h4>Target interaction</h4>
+      <p>Earth's surface absorbs, reflects, transmits, or emits energy.</p>
+    </div>
+    <div class="step-card">
+      <div class="sc-num">COMPONENT 4</div>
+      <h4>Sensor</h4>
+      <p>Measures the energy coming from the target.</p>
+    </div>
+    <div class="step-card">
+      <div class="sc-num">COMPONENT 5</div>
+      <h4>Data transmission and processing</h4>
+      <p>Measurements are converted into digital data, corrected, and processed into images.</p>
+    </div>
+    <div class="step-card">
+      <div class="sc-num">COMPONENT 6</div>
+      <h4>Interpretation and application</h4>
+      <p>Analysts identify features and extract useful information.</p>
+    </div>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">00.4 / Why</div>
+  <h2 class="section-title">Why remote sensing?</h2>
+
+  <div class="tech-detail" style="margin-top: 8px;">
+    <div class="label">Why</div>
+    <p>Because physical access is often impossible, dangerous, expensive, or simply too slow. You can't walk every square kilometre of the Amazon to track deforestation, or send a person into a cyclone to map flood extent — but a satellite passes over the whole planet every few days.</p>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">00.5 / Applications</div>
+  <h2 class="section-title">Applications of remote sensing</h2>
+  <p class="section-intro" style="max-width: 760px;">Remote sensing is used across environmental science, engineering, agriculture, and public planning.</p>
+
+  <div class="app-case-grid">
+    <div class="app-case">
+      <div class="ac-img-wrap"><img src="../../assets/images/remote-sensing/intro/intro-app-agriculture.webp" alt="Satellite view of farmland — a patchwork of rectangular fields, with some fields highlighted in bright green, yellow and orange"></div>
+      <div class="ac-body">
+        <h3>Agriculture</h3>
+        <ul>
+          <li>Crop-type mapping.</li>
+          <li>Crop growth and vegetation monitoring.</li>
+          <li>Drought and irrigation assessment.</li>
+          <li>Detecting crop stress.</li>
+          <li>Estimating agricultural acreage.</li>
+        </ul>
+        <p class="ac-caption">Farmland from orbit. Differences in colour and vigour between fields are the starting point for crop-type mapping and growth monitoring.</p>
+      </div>
+    </div>
+
+    <div class="app-case">
+      <div class="ac-img-wrap"><img src="../../assets/images/remote-sensing/intro/intro-app-mineral-exploration.webp" alt="Colour-composite satellite image of a mining and industrial area in rugged terrain, rendered in vivid false colours"></div>
+      <div class="ac-body">
+        <h3>Mineral exploration</h3>
+        <ul>
+          <li>Identifying hydrothermal alteration zones</li>
+          <li>Mapping structural traps</li>
+          <li>Topographic and surficial mapping</li>
+          <li>Geophysical anomaly correlation</li>
+          <li>Monitoring mining footprints</li>
+        </ul>
+        <p class="ac-caption">A colour-enhanced view of a mineral exploration area — such composites help map rock types, alteration zones and structures.</p>
+      </div>
+    </div>
+
+    <div class="app-case">
+      <div class="ac-img-wrap"><img src="../../assets/images/remote-sensing/intro/intro-app-disaster-management.webp" alt="False-colour satellite image showing dense green vegetation with water bodies and wet ground highlighted in bright cyan"></div>
+      <div class="ac-body">
+        <h3>Disaster management</h3>
+        <ul>
+          <li>Flood extent mapping.</li>
+          <li>Wildfire monitoring.</li>
+          <li>Landslide assessment.</li>
+          <li>Cyclone and storm damage assessment.</li>
+          <li>Post-disaster planning.</li>
+        </ul>
+        <p class="ac-caption">Water and wet ground stand out sharply in this composite — the kind of view used to map flood extent and assess storm damage.</p>
+      </div>
+    </div>
+
+    <div class="app-case">
+      <div class="ac-img-wrap"><img src="../../assets/images/remote-sensing/intro/intro-app-military.webp" alt="High-resolution view of a building complex beside a road in arid terrain, with visible damage to one of the structures"></div>
+      <div class="ac-body">
+        <h3>Military reconnaissance</h3>
+        <ul>
+          <li>Intelligence gathering</li>
+          <li>Battlefield damage assessment</li>
+          <li>Terrain and mobility analysis</li>
+          <li>Border and maritime surveillance</li>
+          <li>Target identification</li>
+        </ul>
+        <p class="ac-caption">High spatial detail of a specific site — the level of imagery used for intelligence gathering, damage assessment and surveillance.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tech-detail">
+    <div class="label">Beyond These</div>
+    <p>Other applications include geology, forestry, weather forecasting, glaciology, oceanography, archaeology, and urban planning.</p>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">00.6 / Trade-offs</div>
+  <h2 class="section-title">Advantages and limitations of remote sensing</h2>
+
+  <div class="adv-lim-grid">
+    <div class="al-card adv">
+      <h3>Advantages</h3>
+      <ol>
+        <li><strong>Large-area coverage:</strong> One image can cover a very large region.</li>
+        <li><strong>Repeated observations:</strong> Supports monitoring of changes over time.</li>
+        <li><strong>Access to difficult areas:</strong> Useful in mountains, forests, deserts, and disaster zones.</li>
+        <li><strong>Multispectral information:</strong> Reveals properties invisible in ordinary photographs.</li>
+        <li><strong>Efficient mapping:</strong> Can support rapid regional mapping and analysis.</li>
+        <li><strong>Historical comparison:</strong> Archived imagery helps analyze long-term changes.</li>
+        <li><strong>Integration with GIS:</strong> Supports spatial analysis and decision-making.</li>
+      </ol>
+    </div>
+
+    <div class="al-card lim">
+      <h3>Limitations</h3>
+      <ol>
+        <li><strong>Cloud cover:</strong> Can obstruct optical observations.</li>
+        <li><strong>Resolution constraints:</strong> Small features may be missed by coarse-resolution sensors.</li>
+        <li><strong>Atmospheric interference:</strong> Scattering and absorption can distort measurements.</li>
+        <li><strong>Cost and expertise:</strong> Some high-resolution datasets and advanced processing systems are expensive.</li>
+        <li><strong>Interpretation errors:</strong> False features may appear after analysis.</li>
+        <li><strong>Ground verification:</strong> Reference observations may be needed to confirm results.</li>
+        <li><strong>Temporal limitations:</strong> A satellite may not observe an area as frequently as required.</li>
+        <li><strong>Processing challenges:</strong> Data calibration, correction, classification, and accuracy assessment require time.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="try-it">
+    <div class="ti-label">What's Next</div>
+    <p>Remote sensing begins with energy. To understand why different surfaces look different, the next concept is electromagnetic radiation and its wavelengths. <a href="fundamentals.html" style="color: var(--teal);">Continue to RS.1 — What Is Remote Sensing? &rarr;</a></p>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">00.7 / Activities</div>
+  <h2 class="section-title">Learning activities</h2>
+
+  <div class="widget-panel">
+    <h3>Activity 1 — Arrange the Remote Sensing process</h3>
+    <p class="widget-sub">The six stages below are out of order. Move them until the sequence is correct, then check your answer.</p>
+    <ul class="order-list" id="orderList"></ul>
+    <div class="widget-actions">
+      <button type="button" class="act-btn primary" id="orderCheck">Check order</button>
+      <button type="button" class="act-btn" id="orderShuffle">Shuffle</button>
+    </div>
+    <div class="act-result" id="orderResult"></div>
+  </div>
+
+  <div class="widget-panel">
+    <h3>Activity 2 — MCQ</h3>
+    <p class="widget-sub">Eight multiple-choice questions on this chapter. Click an option to answer — feedback appears instantly, and each question locks once answered.</p>
+    <div class="quiz-section" id="intro-quiz-container"></div>
+  </div>
+
+  <div class="widget-panel">
+    <h3>Activity 3 — Match the component</h3>
+    <p class="widget-sub">Connect each component to its function: click a component on the left, then click its function on the right. Then check your matches.</p>
+    <div class="match-grid">
+      <div class="match-col" id="matchLeft"></div>
+      <div class="match-col" id="matchRight"></div>
+    </div>
+    <div class="widget-actions">
+      <button type="button" class="act-btn primary" id="matchCheck">Check matches</button>
+      <button type="button" class="act-btn" id="matchReset">Reset</button>
+    </div>
+    <div class="act-result" id="matchResult"></div>
+  </div>
+</section>
+
+<script src="../../js/app.js"></script>
+<script>
+(function() {
+  /* ---------- shared helper ---------- */
+  function shuffled(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  /* ================= Activity 2 — MCQ =================
+     Same behavior and classes as the site-wide quiz (pages/quiz.html):
+     click to answer, lock the question, show feedback, track progress
+     and a final score. Question set, options and answers are taken
+     verbatim from the Intro to RS source material. */
+  const topic = {
+    title: 'Intro to Remote Sensing',
+    desc: 'RS.0: the definition, the six-component process, and why remote sensing matters',
+    questions: [
+      { q: "What is remote sensing?",
+        options: ["Collecting information by physically touching an object", "Collecting information without physically touching an object", "Studying only objects in space", "Measuring temperature with a thermometer"],
+        correct: 1, feedback: "Correct answer: B." },
+      { q: "What does a remote sensing system detect or measure?",
+        options: ["Electromagnetic energy", "Only sound waves", "Only visible light", "Soil weight"],
+        correct: 0, feedback: "Correct answer: A." },
+      { q: "Which is the main source of energy for most optical satellite images?",
+        options: ["The Moon", "Earth's core", "The Sun", "Artificial lighting"],
+        correct: 2, feedback: "Correct answer: C." },
+      { q: "When radiation passes through the atmosphere, it may be scattered or absorbed.",
+        options: ["True", "False"],
+        correct: 0, feedback: "Correct answer: A. True" },
+      { q: "What can Earth's surface do to incoming energy?",
+        options: ["Only absorb it", "Only reflect it", "Absorb, reflect, transmit, or emit it", "Convert all of it into visible light"],
+        correct: 2, feedback: "Correct answer: C." },
+      { q: "Scientists want to monitor deforestation in the Amazon but cannot visit every location. Why is remote sensing useful?",
+        options: ["It requires visiting every tree", "It allows large areas to be monitored without visiting every location", "It prevents deforestation automatically", "It works only in cities"],
+        correct: 1, feedback: "Correct answer: B." },
+      { q: "Field verification can help confirm whether an interpretation of a satellite image is accurate.",
+        options: ["True", "False"],
+        correct: 0, feedback: "Correct answer: A. True" },
+      { q: "Why may field verification be necessary?",
+        options: ["To confirm that image interpretations are accurate", "To prevent satellites from orbiting", "To eliminate all electromagnetic radiation", "To replace every satellite image"],
+        correct: 0, feedback: "Correct answer: A." }
+    ]
+  };
+
+  const container = document.getElementById('intro-quiz-container');
+  const totalQuestions = topic.questions.length;
+  let totalAnswered = 0, totalCorrect = 0;
+
+  const topicHeader = document.createElement('div');
+  topicHeader.className = 'quiz-topic-header';
+  topicHeader.innerHTML = `
+    <div class="topic-num">Topic 1 of 1</div>
+    <div class="topic-title">${topic.title}</div>
+    <div class="topic-desc">${topic.desc}</div>
+    <div class="topic-progress">0/${totalQuestions} answered</div>
+  `;
+  container.appendChild(topicHeader);
+
+  topic.questions.forEach((q, qi) => {
+    const qDiv = document.createElement('div');
+    qDiv.className = 'quiz-question';
+    qDiv.innerHTML = `
+      <div class="q-num">Question ${qi + 1} of ${totalQuestions}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="quiz-options">
+        ${q.options.map((opt, oi) => `
+          <div class="quiz-option" data-qi="${qi}" data-oi="${oi}">
+            <div class="marker">${String.fromCharCode(65 + oi)}</div>
+            <span>${opt}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="quiz-feedback" id="feedback-${qi}">${q.feedback}</div>
+    `;
+    container.appendChild(qDiv);
+  });
+
+  const scoreDiv = document.createElement('div');
+  scoreDiv.className = 'quiz-score';
+  scoreDiv.id = 'intro-quiz-score';
+  scoreDiv.innerHTML = `You scored <span class="score-num">0</span> / ${totalQuestions}<br><span style="font-size: 13px; color: var(--text-dim); margin-top: 8px; display: block;">Revisit any section above if an answer surprised you.</span>`;
+  container.appendChild(scoreDiv);
+
+  container.querySelectorAll('.quiz-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const qi = parseInt(opt.dataset.qi);
+      const oi = parseInt(opt.dataset.oi);
+      const q = topic.questions[qi];
+      const options = container.querySelectorAll(`.quiz-option[data-qi="${qi}"]`);
+      if (options[0].classList.contains('disabled')) return;
+      options.forEach(o => o.classList.add('disabled'));
+      if (oi === q.correct) {
+        opt.classList.add('correct');
+        opt.querySelector('.marker').textContent = '\u2713';
+        totalCorrect++;
+      } else {
+        opt.classList.add('wrong');
+        opt.querySelector('.marker').textContent = '\u2717';
+        options[q.correct].classList.add('correct');
+        options[q.correct].querySelector('.marker').textContent = '\u2713';
+      }
+      totalAnswered++;
+      document.getElementById(`feedback-${qi}`).classList.add('show');
+      const prog = topicHeader.querySelector('.topic-progress');
+      if (totalAnswered === totalQuestions) {
+        prog.innerHTML = `${totalCorrect}/${totalQuestions} correct`;
+        prog.style.color = totalCorrect === totalQuestions ? 'var(--green)' : 'var(--amber)';
+        setTimeout(() => {
+          const score = document.getElementById('intro-quiz-score');
+          score.querySelector('.score-num').textContent = totalCorrect;
+          score.classList.add('show');
+          score.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 500);
+      } else {
+        prog.textContent = `${totalAnswered}/${totalQuestions} answered`;
+      }
+    });
+  });
+
+  /* ================= Activity 1 — Arrange the process ================= */
+  const PROCESS_ORDER = ['Energy source', 'Atmosphere', 'Target interaction', 'Sensor', 'Data processing', 'Interpretation'];
+  const orderList = document.getElementById('orderList');
+  const orderResult = document.getElementById('orderResult');
+  let orderItems = [];
+
+  function clearOrderMarks() {
+    orderList.querySelectorAll('.order-item').forEach(li => li.classList.remove('pos-ok', 'pos-bad'));
+    orderResult.className = 'act-result';
+  }
+
+  function renderOrder() {
+    orderList.innerHTML = '';
+    orderItems.forEach((name, idx) => {
+      const li = document.createElement('li');
+      li.className = 'order-item';
+      li.innerHTML = `
+        <span class="oi-name">${name}</span>
+        <span class="oi-btns">
+          <button type="button" class="oi-btn" data-move="up" aria-label="Move up" ${idx === 0 ? 'disabled' : ''}>&#9650;</button>
+          <button type="button" class="oi-btn" data-move="down" aria-label="Move down" ${idx === orderItems.length - 1 ? 'disabled' : ''}>&#9660;</button>
+        </span>`;
+      orderList.appendChild(li);
+    });
+  }
+
+  orderList.addEventListener('click', (e) => {
+    const btn = e.target.closest('.oi-btn');
+    if (!btn || btn.disabled) return;
+    const li = btn.closest('.order-item');
+    const idx = Array.prototype.indexOf.call(orderList.children, li);
+    const swapWith = btn.dataset.move === 'up' ? idx - 1 : idx + 1;
+    if (swapWith < 0 || swapWith >= orderItems.length) return;
+    [orderItems[idx], orderItems[swapWith]] = [orderItems[swapWith], orderItems[idx]];
+    clearOrderMarks();
+    renderOrder();
+  });
+
+  document.getElementById('orderCheck').addEventListener('click', () => {
+    let correct = 0;
+    orderList.querySelectorAll('.order-item').forEach((li, idx) => {
+      const ok = orderItems[idx] === PROCESS_ORDER[idx];
+      li.classList.add(ok ? 'pos-ok' : 'pos-bad');
+      if (ok) correct++;
+    });
+    orderResult.classList.add('show');
+    if (correct === PROCESS_ORDER.length) {
+      orderResult.classList.add('ok');
+      orderResult.textContent = 'Correct — the process runs: Energy source \u2192 Atmosphere \u2192 Target interaction \u2192 Sensor \u2192 Data processing \u2192 Interpretation.';
+    } else {
+      orderResult.classList.add('partial');
+      orderResult.textContent = correct + ' of ' + PROCESS_ORDER.length + ' steps are in the right position — keep adjusting.';
+    }
+  });
+
+  document.getElementById('orderShuffle').addEventListener('click', () => {
+    do {
+      orderItems = shuffled(PROCESS_ORDER);
+    } while (orderItems.join('|') === PROCESS_ORDER.join('|'));
+    clearOrderMarks();
+    renderOrder();
+  });
+
+  orderItems = shuffled(PROCESS_ORDER);
+  renderOrder();
+
+  /* ================= Activity 3 — Match the component ================= */
+  const MATCH_PAIRS = [
+    { component: 'Sun', func: 'Provides energy' },
+    { component: 'Atmosphere', func: 'Scatters or absorbs radiation' },
+    { component: 'Target', func: 'Reflects, absorbs, transmits, or emits energy' },
+    { component: 'Sensor', func: 'Measures energy' },
+    { component: 'Processing', func: 'Converts measurements into usable data' },
+    { component: 'Analyst', func: 'Interprets the information' }
+  ];
+  const matchLeft = document.getElementById('matchLeft');
+  const matchRight = document.getElementById('matchRight');
+  const matchResult = document.getElementById('matchResult');
+
+  const rightItems = shuffled(MATCH_PAIRS.map(p => p.func));
+  const pairOfLeft = new Array(MATCH_PAIRS.length).fill(null);
+  const pairOfRight = new Array(MATCH_PAIRS.length).fill(null);
+  let selectedLeft = null;
+
+  function renderMatchItem(col, index, text, side) {
+    const div = document.createElement('div');
+    div.className = 'match-item';
+    div.dataset.side = side;
+    div.dataset.index = index;
+    div.innerHTML = `<span class="mi-name">${text}</span><span class="mi-badge"></span>`;
+    col.appendChild(div);
+  }
+
+  MATCH_PAIRS.forEach((p, i) => renderMatchItem(matchLeft, i, p.component, 'left'));
+  rightItems.forEach((t, i) => renderMatchItem(matchRight, i, t, 'right'));
+
+  function clearMatchMarks() {
+    document.querySelectorAll('.match-item').forEach(el => el.classList.remove('correct', 'wrong'));
+    matchResult.className = 'act-result';
+  }
+
+  function refreshBadges() {
+    document.querySelectorAll('.match-item').forEach(el => {
+      const side = el.dataset.side;
+      const i = parseInt(el.dataset.index);
+      const partner = side === 'left' ? pairOfLeft[i] : pairOfRight[i];
+      const badge = el.querySelector('.mi-badge');
+      if (partner === null) {
+        el.classList.remove('paired');
+        badge.textContent = '';
+      } else {
+        el.classList.add('paired');
+        badge.textContent = side === 'left' ? (i + 1) : (pairOfRight[i] + 1);
+      }
+    });
+  }
+
+  document.querySelectorAll('.match-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const side = el.dataset.side;
+      const i = parseInt(el.dataset.index);
+      clearMatchMarks();
+      if (side === 'left') {
+        if (pairOfLeft[i] !== null) {
+          pairOfRight[pairOfLeft[i]] = null;
+          pairOfLeft[i] = null;
+        }
+        if (selectedLeft === i) {
+          selectedLeft = null;
+          el.classList.remove('selected');
+        } else {
+          document.querySelectorAll('.match-item.selected').forEach(x => x.classList.remove('selected'));
+          selectedLeft = i;
+          el.classList.add('selected');
+        }
+      } else {
+        if (selectedLeft !== null) {
+          if (pairOfLeft[selectedLeft] !== null) {
+            pairOfRight[pairOfLeft[selectedLeft]] = null;
+          }
+          if (pairOfRight[i] !== null) {
+            pairOfLeft[pairOfRight[i]] = null;
+          }
+          pairOfLeft[selectedLeft] = i;
+          pairOfRight[i] = selectedLeft;
+          document.querySelectorAll('.match-item.selected').forEach(x => x.classList.remove('selected'));
+          selectedLeft = null;
+        } else if (pairOfRight[i] !== null) {
+          pairOfLeft[pairOfRight[i]] = null;
+          pairOfRight[i] = null;
+        }
+      }
+      refreshBadges();
+    });
+  });
+
+  document.getElementById('matchCheck').addEventListener('click', () => {
+    if (pairOfLeft.indexOf(null) !== -1) {
+      matchResult.className = 'act-result show partial';
+      matchResult.textContent = 'Match all six components before checking.';
+      return;
+    }
+    let correct = 0;
+    pairOfLeft.forEach((rightIdx, leftIdx) => {
+      const ok = rightItems[rightIdx] === MATCH_PAIRS[leftIdx].func;
+      matchLeft.children[leftIdx].classList.add(ok ? 'correct' : 'wrong');
+      matchRight.children[rightIdx].classList.add(ok ? 'correct' : 'wrong');
+      if (ok) correct++;
+    });
+    matchResult.classList.add('show');
+    if (correct === MATCH_PAIRS.length) {
+      matchResult.classList.add('ok');
+      matchResult.textContent = 'All six matches are correct.';
+    } else {
+      matchResult.classList.add('partial');
+      matchResult.textContent = correct + ' of ' + MATCH_PAIRS.length + ' matches are correct — adjust the rest and check again.';
+    }
+  });
+
+  document.getElementById('matchReset').addEventListener('click', () => {
+    pairOfLeft.fill(null);
+    pairOfRight.fill(null);
+    selectedLeft = null;
+    document.querySelectorAll('.match-item.selected').forEach(x => x.classList.remove('selected'));
+    clearMatchMarks();
+    refreshBadges();
+  });
+})();
+</script>
+</body>
+</html>
