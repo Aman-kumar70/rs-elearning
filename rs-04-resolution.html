@@ -1,0 +1,2219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Four Resolutions — RS.4</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<header class="page-hero">
+  <div class="chapter-badge">Track A · RS.4 of 6</div>
+  <h1>The Four <span>Resolutions</span></h1>
+  <p class="hero-intro">"Resolution" isn't one number — it's four independent trade-offs (spatial, spectral, radiometric, temporal), and no satellite maximizes all four at once. Choosing the right data for a job means knowing which resolution actually matters for your question.</p>
+  <div class="chapter-progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span></div>
+</header>
+
+<section class="content-section reveal">
+  <div class="section-label">04.1 / The Four Types</div>
+  <h2 class="section-title">What each resolution actually means</h2>
+
+  <div class="resolution-grid">
+    <div class="res-card spatial">
+      <div class="res-icon" style="background: var(--amber-dim); color: var(--amber);">🔍</div>
+      <h3>Spatial Resolution</h3>
+      <p>The ground area one pixel covers. "How much detail can I see?" A 1m pixel shows individual buildings; a 1km pixel shows only broad patterns. Defined by IFOV — the solid angle a detector is sensitive to.</p>
+      <div class="res-examples"><span class="res-example">Cartosat-3: 0.25m</span><span class="res-example">IKONOS: 1m</span><span class="res-example">IRS PAN: 5.8m</span><span class="res-example">Landsat: 30m</span><span class="res-example">MODIS: 250m-1km</span></div>
+    </div>
+    <div class="res-card spectral">
+      <div class="res-icon" style="background: var(--teal-dim); color: var(--teal);">🌈</div>
+      <h3>Spectral Resolution</h3>
+      <p>The width and number of wavelength bands a sensor detects. "How many colours can I see?" Narrower bands = higher spectral resolution. Panchromatic = 1 broad band; hyperspectral = hundreds of narrow ones.</p>
+      <div class="res-examples"><span class="res-example">Landsat ETM+: 6 bands</span><span class="res-example">EO-1 ALI: 9 bands</span><span class="res-example">Hyperion: 150 bands</span><span class="res-example">Sentinel-2: 13 bands</span></div>
+    </div>
+    <div class="res-card radiometric">
+      <div class="res-icon" style="background: var(--blue-dim); color: var(--blue);">📊</div>
+      <h3>Radiometric Resolution</h3>
+      <p>Ability to discriminate small energy differences. "How many shades of gray?" Measured in bits — each bit doubles the grey levels. Higher bits = smoother gradients, more shadow detail.</p>
+      <div class="res-examples"><span class="res-example">Landsat MSS: 6-bit (64)</span><span class="res-example">Landsat TM: 8-bit (256)</span><span class="res-example">Landsat OLI: 12-bit (4096)</span><span class="res-example">IKONOS: 11-bit (2048)</span></div>
+    </div>
+    <div class="res-card temporal">
+      <div class="res-icon" style="background: var(--purple-dim); color: var(--purple);">⏱️</div>
+      <h3>Temporal Resolution</h3>
+      <p>How often a satellite revisits the same area. "How often can I see changes?" Depends on orbit, swath width, and latitude. Weather needs hourly; vegetation monitoring can use weeks.</p>
+      <div class="res-examples"><span class="res-example">GOES/INSAT: Hourly</span><span class="res-example">MODIS: 1-2 days</span><span class="res-example">Sentinel-2: 5 days</span><span class="res-example">Landsat: 16 days</span></div>
+    </div>
+  </div>
+
+  <div class="tech-detail">
+    <div class="label">The IFOV Formula</div>
+    <p>Spatial resolution is defined by the <strong>Instantaneous Field of View (IFOV)</strong>: &beta; = a/f (radians), where <strong>a</strong> is detector dimension and <strong>f</strong> is focal length. The <strong>Instantaneous Ground Field of View (IGFOV)</strong> = IFOV &times; h, where <strong>h</strong> is flying height. To get finer spatial resolution: smaller detector, longer focal length, or lower orbit.</p>
+  </div>
+
+  <!-- INTERACTIVE IFOV & OPTICAL GEOMETRY LAB -->
+  <div class="ifov-lab-card">
+    <div class="ifov-lab-header">
+      <div>
+        <div class="lab-pill">ISRO IIRS Optics Lab</div>
+        <h3 style="margin: 4px 0 6px 0; color: #fff; font-size: 1.25rem;">Interactive IFOV &amp; Ground Pixel Projector</h3>
+        <p style="color: var(--text-dim); font-size: 0.88rem; margin: 0;">Explore the optical geometry: Instantaneous Field of View (&beta; = a/f) and Ground Resolution Element (IGFOV = &beta; &times; H). Adjust altitude, focal length, and detector size in real time.</p>
+      </div>
+    </div>
+
+    <!-- Platform Presets -->
+    <div class="ifov-preset-row">
+      <span class="ifov-preset-label">Sensor Presets:</span>
+      <div class="ifov-preset-chips">
+        <button class="ifov-chip active" data-h="505" data-f="4000" data-a="2" data-name="Cartosat-3 (High-Res LEO)">🛰️ Cartosat-3 (0.25m)</button>
+        <button class="ifov-chip" data-h="786" data-f="590" data-a="7.5" data-name="Sentinel-2 MSI (LEO)">🛰️ Sentinel-2 (10m)</button>
+        <button class="ifov-chip" data-h="705" data-f="640" data-a="27.2" data-name="Landsat-8/9 OLI (LEO)">🛰️ Landsat-8/9 (30m)</button>
+        <button class="ifov-chip" data-h="2.5" data-f="150" data-a="6" data-name="Aerial Survey Aircraft">✈️ Aerial Survey (10cm)</button>
+        <button class="ifov-chip" data-h="0.12" data-f="24" data-a="3.2" data-name="Survey Drone / UAV">🚁 Drone / UAV (1.6cm)</button>
+        <button class="ifov-chip" data-h="35786" data-f="800" data-a="22.4" data-name="INSAT-3D / GOES (Geostationary)">🌐 INSAT-3D (1km)</button>
+      </div>
+    </div>
+
+    <div class="ifov-layout">
+      <!-- Left: Interactive Ray Tracing Canvas -->
+      <div class="ifov-canvas-box">
+        <canvas id="ifov-canvas" width="560" height="380"></canvas>
+        <div class="ifov-canvas-badge" id="ifov-canvas-badge">LEO Satellite · 505 km Altitude</div>
+      </div>
+
+      <!-- Right: Sliders & Live Physics Telemetry -->
+      <div class="ifov-controls-box">
+        <div class="ifov-slider-group">
+          <div class="ifov-slider-header">
+            <span>Flying Height / Altitude (<span class="mono-amber">H</span>)</span>
+            <span class="ifov-val-badge" id="val-ifov-h">505 km</span>
+          </div>
+          <input type="range" id="slider-ifov-h" min="0.05" max="1000" step="0.05" value="505">
+          <div class="ifov-range-hints"><span>Drone (50m)</span><span>Air (2.5km)</span><span>LEO (705km)</span></div>
+        </div>
+
+        <div class="ifov-slider-group">
+          <div class="ifov-slider-header">
+            <span>Focal Length (<span class="mono-teal">f</span>)</span>
+            <span class="ifov-val-badge" id="val-ifov-f">4000 mm (4.0 m)</span>
+          </div>
+          <input type="range" id="slider-ifov-f" min="10" max="5000" step="10" value="4000">
+          <div class="ifov-range-hints"><span>Wide (24mm)</span><span>Medium (600mm)</span><span>Telescope (4000mm)</span></div>
+        </div>
+
+        <div class="ifov-slider-group">
+          <div class="ifov-slider-header">
+            <span>Detector Element Size (<span class="mono-purple">a</span>)</span>
+            <span class="ifov-val-badge" id="val-ifov-a">2.0 &mu;m</span>
+          </div>
+          <input type="range" id="slider-ifov-a" min="1" max="50" step="0.5" value="2.0">
+          <div class="ifov-range-hints"><span>1.5 &mu;m (CCD)</span><span>10 &mu;m (CMOS)</span><span>30 &mu;m (TIR)</span></div>
+        </div>
+
+        <!-- Live Math & Footprint Box -->
+        <div class="ifov-math-card">
+          <div class="ifov-calc-grid">
+            <div class="ifov-calc-item">
+              <span class="ci-lbl">Angular IFOV (&beta; = a / f)</span>
+              <span class="ci-val mono-teal" id="calc-ifov-rad">0.50 &mu;rad (0.103 arcsec)</span>
+            </div>
+            <div class="ifov-calc-item">
+              <span class="ci-lbl">Ground Resolution (IGFOV = &beta; &times; H)</span>
+              <span class="ci-val mono-amber" id="calc-ifov-igfov">0.25 m (25.3 cm / pixel)</span>
+            </div>
+          </div>
+          <div class="ifov-resolvable-box">
+            <span class="res-target-icon" id="res-target-icon">🚗</span>
+            <div class="res-target-desc" id="res-target-desc">
+              <strong>Resolvable Targets:</strong> At 25 cm/pixel, you can clearly distinguish individual cars, building roof structures, road centerlines, and large trees.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="plain-english">
+    <div class="pe-icon">💡</div>
+    <div class="pe-body">
+      <div class="pe-label">Plain English</div>
+      <p>Think of IFOV like the beam of a flashlight pointed at the ground from an airplane. A narrower beam (smaller detector, or a zoomed-in lens) lights up a smaller, more detailed patch of ground — that patch is your pixel. Fly higher, and even a narrow beam spreads out to cover more ground, so your pixel gets bigger and blurrier. That's the whole trade-off in one sentence: <strong>closer or more zoomed-in = smaller, sharper pixels; farther away = bigger, blurrier pixels.</strong></p>
+    </div>
+  </div>
+
+  <!-- AUTHENTIC IFOV OPTICAL GEOMETRY DIAGRAM -->
+  <div class="figure">
+    <div class="figure-img-wrap">
+      <img src="img/res-ifov-diagram.jpg" alt="Instantaneous Field of View IFOV optical geometry diagram from IIRS lecture">
+    </div>
+    <figcaption>
+      <strong>Sensor Optics: The Instantaneous Field of View (IFOV) Geometry.</strong>
+      The geometric projection of a single detector element through the focal optics: Angular IFOV is determined strictly by detector pitch <em>a</em> and focal length <em>f</em> (&beta; = a / f). The ground resolution cell dimension <em>D</em> (or IGFOV) expands linearly with platform altitude <em>H</em> (D = &beta; &times; H).
+      <span class="fig-credit">Source: ISRO IIRS Dehradun &mdash; "Fundamentals of Remote Sensing"</span>
+    </figcaption>
+  </div>
+
+  <!-- INTERACTIVE SPATIAL RESOLUTION: JUXTAPOSE BEFORE/AFTER SLIDER -->
+  <div class="spatial-juxtapose-card">
+    <div class="juxtapose-header">
+      <div>
+        <h3>Interactive Spatial Resolution: "Before &amp; After" Slider</h3>
+        <p>Drag the slider divider horizontally across the same city landscape to see how detail degrades as pixel size increases from 10m (Sentinel-2) to 30m (Landsat) and 250m (MODIS).</p>
+      </div>
+    </div>
+
+    <!-- Satellite Pair Selector -->
+    <div class="juxtapose-pair-selector">
+      <button type="button" class="jux-btn active" data-pair="s2-l8">Sentinel-2 (10m) vs Landsat-8/9 (30m)</button>
+      <button type="button" class="jux-btn" data-pair="l8-modis">Landsat-8/9 (30m) vs MODIS (250m)</button>
+      <button type="button" class="jux-btn" data-pair="carto-s2">Cartosat-3 (1m) vs Sentinel-2 (10m)</button>
+    </div>
+
+    <!-- Juxtapose Viewport -->
+    <div class="juxtapose-viewport" id="juxtapose-viewport">
+      <!-- Base Canvas (Right side / Coarser) -->
+      <canvas id="jux-canvas-base" class="juxtapose-canvas-base"></canvas>
+
+      <!-- Overlay Wrap (Left side / Finer) with clipping -->
+      <div class="juxtapose-overlay-wrap" id="jux-overlay-wrap">
+        <canvas id="jux-canvas-overlay" class="juxtapose-canvas-overlay"></canvas>
+        <div class="juxtapose-handle" id="jux-handle">&#10094;&#10095;</div>
+      </div>
+
+      <!-- Live Floating Badges -->
+      <div class="jux-badge left" id="jux-badge-left">10m &middot; Sentinel-2 MSI</div>
+      <div class="jux-badge right" id="jux-badge-right">30m &middot; Landsat-8/9 OLI</div>
+    </div>
+
+    <!-- Live Telemetry Readout -->
+    <div class="juxtapose-telemetry">
+      <div class="jux-stat-card left">
+        <div class="j-label" id="jux-meta-left-lbl">Left Sensor (Finer)</div>
+        <div class="j-val" id="jux-meta-left-val">10m / pixel &middot; 100 m&sup2;</div>
+        <div style="font-size:0.8rem; color:var(--text-dim); margin-top:4px;" id="jux-meta-left-desc">Shows individual city streets, buildings, and field boundaries.</div>
+      </div>
+      <div class="jux-stat-card right">
+        <div class="j-label" id="jux-meta-right-lbl">Right Sensor (Coarser)</div>
+        <div class="j-val" id="jux-meta-right-val">30m / pixel &middot; 900 m&sup2; (9&times; area)</div>
+        <div style="font-size:0.8rem; color:var(--text-dim); margin-top:4px;" id="jux-meta-right-desc">Urban streets blend into single mixed pixels; only large avenues and fields resolve.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTHENTIC ISRO RESOLUTION STEP-LADDER GALLERY -->
+  <div class="res-ladder-wrap">
+    <div class="res-ladder-header">
+      <div class="lab-pill">ISRO Operational Missions</div>
+      <h3>The Spatial Resolution Ladder: Real Earth Observation Step-by-Step</h3>
+      <p>Synthetic blur tests simulate resolution in software, but operational satellite payloads reveal true optical physics. Below is the exact same geographic scene captured across ISRO's operational sensor hierarchy &mdash; from regional synoptic monitoring down to sub-meter cadastral surveillance.</p>
+    </div>
+
+    <div class="res-ladder-grid">
+      <!-- 1. AWiFS 56m -->
+      <div class="res-ladder-card">
+        <div class="res-ladder-thumb">
+          <img src="img/res-isro-ladder-awifs-56m.jpg" alt="IRS Resourcesat AWiFS 56 meter spatial resolution">
+          <span class="res-ladder-badge coarse">56 m GSD</span>
+        </div>
+        <div class="res-ladder-info">
+          <div>
+            <h4>AWiFS (Advanced Wide Field)</h4>
+            <span class="sensor-tag">IRS-P6 / Resourcesat-1 &amp; 2</span>
+            <p><strong>Resolved Features:</strong> 740 km wide swath captures statewide vegetation vigor, major river drainage networks, and regional drought anomalies. Individual city streets blend into regional averages.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Landsat ETM+ 30m -->
+      <div class="res-ladder-card">
+        <div class="res-ladder-thumb">
+          <img src="img/res-isro-ladder-etm-30m.jpg" alt="Landsat-7 ETM+ 30 meter spatial resolution">
+          <span class="res-ladder-badge coarse">30 m GSD</span>
+        </div>
+        <div class="res-ladder-info">
+          <div>
+            <h4>ETM+ / OLI (Landsat Series)</h4>
+            <span class="sensor-tag">Landsat 7 / 8 / 9</span>
+            <p><strong>Resolved Features:</strong> Agricultural field parcel boundaries, township outlines, multi-lane highways, and water reservoirs. Mixed urban pixels dominate residential zones.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. LISS-III 23.5m -->
+      <div class="res-ladder-card">
+        <div class="res-ladder-thumb">
+          <img src="img/res-isro-ladder-liss3-23m.jpg" alt="IRS LISS-III 23.5 meter spatial resolution">
+          <span class="res-ladder-badge medium">23.5 m GSD</span>
+        </div>
+        <div class="res-ladder-info">
+          <div>
+            <h4>LISS-III (Linear Self-Scanning)</h4>
+            <span class="sensor-tag">IRS-1C / 1D &amp; Resourcesat-1/2</span>
+            <p><strong>Resolved Features:</strong> Village settlements, secondary canal networks, distinct forest stand boundaries, and agricultural plot clusters across a 141 km swath.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. LISS-IV 5.8m -->
+      <div class="res-ladder-card">
+        <div class="res-ladder-thumb">
+          <img src="img/res-isro-ladder-liss4-5m.jpg" alt="IRS Resourcesat LISS-IV 5.8 meter spatial resolution">
+          <span class="res-ladder-badge fine">5.8 m GSD</span>
+        </div>
+        <div class="res-ladder-info">
+          <div>
+            <h4>LISS-IV Multispectral</h4>
+            <span class="sensor-tag">Resourcesat-1 / 2 / 2A</span>
+            <p><strong>Resolved Features:</strong> Arterial city avenues, individual farming plots, factory compounds, and airport runway layouts. Bridges across rivers are clearly demarcated.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Cartosat-1 2.5m -->
+      <div class="res-ladder-card">
+        <div class="res-ladder-thumb">
+          <img src="img/res-isro-ladder-carto1-2m.jpg" alt="ISRO Cartosat-1 2.5 meter stereo panchromatic">
+          <span class="res-ladder-badge fine">2.5 m GSD</span>
+        </div>
+        <div class="res-ladder-info">
+          <div>
+            <h4>Cartosat-1 Stereo PAN</h4>
+            <span class="sensor-tag">IRS-P5 (Fore +26&deg; / Aft -5&deg;)</span>
+            <p><strong>Resolved Features:</strong> Individual building footprints, suburban residential layouts, and two-lane tarmac roads. Enables national-scale 3D Digital Elevation Models (CartoDEM).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Cartosat-2 0.8m Sub-Meter -->
+      <div class="res-ladder-card">
+        <div class="res-ladder-thumb">
+          <img src="img/res-isro-ladder-carto2-submeter.jpg" alt="ISRO Cartosat-2 0.8 meter sub-meter panchromatic">
+          <span class="res-ladder-badge submeter">0.8 m GSD</span>
+        </div>
+        <div class="res-ladder-info">
+          <div>
+            <h4>Cartosat-2 High-Agility PAN</h4>
+            <span class="sensor-tag">Cartosat-2 Series (ISRO)</span>
+            <p><strong>Resolved Features:</strong> Individual passenger vehicles on highways, road centerlines, aircraft on taxiways, roof HVAC structures, and cadastral property boundaries.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. QuickBird 0.6m -->
+      <div class="res-ladder-card">
+        <div class="res-ladder-thumb">
+          <img src="img/res-isro-ladder-quickbird.jpg" alt="QuickBird 0.6 meter ultra high spatial resolution">
+          <span class="res-ladder-badge submeter">0.6 m GSD</span>
+        </div>
+        <div class="res-ladder-info">
+          <div>
+            <h4>QuickBird Commercial VHR</h4>
+            <span class="sensor-tag">DigitalGlobe / VHR Constellation</span>
+            <p><strong>Resolved Features:</strong> Precise road markings, parking stall divisions, small trees, footpaths, and structural roof edges for ultra-detailed urban cadastre.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 14px; text-align: right;">
+      <span class="fig-credit">Source: ISRO IIRS Dehradun &mdash; "Earth Observation Platforms and Sensors", Shri Vinay Kumar</span>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE TEMPORAL RESOLUTION: MINI-CALENDAR FLYOVER TRACKER -->
+  <div class="temporal-sim-card">
+    <div class="temporal-header">
+      <div>
+        <h3>Temporal Resolution: Orbit Revisit Calendar Simulator</h3>
+        <p>A satellite cannot be everywhere at once. Select a satellite and click "Animate Month" to see how often its orbital path allows it to photograph the exact same target area on the ground.</p>
+      </div>
+    </div>
+
+    <!-- Satellite Selection Buttons -->
+    <div class="temporal-sat-picker">
+      <button type="button" class="temp-sat-btn active" data-sat="sentinel2">Sentinel-2 Constellation (5-day revisit)</button>
+      <button type="button" class="temp-sat-btn" data-sat="landsat">Landsat 8/9 Constellation (8-day revisit)</button>
+      <button type="button" class="temp-sat-btn" data-sat="modis">MODIS Terra &amp; Aqua (1–2 day revisit)</button>
+      <button type="button" class="temp-sat-btn" data-sat="insat">INSAT-3D / GOES (Continuous 15-min)</button>
+      <button type="button" class="temp-sat-btn" data-sat="sar">Sentinel-1 SAR (6-day all-weather)</button>
+    </div>
+
+    <!-- Calendar Month Simulation View -->
+    <div class="calendar-sim-box">
+      <div class="calendar-top-bar">
+        <div class="calendar-target-info">
+          <span>Target Ground Location:</span>
+          <span class="coord">Hyderabad Region (17.385&deg; N, 78.486&deg; E)</span>
+        </div>
+        <div class="calendar-anim-controls">
+          <button type="button" class="cal-play-btn" id="btn-play-calendar">&#9654; Animate Month Timeline</button>
+        </div>
+      </div>
+
+      <!-- Weekday headers -->
+      <div class="calendar-weekdays">
+        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+      </div>
+
+      <!-- 30 Calendar Day Cells -->
+      <div class="calendar-days-grid" id="calendar-days-grid">
+        <!-- Dynamically rendered day cells -->
+      </div>
+
+      <!-- Event Acquisition Log Bar -->
+      <div class="calendar-log-box" id="calendar-log-box">
+        <div class="cal-log-text" id="cal-log-text">
+          Select a satellite or click <strong>Animate Month Timeline</strong> to observe orbital passes.
+        </div>
+        <div class="cal-log-stat">
+          <div class="cal-stat-item">
+            <span class="cs-lbl">Monthly Passes</span>
+            <span class="cs-val" id="stat-monthly-passes">6 Passes / Month</span>
+          </div>
+          <div class="cal-stat-item">
+            <span class="cs-lbl">Cloud Risk</span>
+            <span class="cs-val" id="stat-cloud-risk">~35% Loss (Optical)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTHENTIC DISASTER MONITORING: TEMPORAL FLOOD INUNDATION -->
+  <div class="figure">
+    <div class="figure-img-wrap dark">
+      <div class="compare-pair-grid">
+        <div class="compare-item">
+          <img src="img/res-temporal-preflood.jpg" alt="Pre-flood baseline satellite image of river course">
+          <span class="compare-label-badge pre">Pass 1 &middot; Pre-Flood Baseline (Dry River Bed)</span>
+        </div>
+        <div class="compare-item">
+          <img src="img/res-temporal-postflood.jpg" alt="Post-flood peak inundation satellite image of inundated floodplains">
+          <span class="compare-label-badge post">Pass 2 &middot; Peak Monsoon Surge (Submerged Agricultural Plains)</span>
+        </div>
+      </div>
+    </div>
+    <figcaption>
+      <strong>Operational Disaster Management: Why Temporal Revisit Frequency Saves Lives.</strong>
+      Extreme weather events and flood inundations evolve within 24 to 72 hours.
+      Left: <em>Pre-Flood Baseline</em> shows a normal dry-season river channel with exposed sandbars and bordering farm plots.
+      Right: <em>Peak Flood Surge</em> shows the river breaching embankments, submerging thousands of hectares of agrarian land (dark inundated pixels).
+      If a satellite has a 16-day revisit period (like a single Landsat spacecraft), the entire flood crest can peak and drain away completely unrecorded between passes. Rapid temporal revisit (1&ndash;2 days via MODIS/VIIRS, or multi-satellite constellations like Sentinel-1 SAR and Sentinel-2) is essential to provide national disaster management agencies with actionable emergency evacuation and relief maps.
+      <span class="fig-credit">Source: ISRO IIRS / Disaster Management Support Programme (DMSP), Dr. Hina Pande</span>
+    </figcaption>
+  </div>
+
+  <!-- INTERACTIVE SPECTRAL RESOLUTION & HYPERSPECTRAL DATA CUBE LAB -->
+  <div class="spectral-lab-card">
+    <div class="spectral-lab-header">
+      <div>
+        <div class="lab-pill" style="background: rgba(45, 212, 191, 0.15); color: var(--teal); border-color: rgba(45, 212, 191, 0.3);">ISRO / NASA ARSET Spectrometry Lab</div>
+        <h3 style="margin: 4px 0 6px 0; color: #fff; font-size: 1.25rem;">Interactive Spectral Slicer: Panchromatic vs Multispectral vs Hyperspectral</h3>
+        <p style="color: var(--text-dim); font-size: 0.88rem; margin: 0;">See how spectral resolution transforms a scene: from 1 wide channel (Pan) to 13 discrete bands (Sentinel-2) to 224 contiguous channels (AVIRIS-NG / EnMAP).</p>
+      </div>
+    </div>
+
+    <!-- Mode Selector Tabs -->
+    <div class="spectral-mode-tabs">
+      <button class="spec-mode-btn" data-mode="pan">
+        <span class="sm-title">1. Panchromatic (PAN)</span>
+        <span class="sm-sub">1 Single Broad Band (450–900 nm) · High Spatial, No Colors</span>
+      </button>
+      <button class="spec-mode-btn" data-mode="msi">
+        <span class="sm-title">2. Multispectral (MSI)</span>
+        <span class="sm-sub">4–13 Discrete Bands · Sentinel-2 / Landsat · Broad Shapes</span>
+      </button>
+      <button class="spec-mode-btn active" data-mode="hsi">
+        <span class="sm-title">3. Hyperspectral (HSI)</span>
+        <span class="sm-sub">224 Contiguous Bands · AVIRIS-NG / EnMAP / EMIT · Full Continuous Fingerprint</span>
+      </button>
+    </div>
+
+    <!-- Material Target Selector -->
+    <div class="spec-target-row">
+      <span class="spec-target-lbl">Inspect Ground Target:</span>
+      <div class="spec-target-chips">
+        <button class="spec-target-chip active" data-target="crop">🌿 Healthy Citrus vs Greening Disease</button>
+        <button class="spec-target-chip" data-target="clay">🪨 Kaolinite Clay vs Alunite (Mineralogy)</button>
+        <button class="spec-target-chip" data-target="water">💧 Clean Lake vs Algal Bloom (Chl-a)</button>
+        <button class="spec-target-chip" data-target="urban">🏙️ Green Painted Roof vs Real Tree Turf</button>
+      </div>
+    </div>
+
+    <div class="spectral-grid-layout">
+      <!-- Left: Chart.js Spectral Curve with Sampling Bands -->
+      <div class="spectral-chart-card">
+        <div class="chart-header-bar">
+          <span id="spec-chart-title">Spectral Signature Curve &amp; Band Sampling</span>
+          <span class="spec-badge mono-teal" id="spec-band-count">224 Contiguous Channels (&Delta;&lambda; = 10 nm)</span>
+        </div>
+        <div class="spec-chart-wrap" style="position: relative; height: 260px;">
+          <canvas id="specResolutionChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Right: 3D Data Cube Visualizer & Discrimination Result -->
+      <div class="spectral-cube-card">
+        <div class="cube-header-bar">
+          <span>Sensor Data Cube Representation</span>
+          <span class="cube-badge" id="cube-mode-badge">Hyperspectral Cube</span>
+        </div>
+        <div class="cube-canvas-wrap">
+          <canvas id="cube-canvas" width="320" height="200"></canvas>
+        </div>
+        <div class="spec-discrim-verdict" id="spec-discrim-verdict">
+          <div class="verdict-icon" id="verdict-icon">✅</div>
+          <div class="verdict-body">
+            <strong id="verdict-title">Target Discriminated with 100% Certainty</strong>
+            <p id="verdict-text">Hyperspectral captures the sharp 2.20 &mu;m kaolinite doublet absorption dip, clearly separating it from alunite.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTHENTIC SENSOR SPECTRAL SAMPLING FIGURE -->
+  <div class="figure">
+    <div class="figure-img-wrap">
+      <img src="img/res-spectral-resolution-real.jpg" alt="Comparison of spectral band sampling: Panchromatic vs Multispectral vs Hyperspectral">
+    </div>
+    <figcaption>
+      <strong>Authentic Sensor Band Sampling: Panchromatic vs. Multispectral vs. Hyperspectral.</strong>
+      Notice how <em>Panchromatic</em> integrates all visible/NIR energy into a single broad DN value (yielding high spatial resolution and photon counts, but zero wavelength discrimination). <em>Multispectral sensors</em> (e.g. IRS LISS-III, Landsat OLI, Sentinel-2) sample discrete spectral windows (&Delta;&lambda; &asymp; 60&ndash;100 nm), capturing broad signature envelopes. <em>Hyperspectral sensors</em> (e.g. AVIRIS-NG, EnMAP, NASA EMIT) slice the spectrum into hundreds of contiguous narrow channels (&Delta;&lambda; &asymp; 5&ndash;10 nm), pinpointing exact molecular absorption dips in minerals, canopy nitrogen, and plant pigments.
+      <span class="fig-credit">Source: ISRO IIRS Dehradun &mdash; "Earth Observation Platforms and Sensors", Shri Vinay Kumar</span>
+    </figcaption>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">04.2 / Pixels &amp; DN Values</div>
+  <h2 class="section-title">What your computer actually sees</h2>
+  <p class="section-intro">A satellite image is a grid of pixels, each holding a Digital Number (DN) — the recorded amount of reflected energy. Higher DN = more energy = brighter pixel. Drag the sliders to see how detail changes with spatial and radiometric resolution together.</p>
+
+  <div class="widget-panel">
+    <div class="pixel-grid-wrap">
+      <div class="pixel-grid" id="pixel-grid"></div>
+      <div class="pixel-controls">
+        <div>
+          <div class="pixel-slider-val"><span>Grid Size</span><span id="pixel-size-val">12 × 12</span></div>
+          <input type="range" id="pixel-size-slider" min="6" max="48" value="12">
+        </div>
+        <div>
+          <div class="pixel-slider-val"><span>Bits</span><span id="pixel-bits-val">8-bit (256 levels)</span></div>
+          <input type="range" id="pixel-bits-slider" min="1" max="12" value="8">
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-dim); padding: 12px; background: var(--surface-2); border-radius: 8px;">
+          <strong style="color: var(--teal);">What's happening:</strong> The grid represents a satellite image with a river, urban area, forest, and sand. More pixels = higher spatial resolution. More bits = higher radiometric resolution. Reduce both to see what early satellites like Landsat MSS captured.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-head"><span>degrade_resolution.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><code><span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+<span class="c-kw">from</span> scipy.ndimage <span class="c-kw">import</span> zoom
+
+<span class="c-com"># image is a numpy array of shape (rows, cols) loaded from a GeoTIFF</span>
+<span class="c-kw">def</span> <span class="c-fn">simulate_coarser_pixel</span>(image, factor):
+    <span class="c-com">"""Shrink then re-expand — simulates a lower spatial-resolution sensor."""</span>
+    small = zoom(image, 1/factor, order=1)      <span class="c-com"># downsample (average nearby pixels)</span>
+    <span class="c-kw">return</span> zoom(small, factor, order=0)           <span class="c-com"># blow back up, blocky like real coarse data</span>
+
+<span class="c-kw">def</span> <span class="c-fn">reduce_radiometric_bits</span>(image, bits):
+    <span class="c-com">"""Quantize DN values to fewer grey levels, like an older 6-bit sensor."""</span>
+    levels = 2**bits
+    scaled = (image / image.<span class="c-fn">max</span>()) * (levels - 1)
+    <span class="c-kw">return</span> np.<span class="c-fn">round</span>(scaled) * (255 / (levels - 1))  <span class="c-com"># rescale back to 0-255 for display</span></code></pre>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">04.3 / Radiometric Resolution</div>
+  <h2 class="section-title">The power of bits</h2>
+  <p class="section-intro">The formula is simple: 2<sup>n</sup> = number of grey levels, where n is bit depth. More bits mean the sensor distinguishes finer energy differences — critical for shadow and bright-area detail.</p>
+
+  <div class="widget-panel">
+    <div class="rad-grid" id="rad-grid"></div>
+  </div>
+
+  <!-- INTERACTIVE RADIOMETRIC DYNAMIC RANGE & SHADOW/HIGHLIGHT LAB -->
+  <div class="radiometric-lab-card">
+    <div class="radiometric-lab-header">
+      <div>
+        <div class="lab-pill" style="background: rgba(59, 130, 246, 0.15); color: var(--blue); border-color: rgba(59, 130, 246, 0.3);">ISRO Radiometry Laboratory</div>
+        <h3 style="margin: 4px 0 6px 0; color: #fff; font-size: 1.25rem;">Interactive Radiometric Resolution: Shadow Detail &amp; Bit-Depth Explorer</h3>
+        <p style="color: var(--text-dim); font-size: 0.88rem; margin: 0;">Experience how bit depth (2<sup>n</sup>) prevents data clipping. Switch between 1-bit, 6-bit (Landsat MSS), 8-bit (Landsat TM), 12-bit (Landsat OLI / Sentinel-2), and 14-bit to inspect hidden textures in deep mountain shadows and bright glaciated terrain.</p>
+      </div>
+    </div>
+
+    <!-- Bit Depth Selector -->
+    <div class="bit-depth-nav">
+      <button class="bit-btn" data-bits="1">
+        <span class="bb-title">1-bit</span>
+        <span class="bb-desc">2 Levels · Binary B&amp;W</span>
+      </button>
+      <button class="bit-btn" data-bits="6">
+        <span class="bb-title">6-bit (MSS)</span>
+        <span class="bb-desc">64 Levels · Severe Contouring</span>
+      </button>
+      <button class="bit-btn" data-bits="8">
+        <span class="bb-title">8-bit (TM)</span>
+        <span class="bb-desc">256 Levels · Standard Display</span>
+      </button>
+      <button class="bit-btn active" data-bits="12">
+        <span class="bb-title">12-bit (OLI / MSI)</span>
+        <span class="bb-desc">4,096 Levels · Deep Shadow Penetration</span>
+      </button>
+      <button class="bit-btn" data-bits="14">
+        <span class="bb-title">14-bit (WorldView-3)</span>
+        <span class="bb-desc">16,384 Levels · Scientific Dynamic Range</span>
+      </button>
+    </div>
+
+    <div class="rad-interactive-grid">
+      <!-- Left: High Dynamic Range Scene Canvas -->
+      <div class="rad-scene-card">
+        <div class="rad-scene-header">
+          <span>Scene: Himalayan Glaciated Valley (Snow + Shadow + Forest + River)</span>
+          <span class="mono-amber" id="rad-active-levels">4,096 Discrete Quantization Steps</span>
+        </div>
+        <div class="rad-canvas-container">
+          <canvas id="rad-scene-canvas" width="560" height="280"></canvas>
+          <!-- Shadow Magnifier Loupe Overlay -->
+          <div class="rad-loupe-info">
+            <span class="rli-tag">🔬 Shadow Zone Inspector</span>
+            <span id="rad-shadow-inspect-text">At 12-bit, mountain paths &amp; pine canopies inside the 5% reflectance shadow are fully resolved (DN = 160–240).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Real-time Histogram & Quantization Steps -->
+      <div class="rad-telemetry-card">
+        <div class="telemetry-header">Radiometric Histogram &amp; Quantization</div>
+        <div class="rad-hist-canvas-wrap">
+          <canvas id="rad-hist-canvas" width="280" height="150"></canvas>
+        </div>
+        <div class="rad-metrics-list">
+          <div class="rm-item">
+            <span class="rm-lbl">Quantization Step Width</span>
+            <span class="rm-val mono-teal" id="stat-quant-step">0.024% of Radiance</span>
+          </div>
+          <div class="rm-item">
+            <span class="rm-lbl">Shadow Clipping Loss</span>
+            <span class="rm-val mono-amber" id="stat-shadow-loss">0% (Zero Clipping)</span>
+          </div>
+          <div class="rm-item">
+            <span class="rm-lbl">Highlight Saturation</span>
+            <span class="rm-val mono-purple" id="stat-highlight-loss">0% (Glacier ice texture preserved)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTHENTIC RADIOMETRIC QUANTIZATION: AIRPORT RUNWAY -->
+  <div class="figure">
+    <div class="figure-img-wrap dark">
+      <img src="img/res-real-radiometric-runway.jpg" alt="Airport runway satellite image degraded across 8-bit, 4-bit, and 1-bit quantization levels">
+    </div>
+    <figcaption>
+      <strong>Authentic Radiometric Resolution Degradation: Airport Runway &amp; Apron Complex.</strong>
+      This classic ISRO IIRS lecture comparison demonstrates how quantization levels affect subtle target contrast and feature detectability:
+      <br>&bull; <strong>8-bit (256 Grey Levels):</strong> Tarmac surface variations, taxiway edge lines, painted runway thresholds, aircraft markings, and grassy verges are crisply separated with smooth grayscale graduation.
+      <br>&bull; <strong>4-bit (16 Grey Levels):</strong> Severe false contouring (posterization) appears. Continuous radiance gradients across concrete paving are crushed into harsh stepped bands, and faint surface painted lines vanish into the background.
+      <br>&bull; <strong>1-bit (2 Levels / Binary):</strong> Every pixel is forced into either 0 (black) or 1 (white). All internal grayscale graduation is destroyed; only harsh high-contrast threshold boundaries survive.
+      <span class="fig-credit">Source: ISRO IIRS Dehradun &mdash; "Image Interpretation and Digital Processing", Dr. Hina Pande</span>
+    </figcaption>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">04.4 / Choosing the Right Resolution</div>
+  <h2 class="section-title">Application guide &amp; the fundamental trade-off</h2>
+
+  <!-- INTERACTIVE MISSION TRADE-OFF MATRIX & REQUIREMENTS MATCHER -->
+  <div class="tradeoff-lab-card">
+    <div class="tradeoff-header">
+      <div>
+        <div class="lab-pill" style="background: rgba(245, 166, 35, 0.15); color: var(--amber); border-color: rgba(245, 166, 35, 0.3);">Mission Design &amp; Sensor Selection</div>
+        <h3 style="margin: 4px 0 6px 0; color: #fff; font-size: 1.25rem;">Interactive Application Requirements &amp; 4-Resolution Matcher</h3>
+        <p style="color: var(--text-dim); font-size: 0.88rem; margin: 0;">Why no single satellite can do everything: select your real-world remote sensing objective to inspect the mandatory resolution profile and optimal sensor constellations.</p>
+      </div>
+    </div>
+
+    <!-- Application Selection Grid -->
+    <div class="app-scenario-grid">
+      <button class="app-scenario-btn active" data-app="cyclone">
+        <span class="as-icon">🌪️</span>
+        <div class="as-text">
+          <strong>Real-Time Cyclone Tracking</strong>
+          <small>Disaster Warning &amp; Cloud Dynamics</small>
+        </div>
+      </button>
+      <button class="app-scenario-btn" data-app="urban">
+        <span class="as-icon">🏙️</span>
+        <div class="as-text">
+          <strong>Urban Cadastral Mapping</strong>
+          <small>Property Boundary &amp; Infrastructure</small>
+        </div>
+      </button>
+      <button class="app-scenario-btn" data-app="agri">
+        <span class="as-icon">🌾</span>
+        <div class="as-text">
+          <strong>Precision Agriculture</strong>
+          <small>Crop Stress, Nitrogen &amp; Yield</small>
+        </div>
+      </button>
+      <button class="app-scenario-btn" data-app="ocean">
+        <span class="as-icon">🌊</span>
+        <div class="as-text">
+          <strong>Ocean Colour &amp; Chlorophyll</strong>
+          <small>Phytoplankton &amp; Coastal Sediment</small>
+        </div>
+      </button>
+      <button class="app-scenario-btn" data-app="wildfire">
+        <span class="as-icon">🔥</span>
+        <div class="as-text">
+          <strong>Wildfire Early Warning</strong>
+          <small>Active Fronts &amp; Smoke Plumes</small>
+        </div>
+      </button>
+      <button class="app-scenario-btn" data-app="mineral">
+        <span class="as-icon">⛏️</span>
+        <div class="as-text">
+          <strong>Geological Mineral Prospecting</strong>
+          <small>Lithology &amp; Hydrothermal Alteration</small>
+        </div>
+      </button>
+    </div>
+
+    <div class="tradeoff-content-grid">
+      <!-- Left: 4-Axis Resolution Spider/Radar Canvas or Gauge Display -->
+      <div class="tradeoff-chart-box">
+        <div class="tcb-head">4-Resolution Trade-Off Profile</div>
+        <div class="radar-chart-wrap" style="position: relative; height: 260px;">
+          <canvas id="tradeoffRadarChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Right: Technical Rationale & Sensor Recommendations -->
+      <div class="tradeoff-intel-box">
+        <div class="intel-banner" id="intel-app-title">🌪️ Cyclone Tracking &amp; Cloud Motion</div>
+        
+        <div class="intel-specs-grid">
+          <div class="is-spec">
+            <span class="is-label">Spatial Req.</span>
+            <span class="is-val mono-amber" id="req-spatial">1 km – 4 km (Coarse is OK)</span>
+          </div>
+          <div class="is-spec">
+            <span class="is-label">Temporal Req.</span>
+            <span class="is-val mono-purple" id="req-temporal">15 – 30 Minutes (Critical!)</span>
+          </div>
+          <div class="is-spec">
+            <span class="is-label">Spectral Req.</span>
+            <span class="is-val mono-teal" id="req-spectral">Thermal IR (10.8&mu;m) &amp; WV (6.7&mu;m)</span>
+          </div>
+          <div class="is-spec">
+            <span class="is-label">Radiometric Req.</span>
+            <span class="is-val mono-blue" id="req-radiometric">10–12 bits (TIR Noise Equivalent &Delta;T)</span>
+          </div>
+        </div>
+
+        <div class="intel-rationale" id="intel-rationale-text">
+          <strong>The Engineering Physics:</strong> A cyclone spans 500–1,000 km across. Sub-meter spatial resolution would produce billions of redundant pixels and take hours to downlink. Instead, geostationary orbit (36,000 km) provides continuous 15-minute hemispheric imagery to track eye progression in real time.
+        </div>
+
+        <div class="intel-sensors">
+          <span class="is-sensor-lbl">Matching Spacecraft:</span>
+          <div class="is-sensor-chips" id="intel-sensor-chips">
+            <span class="sensor-chip">🛰️ INSAT-3D/3DR (ISRO)</span>
+            <span class="sensor-chip">🛰️ GOES-16/18 (NOAA)</span>
+            <span class="sensor-chip">🛰️ Meteosat-11 (EUMETSAT)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Application</th><th>Spatial Resolution Needed</th><th>Example Satellites</th></tr></thead>
+      <tbody>
+        <tr><td class="row-name">Military Surveillance</td><td class="mono-teal">&le; 1 m</td><td>IKONOS PAN, Cartosat-3</td></tr>
+        <tr><td class="row-name">Cartography &amp; Urban Planning</td><td class="mono-teal">2 – 6 m</td><td>Cartosat-2, WorldView</td></tr>
+        <tr><td class="row-name">Land Use, Crop &amp; Forest Monitoring</td><td class="mono-teal">10 – 30 m</td><td>Landsat, Sentinel-2, LISS-III</td></tr>
+        <tr><td class="row-name">Ocean Colour (Chlorophyll, Sediment)</td><td class="mono-teal">300 – 1100 m</td><td>OCM, MODIS</td></tr>
+        <tr><td class="row-name">Meteorology (Clouds, Water Vapor)</td><td class="mono-teal">1 – 8 km</td><td>INSAT, GOES, METEOSAT</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- AUTHENTIC SUB-METER CADASTRAL & INFRASTRUCTURE IMAGERY -->
+  <div class="figure-row">
+    <div class="figure">
+      <div class="figure-img-wrap dark">
+        <img src="img/res-cartosat-hyderabad.jpg" alt="ISRO Cartosat sub-meter satellite image of Hyderabad urban infrastructure">
+      </div>
+      <figcaption>
+        <strong>Sub-Meter Urban Cadastral Mapping: ISRO Cartosat over Hyderabad.</strong>
+        At sub-meter Ground Sample Distance (GSD), multi-lane flyover junctions, building footprints, and vehicle parking lots are distinctly resolved, providing municipal corporations with base maps for property tax GIS and road widening.
+        <span class="fig-credit">Source: ISRO NRSC / Cartosat-2 Series, Shri Vinay Kumar</span>
+      </figcaption>
+    </div>
+    <div class="figure">
+      <div class="figure-img-wrap dark">
+        <img src="img/res-cartosat-bangalore.jpg" alt="ISRO Cartosat sub-meter satellite image of Bangalore airport infrastructure">
+      </div>
+      <figcaption>
+        <strong>High-Resolution Transportation Infrastructure: Bangalore Airport.</strong>
+        Cartosat sub-meter imaging resolves runway edge markings, taxiway high-speed turnoffs, passenger terminal gates, and parked commercial airliners for national aerospace asset monitoring.
+        <span class="fig-credit">Source: ISRO NRSC / Cartosat-2 Series, Shri Vinay Kumar</span>
+      </figcaption>
+    </div>
+  </div>
+
+  <div class="tech-detail">
+    <div class="label">The Resolution Trade-off</div>
+    <p>It is very difficult to obtain high spatial, spectral, temporal, and radiometric resolution all at once. A 0.25m satellite typically has a narrow swath and long revisit time. A weather satellite with hourly revisit (GOES/INSAT) has kilometre-scale pixels. Every satellite embodies a deliberate compromise &mdash; you pick the one that matches your application.</p>
+  </div>
+
+  <!-- AUTHENTIC APPLICATION VS RESOLUTION HIERARCHY MATRIX -->
+  <div class="figure">
+    <div class="figure-img-wrap">
+      <img src="img/res-application-vs-resolution.jpg" alt="Application hierarchy vs spatial and temporal resolution requirements">
+    </div>
+    <figcaption>
+      <strong>The Remote Sensing Application vs. Resolution Trade-Off Hierarchy.</strong>
+      No single mission can optimize all four parameters simultaneously.
+      Global meteorological &amp; oceanographic systems require high temporal revisit (hourly to daily) over continental scales, accepting kilometre-scale pixels. Conversely, urban cadastre, structural damage assessment, and precision civil engineering demand sub-meter spatial detail, operating with narrower swath widths and longer revisit cycles.
+      <span class="fig-credit">Source: ISRO IIRS Dehradun &mdash; "Earth Observation Platforms and Sensors", Shri Vinay Kumar</span>
+    </figcaption>
+  </div>
+
+  <div class="key-takeaways">
+    <div class="kt-label">Key Takeaways</div>
+    <ul>
+      <li><strong>Spatial resolution</strong> = pixel size on the ground (IFOV × altitude). Smaller pixel = more detail, less coverage.</li>
+      <li><strong>Spectral resolution</strong> = number/width of bands: panchromatic (1) &lt; multispectral (3–10) &lt; hyperspectral (100s).</li>
+      <li><strong>Radiometric resolution</strong> = bits: 2<sup>n</sup> grey levels. 12-bit sensors reveal detail 8-bit sensors simply never recorded.</li>
+      <li><strong>Temporal resolution</strong> = revisit time: hourly for weather, daily for ocean, 5–16 days for land monitoring.</li>
+      <li>You can't max out all four — <strong>every satellite is a deliberate trade-off</strong> matched to its purpose.</li>
+    </ul>
+  </div>
+</section>
+
+<script src="app.js"></script>
+<script>
+(function() {
+  const grid = document.getElementById('pixel-grid');
+  const sizeSlider = document.getElementById('pixel-size-slider');
+  const bitsSlider = document.getElementById('pixel-bits-slider');
+  const sizeVal = document.getElementById('pixel-size-val');
+  const bitsVal = document.getElementById('pixel-bits-val');
+  function getLandscapeValue(row, col, size) {
+    const r = row / size, c = col / size;
+    let val = 0.3 + 0.2 * Math.sin(r * Math.PI * 2) * Math.cos(c * Math.PI * 3);
+    const distToRiver = Math.abs(r - c * 0.8 - 0.1);
+    if (distToRiver < 0.04) val = 0.05;
+    if (r < 0.3 && c > 0.6) val = 0.7 + 0.1 * Math.sin(r * 50) * Math.cos(c * 50);
+    if (r > 0.55 && c < 0.35) val = 0.45 + 0.08 * Math.sin(r * 30) * Math.cos(c * 30);
+    if (r < 0.2 && c < 0.2) val = 0.85;
+    return Math.max(0, Math.min(1, val));
+  }
+  function renderGrid() {
+    const size = parseInt(sizeSlider.value);
+    const bits = parseInt(bitsSlider.value);
+    const maxVal = Math.pow(2, bits) - 1;
+    sizeVal.textContent = `${size} × ${size}`;
+    bitsVal.textContent = `${bits}-bit (${(maxVal + 1).toLocaleString()} levels)`;
+    grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+    grid.innerHTML = '';
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        const normalized = getLandscapeValue(r, c, size);
+        const dn = Math.round(normalized * maxVal);
+        const brightness = Math.round(normalized * 255);
+        const cell = document.createElement('div');
+        cell.className = 'pixel-cell';
+        cell.style.background = `rgb(${brightness},${brightness},${brightness})`;
+        cell.style.aspectRatio = '1';
+        if (size <= 16) cell.textContent = dn;
+        grid.appendChild(cell);
+      }
+    }
+  }
+  sizeSlider.addEventListener('input', renderGrid);
+  bitsSlider.addEventListener('input', renderGrid);
+  renderGrid();
+})();
+(function() {
+  const container = document.getElementById('rad-grid');
+  const bitsList = [1, 2, 4, 8, 11, 12];
+  bitsList.forEach(bits => {
+    const levels = Math.pow(2, bits);
+    const card = document.createElement('div');
+    card.className = 'rad-card';
+    const gradDiv = document.createElement('div');
+    gradDiv.className = 'rad-bar';
+    const stops = [];
+    const nStops = Math.min(levels, 64);
+    for (let i = 0; i < nStops; i++) {
+      const pct = (i / (nStops - 1)) * 100;
+      const val = Math.round((i / (nStops - 1)) * 255);
+      stops.push(`rgb(${val},${val},${val}) ${pct}%`);
+    }
+    gradDiv.style.background = `linear-gradient(to right, ${stops.join(', ')})`;
+    card.innerHTML = `<div class="bits">${bits}-bit</div><div class="levels">${levels.toLocaleString()} grey levels</div>`;
+    card.appendChild(gradDiv);
+    const sensors = { 1:'Binary image', 2:'Early weather fax', 4:'Basic display', 8:'Landsat TM, most displays', 11:'IKONOS — detail in shadows', 12:'Landsat OLI — sharpest' };
+    const sensorDiv = document.createElement('div');
+    sensorDiv.style.cssText = 'font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); margin-top: 8px; text-align: center;';
+    sensorDiv.textContent = sensors[bits] || '';
+    card.appendChild(sensorDiv);
+    container.appendChild(card);
+  });
+})();
+
+// ================================================================
+// SPATIAL RESOLUTION JUXTAPOSE SLIDER ENGINE
+// ================================================================
+(function() {
+  const viewport = document.getElementById('juxtapose-viewport');
+  const overlayWrap = document.getElementById('jux-overlay-wrap');
+  const baseCanvas = document.getElementById('jux-canvas-base');
+  const overlayCanvas = document.getElementById('jux-canvas-overlay');
+  const handle = document.getElementById('jux-handle');
+  if (!viewport || !overlayWrap || !baseCanvas || !overlayCanvas) return;
+
+  const bCtx = baseCanvas.getContext('2d');
+  const oCtx = overlayCanvas.getContext('2d');
+
+  let currentPair = 's2-l8';
+  let isDragging = false;
+  let splitPct = 50;
+
+  const pairConfig = {
+    's2-l8': {
+      leftBadge: '10m · Sentinel-2 MSI',
+      rightBadge: '30m · Landsat-8/9 OLI',
+      leftRes: 10,
+      rightRes: 30,
+      leftMeta: { val: '10m / pixel · 100 m²', desc: 'Shows individual city streets, buildings, and field boundaries.' },
+      rightMeta: { val: '30m / pixel · 900 m² (9× area)', desc: 'Urban streets blend into single mixed pixels; only large avenues and fields resolve.' }
+    },
+    'l8-modis': {
+      leftBadge: '30m · Landsat-8/9 OLI',
+      rightBadge: '250m · MODIS Terra/Aqua',
+      leftRes: 30,
+      rightRes: 250,
+      leftMeta: { val: '30m / pixel · 900 m²', desc: 'Agricultural fields, city limits, and water reservoirs clearly distinct.' },
+      rightMeta: { val: '250m / pixel · 62,500 m² (69× area)', desc: 'Entire city is compressed into ~4 coarse blocks; runways & bridges disappear entirely.' }
+    },
+    'carto-s2': {
+      leftBadge: '1m · Cartosat-3 PAN',
+      rightBadge: '10m · Sentinel-2 MSI',
+      leftRes: 1,
+      rightRes: 10,
+      leftMeta: { val: '1m / pixel · 1 m²', desc: 'Sharp sub-meter detail: individual parked aircraft on tarmac, road lanes, houses.' },
+      rightMeta: { val: '10m / pixel · 100 m² (100× area)', desc: 'Aircraft blur into grey smudges; runway centerline vanishes; only boundary remains.' }
+    }
+  };
+
+  // High-resolution procedural urban landscape generator (City + Airport + River)
+  function drawHighResScene(ctx, w, h) {
+    // Background terrain (agriculture fields & suburbs)
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(0, 0, w, h);
+
+    // Diagonal winding river
+    ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = w * 0.08;
+    ctx.beginPath();
+    ctx.moveTo(w * 0.05, 0);
+    ctx.bezierCurveTo(w * 0.4, h * 0.35, w * 0.2, h * 0.65, w * 0.75, h);
+    ctx.stroke();
+
+    // Sandbanks along river
+    ctx.strokeStyle = '#ca8a04';
+    ctx.lineWidth = w * 0.015;
+    ctx.beginPath();
+    ctx.moveTo(w * 0.08, 0);
+    ctx.bezierCurveTo(w * 0.42, h * 0.35, w * 0.23, h * 0.65, w * 0.77, h);
+    ctx.stroke();
+
+    // Agricultural grid patches (left side)
+    const fieldColors = ['#15803d', '#166534', '#a16207', '#4d7c0f', '#047857'];
+    for (let r = 0; r < 5; r++) {
+      for (let c = 0; c < 4; c++) {
+        ctx.fillStyle = fieldColors[(r * 4 + c) % fieldColors.length];
+        ctx.fillRect(w * 0.02 + c * (w * 0.07), h * 0.45 + r * (h * 0.09), w * 0.062, h * 0.078);
+      }
+    }
+
+    // Dense Urban Grid / City Blocks (top-right)
+    ctx.fillStyle = '#475569';
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const bx = w * 0.52 + c * (w * 0.05);
+        const by = h * 0.05 + r * (h * 0.05);
+        ctx.fillStyle = (r + c) % 3 === 0 ? '#94a3b8' : '#64748b';
+        ctx.fillRect(bx, by, w * 0.04, h * 0.038);
+      }
+    }
+
+    // Main Highways (roads with bridge over river)
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = w * 0.018;
+    ctx.beginPath();
+    ctx.moveTo(0, h * 0.4);
+    ctx.lineTo(w, h * 0.4);
+    ctx.moveTo(w * 0.5, 0);
+    ctx.lineTo(w * 0.5, h);
+    ctx.stroke();
+
+    // Airport Complex (bottom-right)
+    const airX = w * 0.48;
+    const airY = h * 0.62;
+    // Tarmac
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(airX, airY, w * 0.48, h * 0.34);
+
+    // Primary Runways
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(airX + w * 0.04, airY + h * 0.06, w * 0.4, h * 0.05);
+    ctx.fillRect(airX + w * 0.04, airY + h * 0.18, w * 0.35, h * 0.045);
+
+    // Runway Centerline dashes (sub-meter detail)
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 6]);
+    ctx.beginPath();
+    ctx.moveTo(airX + w * 0.04, airY + h * 0.085);
+    ctx.lineTo(airX + w * 0.44, airY + h * 0.085);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Parked Airplanes on apron
+    ctx.fillStyle = '#ffffff';
+    for (let i = 0; i < 5; i++) {
+      const ax = airX + w * 0.08 + i * (w * 0.06);
+      const ay = airY + h * 0.28;
+      // Fuselage + wings
+      ctx.fillRect(ax - 2, ay - 6, 4, 12);
+      ctx.fillRect(ax - 7, ay - 2, 14, 3);
+    }
+  }
+
+  // Downsample high-res canvas into discrete blocky pixels
+  function renderPixelated(targetCtx, w, h, pixelSizeMeters) {
+    // Map meter resolution to canvas pixel block size
+    // 1m -> 1px, 10m -> 5px, 30m -> 15px, 250m -> 75px
+    let blockSize = 1;
+    if (pixelSizeMeters === 1) blockSize = 1;
+    else if (pixelSizeMeters === 10) blockSize = 6;
+    else if (pixelSizeMeters === 30) blockSize = 18;
+    else if (pixelSizeMeters === 250) blockSize = 80;
+
+    if (blockSize <= 1) {
+      drawHighResScene(targetCtx, w, h);
+      return;
+    }
+
+    // Render offscreen at full resolution first
+    const off = document.createElement('canvas');
+    off.width = w;
+    off.height = h;
+    const offCtx = off.getContext('2d');
+    drawHighResScene(offCtx, w, h);
+
+    const cols = Math.ceil(w / blockSize);
+    const rows = Math.ceil(h / blockSize);
+
+    // Downsample by averaging inside block
+    const imgData = offCtx.getImageData(0, 0, w, h).data;
+    targetCtx.clearRect(0, 0, w, h);
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const startX = c * blockSize;
+        const startY = r * blockSize;
+
+        // Sample center of block
+        const sampleX = Math.min(w - 1, startX + Math.floor(blockSize / 2));
+        const sampleY = Math.min(h - 1, startY + Math.floor(blockSize / 2));
+        const idx = (sampleY * w + sampleX) * 4;
+
+        targetCtx.fillStyle = `rgb(${imgData[idx]}, ${imgData[idx+1]}, ${imgData[idx+2]})`;
+        targetCtx.fillRect(startX, startY, blockSize, blockSize);
+
+        // Draw faint pixel grid border for coarse resolutions (30m & 250m)
+        if (blockSize >= 18) {
+          targetCtx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+          targetCtx.lineWidth = 1;
+          targetCtx.strokeRect(startX, startY, blockSize, blockSize);
+        }
+      }
+    }
+  }
+
+  function resizeAndRender() {
+    const w = viewport.clientWidth;
+    const h = viewport.clientHeight;
+    baseCanvas.width = w;
+    baseCanvas.height = h;
+    overlayCanvas.width = w;
+    overlayCanvas.height = h;
+
+    const cfg = pairConfig[currentPair];
+    // Base (Right = Coarser)
+    renderPixelated(bCtx, w, h, cfg.rightRes);
+    // Overlay (Left = Finer)
+    renderPixelated(oCtx, w, h, cfg.leftRes);
+
+    updateSplit(splitPct);
+  }
+
+  function updateSplit(pct) {
+    splitPct = Math.max(0, Math.min(100, pct));
+    overlayWrap.style.width = splitPct + '%';
+  }
+
+  // Dragging event handlers
+  function handleMove(clientX) {
+    const rect = viewport.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const pct = (x / rect.width) * 100;
+    updateSplit(pct);
+  }
+
+  viewport.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    handleMove(e.clientX);
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (isDragging) handleMove(e.clientX);
+  });
+  window.addEventListener('mouseup', () => { isDragging = false; });
+
+  viewport.addEventListener('touchstart', (e) => {
+    isDragging = true;
+    handleMove(e.touches[0].clientX);
+  }, { passive: true });
+  window.addEventListener('touchmove', (e) => {
+    if (isDragging) handleMove(e.touches[0].clientX);
+  }, { passive: true });
+  window.addEventListener('touchend', () => { isDragging = false; });
+
+  // Satellite pair selector buttons
+  const pairBtns = document.querySelectorAll('.jux-btn');
+  const bLeft = document.getElementById('jux-badge-left');
+  const bRight = document.getElementById('jux-badge-right');
+  const metaLeftVal = document.getElementById('jux-meta-left-val');
+  const metaLeftDesc = document.getElementById('jux-meta-left-desc');
+  const metaRightVal = document.getElementById('jux-meta-right-val');
+  const metaRightDesc = document.getElementById('jux-meta-right-desc');
+
+  pairBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      pairBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPair = btn.dataset.pair;
+      const cfg = pairConfig[currentPair];
+
+      bLeft.textContent = cfg.leftBadge;
+      bRight.textContent = cfg.rightBadge;
+      metaLeftVal.innerHTML = cfg.leftMeta.val;
+      metaLeftDesc.textContent = cfg.leftMeta.desc;
+      metaRightVal.innerHTML = cfg.rightMeta.val;
+      metaRightDesc.textContent = cfg.rightMeta.desc;
+
+      resizeAndRender();
+    });
+  });
+
+  window.addEventListener('resize', resizeAndRender);
+  resizeAndRender();
+})();
+
+// ================================================================
+// TEMPORAL RESOLUTION: MINI-CALENDAR FLYOVER TRACKER ENGINE
+// ================================================================
+(function() {
+  const calGrid = document.getElementById('calendar-days-grid');
+  const playBtn = document.getElementById('btn-play-calendar');
+  const logText = document.getElementById('cal-log-text');
+  const statPasses = document.getElementById('stat-monthly-passes');
+  const statCloud = document.getElementById('stat-cloud-risk');
+  const satBtns = document.querySelectorAll('.temp-sat-btn');
+  if (!calGrid) return;
+
+  const satSchedules = {
+    sentinel2: {
+      name: 'Sentinel-2A & 2B Constellation',
+      revisit: '5 days',
+      passDays: [2, 7, 12, 17, 22, 27],
+      monthlyPasses: '6 Passes / Month',
+      cloudRisk: '~35% Loss (Optical)',
+      type: 'Sun-Synchronous Multi-Spectral',
+      swath: '290 km',
+      cloudDays: [7, 17], // Simulated cloudy days
+      note: '5-day revisit achieved by phasing two identical satellites (2A + 2B) 180° apart in the same polar orbit.'
+    },
+    landsat: {
+      name: 'Landsat 8 & 9 Constellation',
+      revisit: '8 days',
+      passDays: [3, 11, 19, 27],
+      monthlyPasses: '4 Passes / Month',
+      cloudRisk: '~35% Loss (Optical)',
+      type: 'Sun-Synchronous Multispectral/Thermal',
+      swath: '185 km',
+      cloudDays: [11],
+      note: 'A single Landsat revisits every 16 days. Operating Landsat 8 and 9 together offsets their orbits by 8 days.'
+    },
+    modis: {
+      name: 'MODIS (Terra & Aqua)',
+      revisit: '1–2 days',
+      passDays: [1, 2, 4, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19, 20, 22, 23, 25, 26, 28, 29],
+      monthlyPasses: '20 Passes / Month',
+      cloudRisk: '~30% Loss (Optical)',
+      type: 'Coarse Wide-Swath Global Monitor',
+      swath: '2,330 km',
+      cloudDays: [5, 14, 22],
+      note: 'Gigantic 2,330 km swath sweeps the entire globe every 1–2 days, trading 250m resolution for near-daily global coverage.'
+    },
+    insat: {
+      name: 'INSAT-3D / 3DR Imager (GEO)',
+      revisit: 'Continuous (15-min scans)',
+      passDays: Array.from({length: 30}, (_, i) => i + 1), // All 30 days
+      monthlyPasses: '2,880 Scans / Month (96/day)',
+      cloudRisk: '0% Loss (Measures clouds!)',
+      type: 'Geostationary Meteorological Imager',
+      swath: 'Full Earth Disk',
+      cloudDays: [],
+      note: 'Parked permanently over the Indian Ocean at 74°E & 82°E. Never leaves the sky, capturing storm updates every 15 minutes.'
+    },
+    sar: {
+      name: 'Sentinel-1 C-band SAR',
+      revisit: '6 days (Constellation)',
+      passDays: [1, 7, 13, 19, 25],
+      monthlyPasses: '5 Passes / Month',
+      cloudRisk: '0% Loss (Microwave All-Weather)',
+      type: 'Synthetic Aperture Radar (Active)',
+      swath: '250 km',
+      cloudDays: [7, 19], // Passes on cloudy days succeed!
+      note: 'Microwave radar pulses pierce dense monsoon rain and cloud cover. 100% of planned acquisitions succeed day or night.'
+    }
+  };
+
+  let activeSatKey = 'sentinel2';
+  let isAnimating = false;
+  let animTimer = null;
+
+  function renderCalendar() {
+    const sched = satSchedules[activeSatKey];
+    calGrid.innerHTML = '';
+    statPasses.textContent = sched.monthlyPasses;
+    statCloud.textContent = sched.cloudRisk;
+
+    for (let day = 1; day <= 30; day++) {
+      const hasPass = sched.passDays.includes(day);
+      const isCloudy = sched.cloudDays.includes(day);
+
+      const cell = document.createElement('div');
+      cell.className = `cal-day-cell ${hasPass ? 'has-pass' : ''}`;
+      cell.id = `cal-day-${day}`;
+
+      let pillText = hasPass ? '🛰️ Pass' : '—';
+      if (activeSatKey === 'insat') pillText = '24/7';
+
+      cell.innerHTML = `
+        <span class="cal-day-num">${day}</span>
+        <span class="cal-pass-pill">${pillText}</span>
+      `;
+      calGrid.appendChild(cell);
+    }
+  }
+
+  function runTimelineAnimation() {
+    if (isAnimating) {
+      clearInterval(animTimer);
+      isAnimating = false;
+      playBtn.textContent = '▶ Animate Month Timeline';
+      return;
+    }
+
+    isAnimating = true;
+    playBtn.textContent = '⏹ Stop Animation';
+    const sched = satSchedules[activeSatKey];
+    let currentDay = 1;
+
+    // Clear existing cell highlights
+    document.querySelectorAll('.cal-day-cell').forEach(c => {
+      c.classList.remove('current-step', 'pulse-pass');
+    });
+
+    animTimer = setInterval(() => {
+      if (currentDay > 30) {
+        clearInterval(animTimer);
+        isAnimating = false;
+        playBtn.textContent = '▶ Replay Month Timeline';
+        logText.innerHTML = `<strong>Month Completed:</strong> ${sched.name} completed its scheduled pass cycle over Hyderabad. Total valid acquisitions: ${sched.passDays.length - (activeSatKey === 'sar' || activeSatKey === 'insat' ? 0 : sched.cloudDays.length)}.`;
+        return;
+      }
+
+      // Highlight current step
+      document.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('current-step'));
+      const activeCell = document.getElementById(`cal-day-${currentDay}`);
+      if (activeCell) activeCell.classList.add('current-step');
+
+      const isPass = sched.passDays.includes(currentDay);
+      const isCloudy = sched.cloudDays.includes(currentDay);
+
+      if (isPass) {
+        activeCell.classList.add('pulse-pass');
+        if (activeSatKey === 'insat') {
+          logText.innerHTML = `<strong>Day ${currentDay}:</strong> INSAT-3D captured 96 continuous hemispheric scans. Cloud movement tracked in thermal infrared.`;
+        } else if (activeSatKey === 'sar') {
+          logText.innerHTML = `<strong>Day ${currentDay} Flyover:</strong> 🛰️ Sentinel-1 C-SAR pass! ${isCloudy ? 'Heavy cloud cover present, but 5.6cm radar pulses penetrate with 100% transmission.' : 'Clear weather radar scan successful.'}`;
+        } else if (isCloudy) {
+          logText.innerHTML = `<strong>Day ${currentDay} Flyover:</strong> ☁️ Optical Pass Failed: Dense monsoon clouds obscure Hyderabad. Visible/NIR data unusable. Revisit missed!`;
+        } else {
+          logText.innerHTML = `<strong>Day ${currentDay} Flyover:</strong> 🛰️ ${sched.name} pass! Crisp clear-sky multispectral acquisition captured at 10:30 AM local solar time.`;
+        }
+      } else {
+        logText.innerHTML = `<strong>Day ${currentDay}:</strong> Satellite in adjacent orbit track (${sched.revisit} revisit). Target waiting for next pass.`;
+      }
+
+      currentDay++;
+    }, 280);
+  }
+
+  playBtn.addEventListener('click', runTimelineAnimation);
+
+  satBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (isAnimating) {
+        clearInterval(animTimer);
+        isAnimating = false;
+        playBtn.textContent = '▶ Animate Month Timeline';
+      }
+      satBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeSatKey = btn.dataset.sat;
+      renderCalendar();
+      logText.innerHTML = `Switched to <strong>${satSchedules[activeSatKey].name}</strong>. Revisit period: <strong>${satSchedules[activeSatKey].revisit}</strong>. Click "Animate Month Timeline" to run flyover simulation.`;
+    });
+  });
+
+  renderCalendar();
+})();
+
+// ================================================================
+// 1. IFOV & OPTICAL GEOMETRY RAY TRACER & CALCULATOR ENGINE
+// ================================================================
+(function() {
+  const canvas = document.getElementById('ifov-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const sH = document.getElementById('slider-ifov-h');
+  const sF = document.getElementById('slider-ifov-f');
+  const sA = document.getElementById('slider-ifov-a');
+
+  const vH = document.getElementById('val-ifov-h');
+  const vF = document.getElementById('val-ifov-f');
+  const vA = document.getElementById('val-ifov-a');
+
+  const cRad = document.getElementById('calc-ifov-rad');
+  const cIgfov = document.getElementById('calc-ifov-igfov');
+  const badge = document.getElementById('ifov-canvas-badge');
+  const targetIcon = document.getElementById('res-target-icon');
+  const targetDesc = document.getElementById('res-target-desc');
+  const chips = document.querySelectorAll('.ifov-chip');
+
+  let currentPlatformName = 'Cartosat-3 (High-Res LEO)';
+
+  function updateCalculations() {
+    const H_km = parseFloat(sH.value); // in km
+    const f_mm = parseFloat(sF.value); // in mm
+    const a_um = parseFloat(sA.value); // in micrometers
+
+    // Text labels
+    vH.textContent = H_km < 1 ? `${Math.round(H_km * 1000)} m` : `${H_km.toLocaleString()} km`;
+    vF.textContent = f_mm >= 1000 ? `${(f_mm / 1000).toFixed(1)} m (${f_mm} mm)` : `${f_mm} mm`;
+    vA.textContent = `${a_um.toFixed(1)} \u03BCm`;
+    badge.textContent = `${currentPlatformName} \u00B7 ${vH.textContent} Alt`;
+
+    // beta = a / f (a in um, f in mm -> 10^-6 / 10^-3 = 10^-3 rad = mrad)
+    // beta_rad = (a_um * 1e-6) / (f_mm * 1e-3) = a_um / (f_mm * 1000)
+    const beta_rad = (a_um * 1e-6) / (f_mm * 1e-3);
+    const beta_urad = beta_rad * 1e6;
+    const beta_arcsec = beta_rad * 206265;
+
+    // IGFOV = beta * H (H in meters)
+    const H_m = H_km * 1000;
+    const igfov_m = beta_rad * H_m;
+
+    cRad.textContent = `${beta_urad.toFixed(2)} \u03BCrad (${beta_arcsec.toFixed(2)} arcsec)`;
+    
+    if (igfov_m < 0.01) {
+      cIgfov.textContent = `${(igfov_m * 1000).toFixed(1)} mm / pixel`;
+    } else if (igfov_m < 1) {
+      cIgfov.textContent = `${(igfov_m * 100).toFixed(1)} cm / pixel`;
+    } else if (igfov_m < 1000) {
+      cIgfov.textContent = `${igfov_m.toFixed(2)} m / pixel`;
+    } else {
+      cIgfov.textContent = `${(igfov_m / 1000).toFixed(2)} km / pixel`;
+    }
+
+    // Resolvable targets text
+    if (igfov_m <= 0.05) {
+      targetIcon.textContent = '🌿';
+      targetDesc.innerHTML = '<strong>Sub-Centimeter Detail (Drone/UAV):</strong> Individual crop leaves, weed patches, fine asphalt cracks, and golf balls resolve clearly.';
+    } else if (igfov_m <= 0.35) {
+      targetIcon.textContent = '🚗';
+      targetDesc.innerHTML = '<strong>Sub-Meter High-Res (Cartosat-3 / WorldView):</strong> Individual automobiles, rooftop AC units, pedestrian crosswalks, and manhole covers visible.';
+    } else if (igfov_m <= 5) {
+      targetIcon.textContent = '🏠';
+      targetDesc.innerHTML = '<strong>High Resolution (IRS PAN / PlanetScope):</strong> House footprints, swimming pools, small farm ponds, and local roads resolved.';
+    } else if (igfov_m <= 15) {
+      targetIcon.textContent = '🌾';
+      targetDesc.innerHTML = '<strong>Medium-High Resolution (Sentinel-2 MSI):</strong> Agricultural field boundaries, city arterial avenues, aircraft on runways, and forest clearings.';
+    } else if (igfov_m <= 60) {
+      targetIcon.textContent = '🗺️';
+      targetDesc.innerHTML = '<strong>Medium Resolution (Landsat OLI):</strong> Broad agricultural plots, urban district boundaries, large water reservoirs, and wildfire burn scars.';
+    } else if (igfov_m <= 300) {
+      targetIcon.textContent = '🌊';
+      targetDesc.innerHTML = '<strong>Coarse Regional (MODIS 250m):</strong> Regional river basins, large mountain ranges, urban sprawl limits, and ocean sediment plumes.';
+    } else {
+      targetIcon.textContent = '🌪️';
+      targetDesc.innerHTML = '<strong>Very Coarse Hemispheric (INSAT-3D / GOES 1-4km):</strong> Continental weather systems, cyclone eye vortex, cloud cover, and sea surface temperature.';
+    }
+
+    drawIFOVScene(igfov_m, H_km, f_mm, a_um);
+  }
+
+  function drawIFOVScene(igfov_m, H_km, f_mm, a_um) {
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    // Background gradient (Space to Earth Atmosphere)
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
+    skyGrad.addColorStop(0, '#030712');
+    skyGrad.addColorStop(0.65, '#0b192e');
+    skyGrad.addColorStop(0.85, '#1e3a5f');
+    skyGrad.addColorStop(1, '#064e3b');
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Stars in upper space
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    const stars = [[30,20],[90,45],[160,15],[240,60],[380,25],[460,50],[520,18],[70,80],[490,95]];
+    stars.forEach(([sx, sy]) => {
+      ctx.beginPath();
+      ctx.arc(sx, sy, 1, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Satellite / Platform Position at top center
+    const satX = w * 0.5;
+    const satY = 45;
+
+    // Draw Sensor Telescope / Satellite Body
+    ctx.save();
+    ctx.translate(satX, satY);
+
+    // Solar panels
+    ctx.fillStyle = '#0284c7';
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 1;
+    ctx.fillRect(-65, -8, 40, 16);
+    ctx.strokeRect(-65, -8, 40, 16);
+    ctx.fillRect(25, -8, 40, 16);
+    ctx.strokeRect(25, -8, 40, 16);
+
+    // Solar panel grid lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.beginPath();
+    ctx.moveTo(-45, -8); ctx.lineTo(-45, 8);
+    ctx.moveTo(45, -8); ctx.lineTo(45, 8);
+    ctx.stroke();
+
+    // Satellite main body (Gold foil)
+    ctx.fillStyle = '#f59e0b';
+    ctx.strokeStyle = '#d97706';
+    ctx.fillRect(-18, -14, 36, 28);
+    ctx.strokeRect(-18, -14, 36, 28);
+
+    // Telescope barrel & Lens
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(-9, 14, 18, 12);
+    ctx.fillStyle = '#38bdf8';
+    ctx.beginPath();
+    ctx.arc(0, 26, 8, 0, Math.PI);
+    ctx.fill();
+
+    ctx.restore();
+
+    // Ground Surface Line
+    const groundY = h - 60;
+    ctx.fillStyle = '#166534';
+    ctx.fillRect(0, groundY, w, 60);
+
+    // Ground terrain details (roads, trees, river)
+    ctx.fillStyle = '#0284c7';
+    ctx.fillRect(w * 0.05, groundY + 15, w * 0.9, 8); // River
+    ctx.fillStyle = '#475569';
+    ctx.fillRect(w * 0.15, groundY + 30, w * 0.7, 6); // Road
+
+    // Projected Ray Beam (IFOV cone)
+    const beamSpread = Math.max(16, Math.min(180, Math.log10(igfov_m + 1.1) * 60 + 24));
+    const groundLeft = satX - beamSpread;
+    const groundRight = satX + beamSpread;
+
+    // Beam Fill
+    const beamGrad = ctx.createLinearGradient(0, satY + 26, 0, groundY);
+    beamGrad.addColorStop(0, 'rgba(245, 166, 35, 0.45)');
+    beamGrad.addColorStop(0.7, 'rgba(45, 212, 191, 0.25)');
+    beamGrad.addColorStop(1, 'rgba(45, 212, 191, 0.6)');
+    ctx.fillStyle = beamGrad;
+    ctx.beginPath();
+    ctx.moveTo(satX, satY + 26);
+    ctx.lineTo(groundLeft, groundY);
+    ctx.lineTo(groundRight, groundY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Ray Outlines
+    ctx.strokeStyle = 'rgba(245, 166, 35, 0.9)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(satX, satY + 26);
+    ctx.lineTo(groundLeft, groundY);
+    ctx.moveTo(satX, satY + 26);
+    ctx.lineTo(groundRight, groundY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Ground Resolution Element (Pixel Footprint) on Ground
+    ctx.fillStyle = 'rgba(245, 166, 35, 0.35)';
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 2.5;
+    ctx.fillRect(groundLeft, groundY - 6, beamSpread * 2, 12);
+    ctx.strokeRect(groundLeft, groundY - 6, beamSpread * 2, 12);
+
+    // Dimension Callouts
+    ctx.fillStyle = '#fff';
+    ctx.font = '11px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(`IGFOV Ground Pixel: ${cIgfov.textContent}`, satX, groundY + 38);
+
+    // Angle label (beta)
+    ctx.fillStyle = '#f5a623';
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.fillText(`\u03B2 = a/f`, satX, satY + 55);
+    ctx.fillText(`H = ${vH.textContent}`, satX + 75, (satY + groundY) * 0.5);
+
+    // Altitude indicator ruler line
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(satX + 45, satY + 26);
+    ctx.lineTo(satX + 45, groundY);
+    ctx.stroke();
+  }
+
+  // Slider event listeners
+  [sH, sF, sA].forEach(slider => {
+    slider.addEventListener('input', () => {
+      currentPlatformName = 'Custom Sensor';
+      chips.forEach(c => c.classList.remove('active'));
+      updateCalculations();
+    });
+  });
+
+  // Preset chips
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      currentPlatformName = chip.dataset.name;
+      sH.value = chip.dataset.h;
+      sF.value = chip.dataset.f;
+      sA.value = chip.dataset.a;
+      updateCalculations();
+    });
+  });
+
+  updateCalculations();
+})();
+
+// ================================================================
+// 2. SPECTRAL RESOLUTION & DATA CUBE ENGINE
+// ================================================================
+(function() {
+  const chartCanvas = document.getElementById('specResolutionChart');
+  const cubeCanvas = document.getElementById('cube-canvas');
+  if (!chartCanvas || !cubeCanvas) return;
+
+  const modeBtns = document.querySelectorAll('.spec-mode-btn');
+  const targetChips = document.querySelectorAll('.spec-target-chip');
+  const bandBadge = document.getElementById('spec-band-count');
+  const cubeBadge = document.getElementById('cube-mode-badge');
+  const verdictIcon = document.getElementById('verdict-icon');
+  const verdictTitle = document.getElementById('verdict-title');
+  const verdictText = document.getElementById('verdict-text');
+
+  let currentMode = 'hsi'; // 'pan', 'msi', 'hsi'
+  let currentTarget = 'crop'; // 'crop', 'clay', 'water', 'urban'
+
+  // Wavelengths from 400nm to 2400nm (step 20nm)
+  const wavelengths = [];
+  for (let w = 400; w <= 2400; w += 20) wavelengths.push(w);
+
+  // Spectral signature models
+  function getSignatures(target) {
+    if (target === 'crop') {
+      // Curve 1: Healthy Citrus (Strong NIR plateau, sharp chlorophyll dip)
+      // Curve 2: Citrus Greening Disease (Degraded NIR, flattened red edge)
+      const c1 = wavelengths.map(w => {
+        if (w < 500) return 6;
+        if (w < 600) return 14;
+        if (w < 680) return 5;
+        if (w < 740) return 5 + (w - 680) * 0.7; // Sharp Red Edge
+        if (w < 1300) return 52 - (w - 740) * 0.005; // NIR Plateau
+        if (w < 1500) return 22; // Water absorption
+        if (w < 1800) return 38;
+        if (w < 2000) return 15;
+        return 24;
+      });
+      const c2 = wavelengths.map(w => {
+        if (w < 500) return 9;
+        if (w < 600) return 18;
+        if (w < 680) return 12; // Chlorophyll loss
+        if (w < 740) return 12 + (w - 680) * 0.32; // Weak Red Edge
+        if (w < 1300) return 33 - (w - 740) * 0.004; // Collapsed NIR
+        if (w < 1500) return 26;
+        if (w < 1800) return 34;
+        if (w < 2000) return 22;
+        return 25;
+      });
+      return {
+        label1: 'Healthy Citrus (Intact Canopy)',
+        label2: 'HLB Greening Disease (Chlorotic)',
+        c1, c2,
+        panDiscrim: { ok: false, title: 'Materials Indistinguishable (0% Separation)', text: 'Panchromatic averages all 450–900nm light into one pixel. Both citrus types yield the same DN (~38).' },
+        msiDiscrim: { ok: false, title: 'Inconclusive / Ambiguous (NDVI overlaps)', text: 'Multispectral Red and NIR bands show lower NDVI, but cannot separate greening disease from simple nitrogen deficiency or drought.' },
+        hsiDiscrim: { ok: true, title: '100% Diagnostic Discrimination Confirmed', text: 'Hyperspectral detects the 705nm red-edge inflection shift and 531nm xanthophyll absorption characteristic of early-stage bacterial HLB infection.' }
+      };
+    } else if (target === 'clay') {
+      // Kaolinite vs Alunite (Hydrothermal alteration minerals)
+      const c1 = wavelengths.map(w => {
+        let base = 25 + (w - 400) * 0.025;
+        if (w >= 1390 && w <= 1430) base -= 24; // 1.4um dip
+        if (w >= 2150 && w <= 2230) base -= 28; // Kaolinite 2.20um doublet!
+        return Math.max(5, base);
+      });
+      const c2 = wavelengths.map(w => {
+        let base = 24 + (w - 400) * 0.024;
+        if (w >= 1420 && w <= 1470) base -= 22; // 1.44um dip
+        if (w >= 2160 && w <= 2190) base -= 25; // Alunite 2.17um dip
+        if (w >= 2300 && w <= 2340) base -= 18;
+        return Math.max(5, base);
+      });
+      return {
+        label1: 'Kaolinite Clay (Al2Si2O5(OH)4)',
+        label2: 'Alunite Hydrothermal Mineral',
+        c1, c2,
+        panDiscrim: { ok: false, title: 'Identical Bright Clay Appearance', text: 'Both minerals have high visible/NIR albedo. In Pan mode, both show as identical white rock.' },
+        msiDiscrim: { ok: false, title: 'Both Fall in SWIR Band 11/12 (Ambiguous)', text: 'Landsat/Sentinel SWIR bands are ~100nm wide. They detect a generic "clay mineral absorption" but cannot tell Kaolinite apart from Alunite.' },
+        hsiDiscrim: { ok: true, title: 'Kaolinite 2.20\u03BCm Doublet Resolved', text: '224 contiguous 10nm bands resolve the diagnostic double absorption valley (2.16\u03BCm & 2.20\u03BCm), crucial for gold/copper prospecting.' }
+      };
+    } else if (target === 'water') {
+      // Clean Deep Lake vs Algal Bloom
+      const c1 = wavelengths.map(w => {
+        if (w < 500) return 10;
+        if (w < 600) return 6;
+        if (w < 700) return 2;
+        return 0.5;
+      });
+      const c2 = wavelengths.map(w => {
+        if (w < 500) return 4;
+        if (w < 580) return 14; // Green peak
+        if (w < 680) return 3; // Chl-a absorption
+        if (w < 720) return 18; // Cyanobacteria phycocyanin fluorescence peak!
+        if (w < 900) return 12;
+        return 1;
+      });
+      return {
+        label1: 'Oligotrophic Clean Water',
+        label2: 'Eutrophic Toxic Cyanobacteria Bloom',
+        c1, c2,
+        panDiscrim: { ok: false, title: 'Both Appear Dark/Grey', text: 'Pan merges green chlorophyll radiance with black water background.' },
+        msiDiscrim: { ok: true, title: 'Detected (High Green/Red Ratio)', text: 'Multispectral distinguishes turbid algae water from clear water, but cannot isolate toxic microcystin toxin strains.' },
+        hsiDiscrim: { ok: true, title: 'Phycocyanin 620nm Biomarker Quantified', text: 'Narrow 620nm absorption and 709nm fluorescence peak directly quantifies toxic blue-green cyanobacteria cell density.' }
+      };
+    } else {
+      // Urban: Green Painted Metal Roof vs Real Tree Turf
+      const c1 = wavelengths.map(w => {
+        if (w < 500) return 6;
+        if (w < 600) return 14;
+        if (w < 680) return 5;
+        if (w < 1300) return 50; // Huge NIR plateau in real vegetation
+        return 20;
+      });
+      const c2 = wavelengths.map(w => {
+        // Green paint: reflects green, but ZERO NIR plateau!
+        if (w < 500) return 6;
+        if (w < 600) return 14; // Green paint
+        if (w < 680) return 7;
+        if (w < 1300) return 9; // Stays low in NIR!
+        return 12;
+      });
+      return {
+        label1: 'Real Living Vegetation Turf',
+        label2: 'Green Painted Metal Industrial Roof',
+        c1, c2,
+        panDiscrim: { ok: false, title: 'Zero Contrast in Visible Light', text: 'Human eyes and Pan cameras see both as identical shade of green.' },
+        msiDiscrim: { ok: true, title: 'NIR Band Instantly Exposes Fake Turf', text: 'Multispectral NIR band easily separates living turf (50% NIR) from green paint (9% NIR).' },
+        hsiDiscrim: { ok: true, title: 'Full Cellulose & Lignin Spectrum Confirmed', text: 'Pinpoints artificial pigment phthalocyanine green absorption versus natural chlorophyll a/b.' }
+      };
+    }
+  }
+
+  // Chart setup
+  const chartCtx = chartCanvas.getContext('2d');
+  let specChart = new Chart(chartCtx, {
+    type: 'line',
+    data: {
+      labels: wavelengths.map(w => `${w}`),
+      datasets: [
+        {
+          label: 'Target 1',
+          data: [],
+          borderColor: '#2dd4bf',
+          backgroundColor: 'rgba(45, 212, 191, 0.1)',
+          borderWidth: 2.5,
+          tension: 0.3,
+          pointRadius: 0
+        },
+        {
+          label: 'Target 2',
+          data: [],
+          borderColor: '#f5a623',
+          backgroundColor: 'rgba(245, 166, 35, 0.1)',
+          borderWidth: 2.5,
+          borderDash: [5, 4],
+          tension: 0.3,
+          pointRadius: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: {
+          title: { display: true, text: 'Wavelength (nm)', color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } },
+          ticks: { color: '#64748b', maxTicksLimit: 8, font: { family: 'JetBrains Mono', size: 10 } },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        },
+        y: {
+          title: { display: true, text: 'Reflectance (%)', color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } },
+          ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          min: 0,
+          max: 60
+        }
+      },
+      plugins: {
+        legend: {
+          labels: { color: '#e2e8f0', font: { family: 'Space Grotesk', size: 11 } }
+        }
+      }
+    }
+  });
+
+  function updateSpectralView() {
+    const data = getSignatures(currentTarget);
+
+    if (currentMode === 'pan') {
+      bandBadge.textContent = '1 Broadband Channel (450–900 nm)';
+      cubeBadge.textContent = '2D Grayscale Matrix (No Depth)';
+
+      // PAN: Average curve between 450 and 900, flat line
+      const avg1 = data.c1.slice(3, 26).reduce((a,b)=>a+b, 0) / 23;
+      const avg2 = data.c2.slice(3, 26).reduce((a,b)=>a+b, 0) / 23;
+
+      specChart.data.datasets[0].data = wavelengths.map(() => avg1);
+      specChart.data.datasets[1].data = wavelengths.map(() => avg2);
+      specChart.data.datasets[0].label = `${data.label1} (Broadband Pan Average: ${avg1.toFixed(1)}%)`;
+      specChart.data.datasets[1].label = `${data.label2} (Broadband Pan Average: ${avg2.toFixed(1)}%)`;
+
+      verdictIcon.textContent = data.panDiscrim.ok ? '✅' : '❌';
+      verdictTitle.textContent = data.panDiscrim.title;
+      verdictText.textContent = data.panDiscrim.text;
+    } else if (currentMode === 'msi') {
+      bandBadge.textContent = '13 Discrete Bands (Sentinel-2 MSI)';
+      cubeBadge.textContent = '13-Slice Layered Stack';
+
+      // MSI: sample at 6 key band centers, step interpolations
+      const msiBands = [490, 560, 665, 705, 842, 1610, 2190];
+      function sampleMSI(curve) {
+        return wavelengths.map(w => {
+          let closestIdx = 0;
+          let minDiff = 9999;
+          msiBands.forEach((bw) => {
+            const diff = Math.abs(w - bw);
+            if (diff < minDiff) { minDiff = diff; closestIdx = Math.round((bw - 400) / 20); }
+          });
+          return curve[Math.min(curve.length - 1, closestIdx)];
+        });
+      }
+
+      specChart.data.datasets[0].data = sampleMSI(data.c1);
+      specChart.data.datasets[1].data = sampleMSI(data.c2);
+      specChart.data.datasets[0].label = `${data.label1} (MSI 13-Band Sampled)`;
+      specChart.data.datasets[1].label = `${data.label2} (MSI 13-Band Sampled)`;
+
+      verdictIcon.textContent = data.msiDiscrim.ok ? '✅' : '⚠️';
+      verdictTitle.textContent = data.msiDiscrim.title;
+      verdictText.textContent = data.msiDiscrim.text;
+    } else {
+      // HSI: Continuous full curve
+      bandBadge.textContent = '224 Contiguous Channels (\u0394\u03BB = 10 nm)';
+      cubeBadge.textContent = '3D Hyperspectral Data Cube';
+
+      specChart.data.datasets[0].data = data.c1;
+      specChart.data.datasets[1].data = data.c2;
+      specChart.data.datasets[0].label = data.label1;
+      specChart.data.datasets[1].label = data.label2;
+
+      verdictIcon.textContent = '✅';
+      verdictTitle.textContent = data.hsiDiscrim.title;
+      verdictText.textContent = data.hsiDiscrim.text;
+    }
+
+    specChart.update();
+    drawCubeVisualization();
+  }
+
+  function drawCubeVisualization() {
+    const ctx = cubeCanvas.getContext('2d');
+    const w = cubeCanvas.width;
+    const h = cubeCanvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    // Isometric Data Cube Rendering
+    const originX = 70;
+    const originY = 140;
+    const cubeW = 110;
+    const cubeH = 80;
+    const cubeDepth = currentMode === 'pan' ? 8 : (currentMode === 'msi' ? 65 : 130);
+
+    // Draw slices along depth
+    const nSlices = currentMode === 'pan' ? 1 : (currentMode === 'msi' ? 7 : 20);
+    const sliceColors = [
+      '#3b82f6', '#06b6d4', '#10b981', '#84cc16', '#eab308', '#f97316', '#ef4444', '#ec4899', '#8b5cf6'
+    ];
+
+    for (let s = nSlices - 1; s >= 0; s--) {
+      const offsetX = (s / nSlices) * cubeDepth * 0.866;
+      const offsetY = -(s / nSlices) * cubeDepth * 0.5;
+
+      const px = originX + offsetX;
+      const py = originY + offsetY;
+
+      ctx.fillStyle = currentMode === 'pan' ? '#475569' : sliceColors[s % sliceColors.length];
+      ctx.globalAlpha = currentMode === 'pan' ? 0.9 : 0.45;
+
+      // Draw rectangular slice in perspective
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(px + cubeW, py);
+      ctx.lineTo(px + cubeW, py - cubeH);
+      ctx.lineTo(px, py - cubeH);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = currentMode === 'pan' ? '#94a3b8' : '#fff';
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.8;
+      ctx.stroke();
+    }
+
+    ctx.globalAlpha = 1.0;
+
+    // Axis labels
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.fillText('X (Spatial)', originX + 25, originY + 18);
+    ctx.fillText('Y (Spatial)', originX - 45, originY - 35);
+    ctx.fillStyle = '#2dd4bf';
+    ctx.fillText('\u03BB (Spectral Depth)', originX + 100, originY - cubeH - 20);
+  }
+
+  modeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      modeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentMode = btn.dataset.mode;
+      updateSpectralView();
+    });
+  });
+
+  targetChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      targetChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      currentTarget = chip.dataset.target;
+      updateSpectralView();
+    });
+  });
+
+  updateSpectralView();
+})();
+
+// ================================================================
+// 3. RADIOMETRIC RESOLUTION DYNAMIC RANGE & SHADOW LAB ENGINE
+// ================================================================
+(function() {
+  const sceneCanvas = document.getElementById('rad-scene-canvas');
+  const histCanvas = document.getElementById('rad-hist-canvas');
+  if (!sceneCanvas || !histCanvas) return;
+
+  const sCtx = sceneCanvas.getContext('2d');
+  const hCtx = histCanvas.getContext('2d');
+
+  const bitBtns = document.querySelectorAll('.bit-btn');
+  const activeLevels = document.getElementById('rad-active-levels');
+  const shadowText = document.getElementById('rad-shadow-inspect-text');
+  const quantStep = document.getElementById('stat-quant-step');
+  const shadowLoss = document.getElementById('stat-shadow-loss');
+  const highlightLoss = document.getElementById('stat-highlight-loss');
+
+  let activeBits = 12;
+
+  // Generate synthetic High Dynamic Range image buffer (Glacier + Shadowed Valley + River)
+  const W = 560, H = 280;
+  const rawLuma = new Float32Array(W * H);
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const nx = x / W;
+      const ny = y / H;
+
+      let luma = 0.3;
+
+      // 1. Sunlit Himalayan Glacial Peak (top right, 80-98% radiance)
+      if (ny < 0.45 && nx > 0.45) {
+        const peakDist = Math.hypot(nx - 0.75, ny - 0.2);
+        if (peakDist < 0.35) {
+          luma = 0.85 + 0.12 * Math.sin(nx * 40 + ny * 20);
+        }
+      }
+
+      // 2. Deep Mountain Shadow Ravine (center left, 2-7% radiance!)
+      if (ny > 0.25 && ny < 0.85 && nx > 0.1 && nx < 0.48) {
+        const shadowDist = Math.hypot(nx - 0.28, ny - 0.55);
+        if (shadowDist < 0.26) {
+          // Fine internal shadow details (roads and tree canopy texture)
+          const roadPattern = Math.abs(ny - (0.4 + nx * 0.4)) < 0.015 ? 0.04 : 0;
+          const treeNoise = 0.015 * Math.sin(nx * 120) * Math.cos(ny * 120);
+          luma = 0.03 + roadPattern + treeNoise; // 3% to 7% radiance
+        }
+      }
+
+      // 3. Valley Floor Agriculture & River (bottom)
+      if (ny >= 0.75) {
+        luma = 0.25 + 0.08 * Math.sin(nx * 25);
+        // Winding dark river
+        if (Math.abs(ny - (0.85 + 0.08 * Math.sin(nx * 8))) < 0.03) {
+          luma = 0.08;
+        }
+      }
+
+      rawLuma[y * W + x] = Math.max(0, Math.min(1, luma));
+    }
+  }
+
+  function renderRadiometricScene() {
+    const levels = Math.pow(2, activeBits);
+    activeLevels.textContent = `${levels.toLocaleString()} Quantization Levels (${activeBits}-bit)`;
+
+    // Calculate metrics
+    const stepPct = (100 / levels).toFixed(activeBits > 8 ? 4 : 2);
+    quantStep.textContent = `${stepPct}% of Radiance`;
+
+    if (activeBits === 1) {
+      shadowLoss.textContent = '100% Clipped (Pure Black)';
+      highlightLoss.textContent = '100% Saturated (Pure White)';
+      shadowText.innerHTML = '<strong>1-bit Failure:</strong> The entire shadow region is clipped to pure 0 (black). All forestry paths, elevation contours, and canopy structures are permanently lost.';
+    } else if (activeBits === 6) {
+      shadowLoss.textContent = '45% Detail Loss (Severe Contouring)';
+      highlightLoss.textContent = '12% Glacier Saturation';
+      shadowText.innerHTML = '<strong>6-bit (Landsat MSS):</strong> Quantization noise creates false contour bands across the shadow. The forest path merges into flat shadow floor.';
+    } else if (activeBits === 8) {
+      shadowLoss.textContent = '8% Detail Loss in Deep Shadows';
+      highlightLoss.textContent = '2% Highlight Clipping';
+      shadowText.innerHTML = '<strong>8-bit (Landsat TM):</strong> Standard display depth. Shadow is visible, but faint canopy gradients and narrow mountain tracks remain noisy and compressed into ~8 DN levels.';
+    } else if (activeBits === 12) {
+      shadowLoss.textContent = '0% (Zero Shadow Clipping)';
+      highlightLoss.textContent = '0% (Full Glacier Texture Preserved)';
+      shadowText.innerHTML = '<strong>12-bit (Landsat OLI / Sentinel-2):</strong> 4,096 discrete levels allocate 250+ DN steps to the shadow zone alone. Mountain paths, rock strata, and dense canopy textures are fully resolved.';
+    } else {
+      shadowLoss.textContent = '0% (Super-Resolution Radiometry)';
+      highlightLoss.textContent = '0% (Scientific Precision)';
+      shadowText.innerHTML = '<strong>14-bit (WorldView-3 / MODIS):</strong> 16,384 levels provide laboratory-grade dynamic range, simultaneously measuring blinding snow albedo and 1% dark ocean reflections without saturation.';
+    }
+
+    // Render Scene Pixels
+    const imgData = sCtx.createImageData(W, H);
+    const data = imgData.data;
+    const histBins = new Array(32).fill(0);
+
+    for (let i = 0; i < rawLuma.length; i++) {
+      const raw = rawLuma[i];
+      // Quantize to bit depth
+      const quant = Math.round(raw * (levels - 1)) / (levels - 1);
+      const byteVal = Math.round(quant * 255);
+
+      const p = i * 4;
+      data[p] = byteVal;
+      data[p + 1] = byteVal;
+      data[p + 2] = byteVal;
+      data[p + 3] = 255;
+
+      // Histogram bin
+      const binIdx = Math.min(31, Math.floor(quant * 32));
+      histBins[binIdx]++;
+    }
+
+    sCtx.putImageData(imgData, 0, 0);
+
+    // Draw Shadow Inspector Loupe Ring on canvas
+    const loupeX = W * 0.28;
+    const loupeY = H * 0.55;
+    const loupeR = 50;
+
+    sCtx.strokeStyle = '#38bdf8';
+    sCtx.lineWidth = 2;
+    sCtx.beginPath();
+    sCtx.arc(loupeX, loupeY, loupeR, 0, Math.PI * 2);
+    sCtx.stroke();
+
+    // Crosshairs
+    sCtx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
+    sCtx.lineWidth = 1;
+    sCtx.beginPath();
+    sCtx.moveTo(loupeX - loupeR - 10, loupeY); sCtx.lineTo(loupeX + loupeR + 10, loupeY);
+    sCtx.moveTo(loupeX, loupeY - loupeR - 10); sCtx.lineTo(loupeX, loupeY + loupeR + 10);
+    sCtx.stroke();
+
+    sCtx.fillStyle = '#38bdf8';
+    sCtx.font = '10px "JetBrains Mono", monospace';
+    sCtx.fillText('Shadow Zone (5% Luma)', loupeX - 55, loupeY - loupeR - 6);
+
+    // Render Histogram on histCanvas
+    renderHistogram(histBins);
+  }
+
+  function renderHistogram(bins) {
+    const hw = histCanvas.width;
+    const hh = histCanvas.height;
+    hCtx.clearRect(0, 0, hw, hh);
+
+    const maxBin = Math.max(...bins, 1);
+    const barW = (hw - 30) / bins.length;
+
+    hCtx.fillStyle = '#38bdf8';
+    for (let b = 0; b < bins.length; b++) {
+      const barH = (bins[b] / maxBin) * (hh - 35);
+      const bx = 15 + b * barW;
+      const by = hh - 20 - barH;
+
+      hCtx.fillRect(bx, by, barW - 1, barH);
+    }
+
+    // Baseline & Axis labels
+    hCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+    hCtx.lineWidth = 1;
+    hCtx.beginPath();
+    hCtx.moveTo(10, hh - 20);
+    hCtx.lineTo(hw - 10, hh - 20);
+    hCtx.stroke();
+
+    hCtx.fillStyle = '#94a3b8';
+    hCtx.font = '9px "JetBrains Mono", monospace';
+    hCtx.fillText('DN: 0 (Shadow)', 12, hh - 6);
+    hCtx.fillText(`DN: ${Math.pow(2, activeBits) - 1} (Glacier)`, hw - 110, hh - 6);
+  }
+
+  bitBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      bitBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeBits = parseInt(btn.dataset.bits);
+      renderRadiometricScene();
+    });
+  });
+
+  renderRadiometricScene();
+})();
+
+// ================================================================
+// 4. MISSION REQUIREMENTS & 4-RESOLUTION TRADEOFF MATCHER
+// ================================================================
+(function() {
+  const radarCanvas = document.getElementById('tradeoffRadarChart');
+  if (!radarCanvas) return;
+
+  const appBtns = document.querySelectorAll('.app-scenario-btn');
+  const banner = document.getElementById('intel-app-title');
+  const reqSpatial = document.getElementById('req-spatial');
+  const reqTemporal = document.getElementById('req-temporal');
+  const reqSpectral = document.getElementById('req-spectral');
+  const reqRadiometric = document.getElementById('req-radiometric');
+  const rationale = document.getElementById('intel-rationale-text');
+  const sensorChipsWrap = document.getElementById('intel-sensor-chips');
+
+  const appProfiles = {
+    cyclone: {
+      title: '🌪️ Real-Time Cyclone Tracking & Cloud Motion',
+      radarValues: [2, 10, 4, 7], // [Spatial, Temporal, Spectral, Radiometric] out of 10
+      spatial: '1 km – 4 km (Coarse is OK)',
+      temporal: '15 – 30 Minutes (Critical!)',
+      spectral: 'Thermal IR (10.8\u03BCm) & Water Vapor (6.7\u03BCm)',
+      radiometric: '10–12 bits (TIR Noise Equivalent \u0394T)',
+      rationale: '<strong>The Engineering Physics:</strong> A tropical cyclone spans 500–1,000 km across. Sub-meter spatial resolution would generate terabytes of redundant pixels and take hours to downlink. Instead, geostationary orbit (36,000 km) provides continuous 15-minute scans to track eye progression and storm intensity in real time.',
+      sensors: ['🛰️ INSAT-3D/3DR (ISRO)', '🛰️ GOES-16/18 (NOAA)', '🛰️ Meteosat-11 (EUMETSAT)']
+    },
+    urban: {
+      title: '🏙️ Urban Cadastral Mapping & Property Boundary',
+      radarValues: [10, 2, 3, 8],
+      spatial: '\u2264 0.25 m – 0.5 m (Sub-meter Mandatory)',
+      temporal: '30 – 90 Days (Low Priority)',
+      spectral: 'Panchromatic + 4-Band RGB/NIR',
+      radiometric: '11–12 bits (Building Shadow Discrimination)',
+      rationale: '<strong>The Engineering Physics:</strong> Property boundaries, cadastral tax maps, and road layouts require sub-meter precision to resolve walls and curb lines. Urban layouts change slowly, so long revisit intervals (months) are completely acceptable in exchange for maximum spatial resolving power.',
+      sensors: ['🛰️ Cartosat-3 / 2S (ISRO)', '🛰️ WorldView-3/4 (Maxar)', '🛰️ Pl\u00E9iades Neo (Airbus)']
+    },
+    agri: {
+      title: '🌾 Precision Agriculture & Crop Nitrogen Stress',
+      radarValues: [7, 8, 8, 8],
+      spatial: '5 m – 10 m (Individual Farm Plots)',
+      temporal: '3 – 5 Days (Track Phenology Cycles)',
+      spectral: 'Red-Edge (705nm), NIR (842nm), SWIR (1610nm)',
+      radiometric: '12 bits (Canopy Reflectance Contrast)',
+      rationale: '<strong>The Engineering Physics:</strong> Crops grow and exhibit fertilizer/pest stress over weekly cycles. 10m spatial resolution resolves individual agricultural fields, while narrow Red-Edge bands quantify chlorophyll without saturation.',
+      sensors: ['🛰️ Sentinel-2A/2B (ESA)', '🛰️ Resourcesat-2A LISS-IV (ISRO)', '🛰️ PlanetScope SuperDove']
+    },
+    ocean: {
+      title: '🌊 Ocean Colour & Chlorophyll-a Phytoplankton',
+      radarValues: [3, 9, 9, 10],
+      spatial: '300 m – 1 km (Open Ocean Mesoscale)',
+      temporal: '1 – 2 Days (Rapid Ocean Dynamics)',
+      spectral: '16–21 Narrow Ocean Colour Bands (412–865 nm)',
+      radiometric: '14 bits (High Signal-to-Noise Ratio SNR)',
+      rationale: '<strong>The Engineering Physics:</strong> Water reflects less than 5% of incident sunlight, requiring ultra-high radiometric sensitivity (14-bit) with exceptional SNR to detect minute microgram variations of chlorophyll-a without sensor noise swamping the signal.',
+      sensors: ['🛰️ Oceansat-3 / EOS-06 OCM (ISRO)', '🛰️ Sentinel-3 OLCI (ESA)', '🛰️ MODIS Aqua (NASA)']
+    },
+    wildfire: {
+      title: '🔥 Wildfire Early Warning & Thermal Fronts',
+      radarValues: [4, 9, 7, 9],
+      spatial: '375 m – 1 km (Active Burn Fronts)',
+      temporal: 'Hourly to Daily (Rapid Fire Spread)',
+      spectral: 'Mid-Wave IR (3.9\u03BCm) & Long-Wave IR (11\u03BCm)',
+      radiometric: '12–14 bits (High Saturation Temperature)',
+      rationale: '<strong>The Engineering Physics:</strong> Flaming fires radiate predominantly in Mid-Wave Infrared (3.9\u03BCm according to Wien\'s Displacement Law). Fire detection sensors must have specialized detectors that don\'t saturate at 1,000 K while providing daily or sub-hourly flyovers.',
+      sensors: ['🛰️ VIIRS (Suomi NPP / NOAA-20)', '🛰️ MODIS (Terra/Aqua)', '🛰️ INSAT-3D TIR']
+    },
+    mineral: {
+      title: '⛏️ Geological Mineral Prospecting & Hydrothermal Alteration',
+      radarValues: [6, 1, 10, 9],
+      spatial: '15 m – 30 m (Rock Outcrops)',
+      temporal: 'Months to Years (Static Geology)',
+      spectral: '200+ Contiguous SWIR Channels (Hyperspectral)',
+      radiometric: '12–14 bits (Diagnostic Crystal Absorption)',
+      rationale: '<strong>The Engineering Physics:</strong> Geological formations never move, so temporal revisit is irrelevant. However, discriminating alunite from kaolinite requires 200+ narrow 10nm spectral channels across the SWIR (2.0–2.4\u03BCm) region.',
+      sensors: ['🛰️ AVIRIS-NG (ISRO/NASA)', '🛰️ EnMAP (DLR)', '🛰️ EMIT (NASA ISS)', '🛰️ Hyperion (EO-1)']
+    }
+  };
+
+  const radarCtx = radarCanvas.getContext('2d');
+  let tradeoffRadar = new Chart(radarCtx, {
+    type: 'radar',
+    data: {
+      labels: ['Spatial (Detail)', 'Temporal (Revisit)', 'Spectral (Bands)', 'Radiometric (Bits)'],
+      datasets: [{
+        label: 'Mandatory Requirement',
+        data: [2, 10, 4, 7],
+        fill: true,
+        backgroundColor: 'rgba(245, 166, 35, 0.25)',
+        borderColor: '#f5a623',
+        pointBackgroundColor: '#f5a623',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: '#f5a623',
+        borderWidth: 2.5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+          grid: { color: 'rgba(255, 255, 255, 0.08)' },
+          pointLabels: {
+            color: '#e2e8f0',
+            font: { family: 'Space Grotesk', size: 11, weight: '600' }
+          },
+          ticks: {
+            display: false,
+            min: 0,
+            max: 10
+          },
+          suggestedMin: 0,
+          suggestedMax: 10
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+
+  function updateTradeoffView(appKey) {
+    const prof = appProfiles[appKey];
+    banner.textContent = prof.title;
+    reqSpatial.textContent = prof.spatial;
+    reqTemporal.textContent = prof.temporal;
+    reqSpectral.textContent = prof.spectral;
+    reqRadiometric.textContent = prof.radiometric;
+    rationale.innerHTML = prof.rationale;
+
+    sensorChipsWrap.innerHTML = prof.sensors.map(s => `<span class="sensor-chip">${s}</span>`).join('');
+
+    tradeoffRadar.data.datasets[0].data = prof.radarValues;
+    tradeoffRadar.update();
+  }
+
+  appBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      appBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateTradeoffView(btn.dataset.app);
+    });
+  });
+
+  updateTradeoffView('cyclone');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orbits & Scanning — RS.3</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="page-hero">
+  <div class="chapter-badge">Track A · RS.3 of 6</div>
+  <h1>Orbits &amp; <span>Scanning</span></h1>
+  <p class="hero-intro">A satellite's orbit decides what it can see, how often, and at what time of day — before a single photon is even captured. Get the orbit wrong for your application and no amount of clever image processing will fix it.</p>
+  <div class="chapter-progress"><span class="done"></span><span class="done"></span><span class="now"></span><span></span><span></span><span></span></div>
+</header>
+
+<section class="content-section reveal">
+  <div class="section-label">03.1 / Orbit Types</div>
+  <h2 class="section-title">Two ways to orbit Earth</h2>
+
+  <div class="www-grid">
+    <div class="www-card what">
+      <div class="www-label">What</div>
+      <p>Almost every Earth-observation satellite uses one of two orbit families: low-altitude <strong>polar/sun-synchronous</strong> orbits, or very-high-altitude <strong>geostationary</strong> orbits directly above the equator.</p>
+    </div>
+    <div class="www-card why">
+      <div class="www-label">Why</div>
+      <p>They solve opposite problems. Polar orbits give you high spatial resolution and full global coverage over days/weeks. Geostationary orbits give you the same view, continuously, forever — perfect for watching a storm develop hour by hour, useless for mapping fine detail.</p>
+    </div>
+    <div class="www-card how">
+      <div class="www-label">How</div>
+      <p>Orbit altitude and inclination are chosen so gravity balances the satellite's speed at the right period — 90 minutes at 700–800 km (polar), or exactly 24 hours at ~36,000 km (geostationary, matching Earth's own rotation so the satellite appears fixed).</p>
+    </div>
+  </div>
+
+  <!-- AUTHENTIC PLATFORMS: GROUND VS AIRBORNE VS SPACEBORNE -->
+  <div class="figure-row">
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/plat-ground-truck.jpg" alt="Ground-based field spectroradiometer mounted on hydraulic truck cherry picker"></div>
+      <figcaption><strong>1. Ground-Based Platform:</strong> Field spectroradiometers mounted on hydraulic crane trucks measure pure, in-situ canopy reflectance without atmospheric interference — essential for ground-truthing satellite data.
+        <span class="fig-credit">Source: ISRO IIRS Dehradun — "Platforms &amp; Sensors," Shri Vinay Kumar</span>
+      </figcaption>
+    </div>
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/plat-airborne-aircraft.jpg" alt="Airborne remote sensing survey aircraft with fuselage sensor pod"></div>
+      <figcaption><strong>2. Airborne Platform:</strong> Survey aircraft operate at 1–10 km altitude, providing flexible on-demand high spatial resolution (5–20 cm) and specialized hyperspectral payloads (e.g. AVIRIS-NG).
+        <span class="fig-credit">Source: ISRO IIRS Dehradun, Shri Vinay Kumar</span>
+      </figcaption>
+    </div>
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/plat-spaceborne-satellite.jpg" alt="Spaceborne Earth observation satellite payload in cleanroom"></div>
+      <figcaption><strong>3. Spaceborne Platform:</strong> Satellites in orbit (500–36,000 km) operate in a vacuum, providing automated, recurring global synoptic coverage for decades.
+        <span class="fig-credit">Source: ISRO IIRS Dehradun, Shri Vinay Kumar</span>
+      </figcaption>
+    </div>
+  </div>
+
+  <div class="orbit-sim-card">
+    <div class="orbit-toggle">
+      <button type="button" class="orbit-btn active" data-orbit="leo">Polar / Sun-Synchronous (LEO)</button>
+      <button type="button" class="orbit-btn" data-orbit="geo">Geostationary (GEO)</button>
+      <button type="button" class="orbit-btn" data-orbit="compare">Compare Scale (LEO vs GEO)</button>
+    </div>
+
+    <!-- Orbit Canvas Viewport -->
+    <div class="orbit-canvas-container">
+      <canvas id="orbit-canvas"></canvas>
+
+      <!-- Live Telemetry HUD -->
+      <div class="orbit-hud">
+        <div class="hud-badge">Orbit: <span id="hud-orbit-type">Polar Sun-Sync (LEO)</span></div>
+        <div class="hud-badge">Altitude: <span id="hud-alt">705 km</span></div>
+        <div class="hud-badge">Velocity: <span id="hud-speed">7.5 km/s (27,000 km/h)</span></div>
+        <div class="hud-badge">Rel. Ground Speed: <span id="hud-ground-speed">6.8 km/s (Scanning)</span></div>
+        <div class="hud-badge">Period: <span id="hud-period">98.8 min (~14.5 orbits/day)</span></div>
+      </div>
+
+      <!-- Controls -->
+      <div class="orbit-sim-controls">
+        <button type="button" class="orbit-sim-btn" id="btn-swath-toggle" title="Toggle ground swath scan beam">Swath: ON</button>
+        <button type="button" class="orbit-sim-btn" id="btn-speed-toggle" title="Cycle simulation speed">Speed: 1x</button>
+        <button type="button" class="orbit-sim-btn" id="btn-pause-toggle" title="Pause or resume motion">⏸ Pause</button>
+      </div>
+    </div>
+
+    <div class="orbit-info" id="orbit-info">
+      <h4 id="orbit-title">Polar / Sun-Synchronous Orbit (LEO)</h4>
+      <p id="orbit-desc">The satellite orbits north-south at 700-800 km altitude while Earth rotates beneath it (west-east). Because the Earth turns continuously, each polar pass cuts across a new strip of longitude. It crosses the equator at ~10:30 AM local solar time every orbit, ensuring consistent sun illumination shadows across the globe.</p>
+      <div class="orbit-stats" id="orbit-stats">
+        <div class="orbit-stat"><span class="label">Altitude</span><span class="val">700–800 km</span></div>
+        <div class="orbit-stat"><span class="label">Orbital Period</span><span class="val">~90–100 min</span></div>
+        <div class="orbit-stat"><span class="label">Inclination</span><span class="val">~98.2° – 98.7°</span></div>
+        <div class="orbit-stat"><span class="label">Primary Missions</span><span class="val">Sentinel-2, Landsat, Resourcesat</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTHENTIC SATELLITE DATA: GEOSTATIONARY FULL EARTH DISK -->
+  <div class="figure">
+    <div class="figure-img-wrap">
+      <img src="img/plat-goes-earth-disk.jpg" alt="Full disk Earth imagery captured from Geostationary orbit at 36,000 km altitude">
+    </div>
+    <figcaption>
+      <strong>Geostationary Perspective (35,786 km Altitude):</strong> A full hemispheric scan captured by a meteorological imager (GOES / INSAT). The spacecraft is locked above the equator with an orbital speed matching Earth's rotation (0 km/h relative velocity), providing unbroken hourly tracking of global cyclone spirals and weather fronts.
+      <span class="fig-credit">Source: NASA Applied Remote Sensing Training (ARSET) — "Satellites and Sensors"</span>
+    </figcaption>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula">T = 2&pi; &radic;(a&sup3;/&mu;)</div>
+    <div class="formula-note">Kepler's Third Law: orbital period T depends only on the semi-major axis a (~ altitude + Earth's radius) and Earth's gravitational parameter &mu; (3.986×10⁵ km³/s²). Plug in a ≈ 7,150 km (700 km altitude) and you get T ≈ 98 minutes — that's why Landsat and Sentinel-2 orbit roughly every 90–100 minutes, ~14–15 times a day.</div>
+  </div>
+
+  <div class="plain-english">
+    <div class="pe-icon">💡</div>
+    <div class="pe-body">
+      <div class="pe-label">Plain English</div>
+      <p>Swing a ball on a string: a short string whips around fast, a long string swings slowly. Orbits work the same way — altitude is the "string length." Fly low (short string) and you race around Earth in 90 minutes. Fly all the way out to 36,000 km (a very long string) and it takes a full 24 hours to go around once — which happens to exactly match how long Earth takes to spin once, which is the whole trick behind a geostationary satellite appearing to "hover."</p>
+    </div>
+  </div>
+
+  <div class="tech-detail">
+    <div class="label">Key Terms You Must Know</div>
+    <p><strong>Swath:</strong> The strip of Earth's surface imaged in one pass. <strong>Revisit Time:</strong> Time between two images of the same area. <strong>Repeat Cycle:</strong> Time between two identical orbits. <strong>Inclination:</strong> Angle between the orbital plane and the equator — polar orbit inclination sits between 80° and 100°. <strong>Period:</strong> Time for one full orbit.</p>
+  </div>
+
+  <div class="sensor-comparison">
+    <div class="sensor-card passive">
+      <div class="sensor-type">Passive Sensor</div>
+      <h3>📷 Like a Camera</h3>
+      <p>Measures radiant energy reflected or emitted by the Earth-atmosphere system. Relies on sunlight — only works during daytime and can be blocked by clouds.</p>
+      <p>Converted to bio-geophysical quantities like temperature, precipitation, and soil moisture.</p>
+      <div class="examples"><span class="example-tag">Landsat OLI/TIRS</span><span class="example-tag">Terra MODIS</span><span class="example-tag">GPM GMI</span><span class="example-tag">GRACE</span></div>
+    </div>
+    <div class="sensor-card active-s">
+      <div class="sensor-type">Active Sensor</div>
+      <h3>🔦 Like a Flashlight</h3>
+      <p>Provides its own energy source. Mostly microwave — penetrates clouds and works day or night.</p>
+      <p>Applications include meteorology, surface elevation mapping, ocean wind speed measurement.</p>
+      <div class="examples"><span class="example-tag">LiDAR (ICESat-2)</span><span class="example-tag">RADAR (Sentinel-1)</span><span class="example-tag">Scatterometer</span><span class="example-tag">Laser Altimeter</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">03.2 / How Sensors Scan</div>
+  <h2 class="section-title">Whisk broom vs push broom</h2>
+  <p class="section-intro">Once a satellite is in the right orbit, it still needs to build a 2D image line by line as it flies forward. Two mechanisms dominate — the difference matters for reliability and image quality.</p>
+
+  <div class="scan-grid">
+    <div class="scan-card">
+      <div class="scan-type">Whisk Broom</div>
+      <h3>🧹 Rotating Mirror Scanner</h3>
+      <p>A single detector (or small bank) sweeps side-to-side across track via an oscillating/rotating mirror, building the image line by line as the satellite flies forward.</p>
+      <div class="scanner-canvas-wrap">
+        <canvas id="canvas-whisk"></canvas>
+      </div>
+      <div style="font-family:var(--font-mono); font-size:10px; color:var(--text-faint); margin-bottom:8px; text-align:center;">Mirror sweeps &plusmn;45° across flight direction</div>
+      <div class="examples"><span class="example-tag">Landsat MSS (1972)</span><span class="example-tag">Landsat TM (1984)</span><span class="example-tag">NOAA AVHRR</span></div>
+    </div>
+    <div class="scan-card">
+      <div class="scan-type">Push Broom</div>
+      <h3>🧹 CCD Linear Array</h3>
+      <p>A stationary linear array of thousands of CCD detectors captures the entire cross-track line simultaneously. Forward satellite velocity provides along-track scan without moving mirrors.</p>
+      <div class="scanner-canvas-wrap">
+        <canvas id="canvas-push"></canvas>
+      </div>
+      <div style="font-family:var(--font-mono); font-size:10px; color:var(--text-faint); margin-bottom:8px; text-align:center;">Thousands of detectors expose simultaneously</div>
+      <div class="examples"><span class="example-tag">IRS LISS-III &amp; IV</span><span class="example-tag">Sentinel-2 MSI</span><span class="example-tag">SPOT 1-7</span></div>
+    </div>
+  </div>
+
+  <!-- AUTHENTIC SENSOR HARDWARE: WHISK BROOM VS PUSH BROOM -->
+  <div class="figure">
+    <div class="figure-img-wrap">
+      <img src="img/plat-whisk-push-hardware.jpg" alt="Whisk broom oscillating mirror vs push broom CCD linear array sensor hardware diagrams">
+    </div>
+    <figcaption>
+      <strong>Scanner Engineering Architecture:</strong> Left: <em>Whisk-Broom (Electromechanical)</em> uses an oscillating mirror reflecting energy onto a single detector point. Prone to mechanical wear and line striping. Right: <em>Push-Broom (Linear Array)</em> uses a wide strip of thousands of micro-detectors exposed simultaneously without moving mirrors. Longer dwell time per pixel yields higher signal-to-noise ratio (SNR).
+      <span class="fig-credit">Source: ISRO IIRS Dehradun — "Platforms &amp; Sensors," Shri Vinay Kumar</span>
+    </figcaption>
+  </div>
+
+  <div class="tech-detail">
+    <div class="label">Why This Matters for Image Processing</div>
+    <p>Whisk-broom mirrors that wear unevenly cause <strong>line striping / banding</strong> — a systematic radiometric error you'll learn to correct in IP.2. Push-broom sensors instead suffer from individual dead or miscalibrated detector elements, causing <strong>line dropout</strong>. Knowing which scanning mechanism produced your image tells you which correction to expect.</p>
+  </div>
+
+  <div class="key-takeaways">
+    <div class="kt-label">Key Takeaways</div>
+    <ul>
+      <li><strong>Sun-synchronous (LEO)</strong> satellites at 700–800 km orbit pole-to-pole, crossing each spot at the same local time — ideal for consistent, comparable global monitoring.</li>
+      <li><strong>Geostationary (GEO)</strong> satellites at ~36,000 km hover over one spot, viewing ~45% of Earth continuously — ideal for weather.</li>
+      <li>Orbital period follows <strong>Kepler's Third Law</strong> — altitude alone determines how often a satellite passes overhead.</li>
+      <li><strong>Passive sensors</strong> need sunlight; <strong>active sensors</strong> (RADAR, LiDAR) make their own signal and work day/night, through clouds.</li>
+      <li><strong>Whisk broom</strong> = rotating mirror (→ striping errors); <strong>push broom</strong> = CCD array, no moving parts (→ dropout errors, but higher reliability).</li>
+    </ul>
+  </div>
+</section>
+
+<script src="app.js"></script>
+<script>
+(function() {
+  const canvas = document.getElementById('orbit-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  let currentMode = 'leo'; // 'leo' | 'geo' | 'compare'
+  let isPaused = false;
+  let speedMultiplier = 1;
+  let showSwath = true;
+
+  let earthRotation = 0;
+  let satAngleLEO = 0;
+  let satAngleGEO = 0;
+  let swathTracks = []; // Historical swath footprints on the rotating globe
+
+  // Telemetry HUD elements
+  const hudType = document.getElementById('hud-orbit-type');
+  const hudAlt = document.getElementById('hud-alt');
+  const hudSpeed = document.getElementById('hud-speed');
+  const hudGroundSpeed = document.getElementById('hud-ground-speed');
+  const hudPeriod = document.getElementById('hud-period');
+  const orbitTitle = document.getElementById('orbit-title');
+  const orbitDesc = document.getElementById('orbit-desc');
+  const orbitStats = document.getElementById('orbit-stats');
+
+  const orbitMeta = {
+    leo: {
+      type: 'Polar Sun-Sync (LEO)',
+      alt: '705 km',
+      speed: '7.5 km/s (27,000 km/h)',
+      groundSpeed: '6.8 km/s (Rapid Scanning)',
+      period: '98.8 min (~14.5 orbits/day)',
+      title: 'Polar / Sun-Synchronous Orbit (LEO)',
+      desc: 'The satellite orbits north-south at 700–800 km altitude while Earth rotates beneath it (west-to-east). Because the Earth turns continuously, each polar pass cuts across a new strip of longitude. It crosses the equator at ~10:30 AM local solar time every orbit, ensuring consistent sun illumination shadows across the globe.',
+      stats: [
+        { label: 'Altitude', val: '700–800 km' },
+        { label: 'Orbital Period', val: '~90–100 min' },
+        { label: 'Inclination', val: '~98.2° – 98.7°' },
+        { label: 'Primary Missions', val: 'Sentinel-2, Landsat, Resourcesat' }
+      ]
+    },
+    geo: {
+      type: 'Geostationary (GEO)',
+      alt: '35,786 km',
+      speed: '3.07 km/s (11,000 km/h)',
+      groundSpeed: '0.0 km/h (Fixed Sub-Satellite Point)',
+      period: '23h 56m 04s (Exact 1:1 with Earth)',
+      title: 'Geostationary Orbit (GEO)',
+      desc: 'Positioned ~35,786 km directly over the Equator (0° inclination), the satellite circles Earth in the exact same direction and time it takes the planet to spin once (24 hours). To an observer on the ground, the satellite appears permanently fixed in the sky, providing non-stop weather and atmospheric scans over ~42% of the globe.',
+      stats: [
+        { label: 'Altitude', val: '35,786 km' },
+        { label: 'Orbital Period', val: '24 hours' },
+        { label: 'Inclination', val: '0.0° (Equatorial)' },
+        { label: 'Primary Missions', val: 'INSAT-3D, GOES-16, Meteosat' }
+      ]
+    },
+    compare: {
+      type: 'Scale Comparison (LEO vs GEO)',
+      alt: '700 km vs 35,786 km',
+      speed: 'LEO: 7.5 km/s | GEO: 3.1 km/s',
+      groundSpeed: 'LEO: Moving | GEO: Fixed',
+      period: 'LEO: 1.5 hr | GEO: 24.0 hr',
+      title: 'Orbital Scale & Keplerian Trade-Off',
+      desc: 'Kepler\'s Third Law dictates that orbital speed decreases and orbital period lengthens with altitude. Notice how close and fast the Polar LEO satellite is (whipping around Earth every 90 minutes) compared to the distant Geostationary satellite parked 35,786 km away matching Earth\'s 24-hour spin.',
+      stats: [
+        { label: 'LEO Distance', val: '1.11 Earth Radii' },
+        { label: 'GEO Distance', val: '6.61 Earth Radii' },
+        { label: 'Speed Ratio', val: 'LEO travels 2.4× faster' },
+        { label: 'Period Ratio', val: '1 GEO orbit = 16 LEO orbits' }
+      ]
+    }
+  };
+
+  function updateHUD() {
+    const m = orbitMeta[currentMode];
+    if (!m) return;
+    hudType.textContent = m.type;
+    hudAlt.textContent = m.alt;
+    hudSpeed.textContent = m.speed;
+    hudGroundSpeed.textContent = m.groundSpeed;
+    hudPeriod.textContent = m.period;
+    orbitTitle.textContent = m.title;
+    orbitDesc.textContent = m.desc;
+    orbitStats.innerHTML = m.stats.map(s => `
+      <div class="orbit-stat">
+        <span class="label">${s.label}</span>
+        <span class="val">${s.val}</span>
+      </div>
+    `).join('');
+  }
+
+  function resizeCanvas() {
+    canvas.width = canvas.clientWidth * window.devicePixelRatio;
+    canvas.height = canvas.clientHeight * window.devicePixelRatio;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  // Draw 3D Earth Globe with Shading and Continents
+  function drawEarth(cx, cy, radius, rotAngle) {
+    ctx.save();
+    ctx.translate(cx, cy);
+
+    // Axial tilt rotation (23.4 degrees)
+    const tilt = -23.4 * (Math.PI / 180);
+    ctx.rotate(tilt);
+
+    // Deep space atmosphere glow rim
+    const atmGlow = ctx.createRadialGradient(0, 0, radius * 0.92, 0, 0, radius * 1.15);
+    atmGlow.addColorStop(0, 'rgba(56, 189, 248, 0.35)');
+    atmGlow.addColorStop(0.5, 'rgba(45, 212, 191, 0.15)');
+    atmGlow.addColorStop(1, 'rgba(45, 212, 191, 0)');
+    ctx.fillStyle = atmGlow;
+    ctx.beginPath();
+    ctx.arc(0, 0, radius * 1.15, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ocean sphere with spherical gradient
+    const oceanGrad = ctx.createRadialGradient(-radius * 0.35, -radius * 0.35, radius * 0.1, 0, 0, radius);
+    oceanGrad.addColorStop(0, '#1d4ed8');
+    oceanGrad.addColorStop(0.6, '#1e3a8a');
+    oceanGrad.addColorStop(1, '#0f172a');
+    ctx.fillStyle = oceanGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Clip to globe for surface features
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    ctx.clip();
+
+    // Continental shapes wrapping around globe as Earth rotates
+    ctx.fillStyle = '#22c55e';
+    const landmasses = [
+      { lon: 0, lat: 20, w: 50, h: 35 },     // Africa/Europe
+      { lon: 80, lat: 22, w: 45, h: 40 },    // Asia / India
+      { lon: 135, lat: -25, w: 30, h: 25 },  // Australia
+      { lon: 260, lat: 40, w: 50, h: 30 },   // N. America
+      { lon: 290, lat: -15, w: 35, h: 45 }   // S. America
+    ];
+
+    landmasses.forEach(land => {
+      // Calculate projected longitude
+      let currentLon = (land.lon + (rotAngle * 180 / Math.PI)) % 360;
+      if (currentLon < 0) currentLon += 360;
+
+      // Project onto sphere if on visible front hemisphere (90 to 270 deg relative)
+      if (currentLon > 90 && currentLon < 270) {
+        const radX = (currentLon - 180) / 90; // -1 to +1
+        const px = radX * radius * 0.88;
+        const py = -(land.lat / 90) * radius * 0.75;
+        const sizeX = (land.w / 180) * radius * Math.cos(radX * Math.PI * 0.5);
+        const sizeY = (land.h / 180) * radius;
+
+        if (sizeX > 1) {
+          ctx.beginPath();
+          ctx.ellipse(px, py, Math.abs(sizeX), sizeY, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    });
+
+    // Latitude parallels & Equator line
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+    ctx.lineWidth = 1;
+    [-45, -20, 0, 20, 45].forEach(lat => {
+      const y = -(lat / 90) * radius * 0.8;
+      const w = Math.sqrt(Math.max(0, radius * radius - y * y));
+      ctx.beginPath();
+      if (lat === 0) {
+        ctx.strokeStyle = 'rgba(245, 166, 35, 0.4)';
+        ctx.lineWidth = 1.5;
+      } else {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 1;
+      }
+      ctx.ellipse(0, y, w, w * 0.18, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+
+    // Polar rotation axis line
+    ctx.strokeStyle = 'rgba(245, 166, 35, 0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(0, -radius * 1.3);
+    ctx.lineTo(0, radius * 1.3);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Day/Night Terminator shadow
+    const shadowGrad = ctx.createLinearGradient(-radius, 0, radius, 0);
+    shadowGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    shadowGrad.addColorStop(0.55, 'rgba(0, 0, 0, 0.2)');
+    shadowGrad.addColorStop(1, 'rgba(0, 0, 0, 0.7)');
+    ctx.fillStyle = shadowGrad;
+    ctx.fillRect(-radius, -radius, radius * 2, radius * 2);
+
+    ctx.restore(); // Restore clip
+
+    // Labels for Poles & Equator
+    ctx.font = '9px JetBrains Mono';
+    ctx.fillStyle = '#f5a623';
+    ctx.fillText('N. POLE', -18, -radius * 1.35);
+    ctx.fillText('S. POLE', -18, radius * 1.45);
+
+    ctx.restore(); // Restore tilt
+  }
+
+  // Draw Satellite Graphic
+  function drawSatellite(x, y, headingAngle, color, size = 10) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(headingAngle);
+
+    // Solar panels (blue arrays)
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillRect(-size * 1.6, -size * 0.35, size * 0.9, size * 0.7);
+    ctx.fillRect(size * 0.7, -size * 0.35, size * 0.9, size * 0.7);
+
+    // Satellite body (gold/foil core)
+    ctx.fillStyle = color;
+    ctx.fillRect(-size * 0.5, -size * 0.5, size, size);
+
+    // Sensor optics aperture
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(0, 0, size * 0.25, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function renderScene() {
+    const W = canvas.width;
+    const H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Stars background
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    const starCoords = [[0.1, 0.2], [0.25, 0.75], [0.85, 0.15], [0.75, 0.85], [0.92, 0.6], [0.08, 0.85], [0.4, 0.1], [0.65, 0.25]];
+    starCoords.forEach(([sx, sy]) => {
+      ctx.beginPath();
+      ctx.arc(sx * W, sy * H, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    const cx = W / 2;
+    const cy = H / 2;
+
+    if (currentMode === 'leo') {
+      // POLAR SUN-SYNCHRONOUS ORBIT
+      const earthR = Math.min(W, H) * 0.28;
+      const orbitRx = earthR * 0.42;  // Inclined ellipse semi-minor
+      const orbitRy = earthR * 1.26;  // Near-pole semi-major (altitude ~705 km)
+
+      // Draw Earth at center
+      drawEarth(cx, cy, earthR, earthRotation);
+
+      // Draw Polar Orbit Ellipse
+      ctx.strokeStyle = 'rgba(245, 166, 35, 0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, orbitRx, orbitRy, -10 * (Math.PI / 180), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Satellite position along Polar ellipse
+      const satTilt = -10 * (Math.PI / 180);
+      const satX_unrot = orbitRx * Math.sin(satAngleLEO);
+      const satY_unrot = -orbitRy * Math.cos(satAngleLEO);
+      const satX = cx + satX_unrot * Math.cos(satTilt) - satY_unrot * Math.sin(satTilt);
+      const satY = cy + satX_unrot * Math.sin(satTilt) + satY_unrot * Math.cos(satTilt);
+
+      // Swath cone from satellite to ground
+      if (showSwath) {
+        // Point on surface underneath satellite
+        const distFromCenter = Math.hypot(satX - cx, satY - cy);
+        const subSatX = cx + (satX - cx) * (earthR / distFromCenter);
+        const subSatY = cy + (satY - cy) * (earthR / distFromCenter);
+
+        // Cone gradient
+        const coneGrad = ctx.createRadialGradient(satX, satY, 5, subSatX, subSatY, earthR * 0.28);
+        coneGrad.addColorStop(0, 'rgba(245, 166, 35, 0.7)');
+        coneGrad.addColorStop(1, 'rgba(245, 166, 35, 0.05)');
+
+        ctx.fillStyle = coneGrad;
+        ctx.beginPath();
+        ctx.moveTo(satX, satY);
+        ctx.lineTo(subSatX - 22, subSatY);
+        ctx.lineTo(subSatX + 22, subSatY);
+        ctx.closePath();
+        ctx.fill();
+
+        // Swath ground footprint ellipse
+        ctx.strokeStyle = '#f5a623';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(subSatX, subSatY, 20, 8, satTilt, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Draw Satellite
+      const satHeading = Math.atan2(satY - cy, satX - cx) + Math.PI / 2;
+      drawSatellite(satX, satY, satHeading, '#f5a623', 8);
+
+    } else if (currentMode === 'geo') {
+      // GEOSTATIONARY ORBIT
+      const earthR = Math.min(W, H) * 0.16;
+      const geoR = earthR * 2.5; // Scaled geostationary distance
+
+      // Draw Earth
+      drawEarth(cx, cy, earthR, earthRotation);
+
+      // Equatorial Orbit Circle
+      ctx.strokeStyle = 'rgba(45, 212, 191, 0.35)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 5]);
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, geoR, geoR * 0.35, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Satellite position: synchronous with Earth rotation
+      const geoX = cx + geoR * Math.cos(earthRotation);
+      const geoY = cy + (geoR * 0.35) * Math.sin(earthRotation);
+
+      // Fixed Field of View Cone to Earth disk
+      if (showSwath) {
+        const geoCone = ctx.createRadialGradient(geoX, geoY, 10, cx, cy, earthR);
+        geoCone.addColorStop(0, 'rgba(45, 212, 191, 0.6)');
+        geoCone.addColorStop(1, 'rgba(45, 212, 191, 0.08)');
+        ctx.fillStyle = geoCone;
+        ctx.beginPath();
+        ctx.moveTo(geoX, geoY);
+        ctx.lineTo(cx - earthR * 0.85, cy);
+        ctx.lineTo(cx + earthR * 0.85, cy);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Draw GEO Satellite
+      drawSatellite(geoX, geoY, earthRotation + Math.PI / 2, '#2dd4bf', 9);
+
+    } else if (currentMode === 'compare') {
+      // SIDE-BY-SIDE SCALE COMPARISON
+      const earthR = Math.min(W, H) * 0.12;
+      const leoR_x = earthR * 1.35;
+      const leoR_y = earthR * 1.45;
+      const geoR_x = earthR * 3.4;
+      const geoR_y = earthR * 1.2;
+
+      drawEarth(cx, cy, earthR, earthRotation);
+
+      // LEO Orbit (close, amber)
+      ctx.strokeStyle = 'rgba(245, 166, 35, 0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, leoR_x, leoR_y, -10 * (Math.PI / 180), 0, Math.PI * 2);
+      ctx.stroke();
+
+      // GEO Orbit (far, teal)
+      ctx.strokeStyle = 'rgba(45, 212, 191, 0.4)';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, geoR_x, geoR_y, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // LEO Satellite
+      const lx = cx + leoR_x * Math.sin(satAngleLEO);
+      const ly = cy - leoR_y * Math.cos(satAngleLEO);
+      drawSatellite(lx, ly, satAngleLEO, '#f5a623', 6);
+
+      // GEO Satellite
+      const gx = cx + geoR_x * Math.cos(earthRotation);
+      const gy = cy + geoR_y * Math.sin(earthRotation);
+      drawSatellite(gx, gy, earthRotation + Math.PI / 2, '#2dd4bf', 8);
+
+      // Labels
+      ctx.font = '10px JetBrains Mono';
+      ctx.fillStyle = '#f5a623';
+      ctx.fillText('LEO: 705 km (90 min)', lx + 8, ly - 6);
+      ctx.fillStyle = '#2dd4bf';
+      ctx.fillText('GEO: 35,786 km (24 hr)', gx + 8, gy - 6);
+    }
+
+    // Animation increments
+    if (!isPaused) {
+      const dt = 0.012 * speedMultiplier;
+      earthRotation += dt * 0.4; // Earth spins west-to-east
+      satAngleLEO += dt * 2.8;   // LEO satellite moves rapidly pole-to-pole
+    }
+
+    requestAnimationFrame(renderScene);
+  }
+
+  // Mode Buttons
+  document.querySelectorAll('.orbit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.orbit-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentMode = btn.dataset.orbit;
+      updateHUD();
+    });
+  });
+
+  // Swath Toggle
+  const swathBtn = document.getElementById('btn-swath-toggle');
+  if (swathBtn) {
+    swathBtn.addEventListener('click', () => {
+      showSwath = !showSwath;
+      swathBtn.textContent = `Swath: ${showSwath ? 'ON' : 'OFF'}`;
+      swathBtn.classList.toggle('active', showSwath);
+    });
+  }
+
+  // Speed Cycle
+  const speedBtn = document.getElementById('btn-speed-toggle');
+  if (speedBtn) {
+    const speeds = [1, 2, 4];
+    let sIdx = 0;
+    speedBtn.addEventListener('click', () => {
+      sIdx = (sIdx + 1) % speeds.length;
+      speedMultiplier = speeds[sIdx];
+      speedBtn.textContent = `Speed: ${speedMultiplier}x`;
+    });
+  }
+
+  // Pause / Resume
+  const pauseBtn = document.getElementById('btn-pause-toggle');
+  if (pauseBtn) {
+    pauseBtn.addEventListener('click', () => {
+      isPaused = !isPaused;
+      pauseBtn.textContent = isPaused ? '▶ Play' : '⏸ Pause';
+      pauseBtn.classList.toggle('active', isPaused);
+    });
+  }
+
+  updateHUD();
+  requestAnimationFrame(renderScene);
+})();
+
+// Active Canvas Scanners Engine (Whisk-Broom vs Push-Broom)
+(function() {
+  const whiskCanvas = document.getElementById('canvas-whisk');
+  const pushCanvas = document.getElementById('canvas-push');
+  if (!whiskCanvas || !pushCanvas) return;
+
+  function initScannerCanvas(c) {
+    c.width = c.clientWidth * window.devicePixelRatio;
+    c.height = c.clientHeight * window.devicePixelRatio;
+  }
+  initScannerCanvas(whiskCanvas);
+  initScannerCanvas(pushCanvas);
+
+  let whiskPhase = 0;
+  let flightY = 0;
+
+  function renderScanners() {
+    // 1. WHISK BROOM (Oscillating Mirror)
+    const wCtx = whiskCanvas.getContext('2d');
+    const wW = whiskCanvas.width, wH = whiskCanvas.height;
+    wCtx.clearRect(0, 0, wW, wH);
+
+    // Ground swath track
+    const satX = wW / 2;
+    const satY = 24;
+
+    // Moving ground lines (simulating satellite forward flight)
+    wCtx.strokeStyle = 'rgba(120, 160, 255, 0.08)';
+    wCtx.lineWidth = 1;
+    for (let y = (flightY % 24); y < wH; y += 24) {
+      wCtx.beginPath();
+      wCtx.moveTo(wW * 0.15, y);
+      wCtx.lineTo(wW * 0.85, y);
+      wCtx.stroke();
+    }
+
+    // Oscillating mirror angle sweep (side to side)
+    const sweepX = satX + Math.sin(whiskPhase) * (wW * 0.32);
+    const groundY = wH - 20;
+
+    // Laser/mirror detector beam
+    const beamGrad = wCtx.createLinearGradient(satX, satY, sweepX, groundY);
+    beamGrad.addColorStop(0, 'rgba(245, 166, 35, 0.9)');
+    beamGrad.addColorStop(1, 'rgba(245, 166, 35, 0.2)');
+    wCtx.strokeStyle = beamGrad;
+    wCtx.lineWidth = 2.5;
+    wCtx.beginPath();
+    wCtx.moveTo(satX, satY);
+    wCtx.lineTo(sweepX, groundY);
+    wCtx.stroke();
+
+    // Spot on ground
+    wCtx.fillStyle = '#f5a623';
+    wCtx.beginPath();
+    wCtx.arc(sweepX, groundY, 4.5, 0, Math.PI * 2);
+    wCtx.fill();
+
+    // Satellite body + oscillating mirror
+    wCtx.fillStyle = '#e6ebf5';
+    wCtx.fillRect(satX - 16, satY - 8, 32, 14);
+    wCtx.fillStyle = '#f5a623';
+    wCtx.save();
+    wCtx.translate(satX, satY);
+    wCtx.rotate(Math.sin(whiskPhase) * 0.4);
+    wCtx.fillRect(-6, -2, 12, 4);
+    wCtx.restore();
+
+    // 2. PUSH BROOM (Linear CCD Array)
+    const pCtx = pushCanvas.getContext('2d');
+    const pW = pushCanvas.width, pH = pushCanvas.height;
+    pCtx.clearRect(0, 0, pW, pH);
+
+    // Parallel curtain of rays exposing simultaneously
+    const pSatX = pW / 2;
+    const pSatY = 24;
+    const arrayWidth = pW * 0.65;
+    const leftX = pSatX - arrayWidth / 2;
+    const rightX = pSatX + arrayWidth / 2;
+    const pGroundY = pH - 20;
+
+    // Moving ground lines
+    pCtx.strokeStyle = 'rgba(120, 160, 255, 0.08)';
+    pCtx.lineWidth = 1;
+    for (let y = (flightY % 24); y < pH; y += 24) {
+      pCtx.beginPath();
+      pCtx.moveTo(pW * 0.15, y);
+      pCtx.lineTo(pW * 0.85, y);
+      pCtx.stroke();
+    }
+
+    // Curtain of parallel beams
+    const curtainGrad = pCtx.createLinearGradient(pSatX, pSatY, pSatX, pGroundY);
+    curtainGrad.addColorStop(0, 'rgba(45, 212, 191, 0.7)');
+    curtainGrad.addColorStop(1, 'rgba(45, 212, 191, 0.12)');
+    pCtx.fillStyle = curtainGrad;
+    pCtx.beginPath();
+    pCtx.moveTo(leftX, pSatY);
+    pCtx.lineTo(rightX, pSatY);
+    pCtx.lineTo(rightX + 15, pGroundY);
+    pCtx.lineTo(leftX - 15, pGroundY);
+    pCtx.closePath();
+    pCtx.fill();
+
+    // Ground scanned line (all pixels simultaneous)
+    pCtx.strokeStyle = '#2dd4bf';
+    pCtx.lineWidth = 3;
+    pCtx.beginPath();
+    pCtx.moveTo(leftX - 15, pGroundY);
+    pCtx.lineTo(rightX + 15, pGroundY);
+    pCtx.stroke();
+
+    // Satellite with CCD array bar
+    pCtx.fillStyle = '#e6ebf5';
+    pCtx.fillRect(pSatX - 25, pSatY - 8, 50, 14);
+    pCtx.fillStyle = '#2dd4bf';
+    pCtx.fillRect(leftX, pSatY + 2, arrayWidth, 4);
+
+    whiskPhase += 0.06;
+    flightY += 0.8;
+
+    requestAnimationFrame(renderScanners);
+  }
+
+  requestAnimationFrame(renderScanners);
+})();
+</script>
+</body>
+</html>

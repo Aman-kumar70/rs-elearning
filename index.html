@@ -4,13 +4,254 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Remote Sensing &amp; Image Processing — Interactive Guide</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 </head>
 <body>
-<div id="root"></div>
-<script type="module" src="/src/main.jsx"></script>
+
+<div class="full-hero">
+  <canvas id="earth-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-tag">IIRS-ISRO &amp; NASA ARSET Lectures · Reworked Into a Practical Course</div>
+    <h1>Remote Sensing<br>&amp; <span>Image Processing</span></h1>
+    <p>Two tracks, one goal: understand satellites well enough to actually use their data. Real figures from the source lectures, real Python code, real applications — not just theory.</p>
+  </div>
+  <div class="scroll-indicator">
+    <span>Scroll to explore</span>
+    <div class="line"></div>
+  </div>
+</div>
+
+<section class="content-section reveal">
+  <div class="section-label">Choose Your Track</div>
+  <h2 class="section-title">Two tracks that build on each other</h2>
+  <p class="section-intro">
+    <strong>Remote Sensing</strong> is about how satellites see Earth — physics, orbits, sensors, resolution.
+    <strong>Image Processing</strong> is about what you do with the data once you have it — correcting it, enhancing it, and turning pixels into information. Most real work needs both. Start with RS if you're new to the field; jump to IP if you already know the fundamentals and want the hands-on part.
+  </p>
+
+  <div class="track-split">
+    <a class="track-card rs" href="rs-01-fundamentals.html">
+      <div class="track-kicker">Track A · Six Chapters</div>
+      <h2>Remote Sensing Fundamentals</h2>
+      <p class="track-desc">How electromagnetic energy travels from the Sun to a sensor, why materials look different in different wavelengths, how orbits and resolution trade off against each other, and how to actually read a satellite image.</p>
+      <div class="track-chapter-list">
+        <span><b>RS.1</b> What Is Remote Sensing?</span>
+        <span><b>RS.2</b> Spectral Signatures</span>
+        <span><b>RS.3</b> Orbits &amp; Scanning</span>
+        <span><b>RS.4</b> The Four Resolutions</span>
+        <span><b>RS.5</b> Reading a Satellite Image</span>
+        <span><b>RS.6</b> Satellites &amp; Free Data</span>
+      </div>
+      <div class="tc-cta">Start Track A &rarr;</div>
+    </a>
+
+    <a class="track-card ip" href="ip-01-basics.html">
+      <div class="track-kicker">Track B · Five Chapters</div>
+      <h2>Digital Image Processing</h2>
+      <p class="track-desc">What a digital image actually is, how to fix radiometric and geometric errors, how to enhance and filter images, how classification algorithms turn pixels into land-cover maps — with working Python code throughout.</p>
+      <div class="track-chapter-list">
+        <span><b>IP.1</b> What Is a Digital Image?</span>
+        <span><b>IP.2</b> Radiometric &amp; Geometric Correction</span>
+        <span><b>IP.3</b> Enhancement, Filtering &amp; Indices</span>
+        <span><b>IP.4</b> Classification</span>
+        <span><b>IP.5</b> Python Lab: NDVI + Classification</span>
+      </div>
+      <div class="tc-cta">Start Track B &rarr;</div>
+    </a>
+  </div>
+
+  <div class="topic-grid">
+    <a class="topic-card" href="applications.html">
+      <div class="tc-num">★</div>
+      <div class="tc-chip" style="background: var(--amber-dim); color: var(--amber);">Practical</div>
+      <h3>Real-World Applications</h3>
+      <p>Crop monitoring, flood mapping through clouds with SAR, deforestation tracking, urban growth, glacier retreat — with the actual bands, indices and workflow used for each, and code you can run.</p>
+      <div class="tc-cta">Open &rarr;</div>
+    </a>
+    <a class="topic-card" href="quiz.html">
+      <div class="tc-num">✓</div>
+      <div class="tc-chip" style="background: var(--purple-dim); color: var(--purple);">Test Yourself</div>
+      <h3>Knowledge Check</h3>
+      <p>Questions across both tracks — fundamentals, signatures, resolution, preprocessing, enhancement, and classification — with instant feedback and a per-topic score.</p>
+      <div class="tc-cta">Take the quiz &rarr;</div>
+    </a>
+  </div>
+
+  <div class="tech-detail">
+    <div class="label">About This Guide</div>
+    <p>
+      Content and figures are drawn from IIRS-ISRO Dehradun lecture material — "Fundamentals of Remote Sensing" (NASA ARSET),
+      "Spectral Signatures and Image Interpretation" (Dr. Hina Pande), "Earth Observation Platforms and Sensors" (Shri Vinay Kumar),
+      "Digital Image Processing: Basic Concepts" (Ms. Minakshi Kumar), and "Digital Image Processing: Image Enhancement" (Dr. Poonam S. Tiwari) —
+      combined with original explanations, diagrams and runnable Python examples so you can move from theory to practice on the same page.
+    </p>
+  </div>
+</section>
+
+<script src="app.js"></script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const canvas = document.getElementById('earth-canvas');
+const heroSection = canvas.parentElement;
+
+let scene, camera, renderer, earth, atmosphere, satellite, stars, controls;
+let animationId;
+
+function initEarth() {
+  scene = new THREE.Scene();
+
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
+  camera.position.set(0, 1, 6.5);
+
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const earthGeo = new THREE.SphereGeometry(2, 64, 64);
+  const textureLoader = new THREE.TextureLoader();
+  textureLoader.crossOrigin = 'anonymous';
+  const earthTexture = textureLoader.load('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg');
+  const earthMat = new THREE.MeshPhongMaterial({ map: earthTexture, shininess: 8, specular: new THREE.Color(0x222244) });
+  earth = new THREE.Mesh(earthGeo, earthMat);
+  scene.add(earth);
+
+  const atmGeo = new THREE.SphereGeometry(2.12, 64, 64);
+  const atmMat = new THREE.ShaderMaterial({
+    vertexShader: `
+      varying vec3 vNormal;
+      void main() {
+        vNormal = normalize(normalMatrix * normal);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      varying vec3 vNormal;
+      void main() {
+        float intensity = pow(0.7 - dot(vNormal, vec3(0,0,1.0)), 2.5);
+        gl_FragColor = vec4(0.5, 0.35, 0.9, 1.0) * intensity;
+      }
+    `,
+    side: THREE.BackSide,
+    blending: THREE.AdditiveBlending,
+    transparent: true
+  });
+  atmosphere = new THREE.Mesh(atmGeo, atmMat);
+  scene.add(atmosphere);
+
+  satellite = new THREE.Group();
+  const bodyGeo = new THREE.BoxGeometry(0.14, 0.1, 0.1);
+  const bodyMat = new THREE.MeshPhongMaterial({ color: 0xddddee, shininess: 60 });
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  const panelGeo = new THREE.BoxGeometry(0.32, 0.005, 0.12);
+  const panelMat = new THREE.MeshPhongMaterial({ color: 0x1a1a3a, shininess: 80, specular: 0x4488ff });
+  const panel1 = new THREE.Mesh(panelGeo, panelMat);
+  panel1.position.x = -0.27;
+  const panel2 = new THREE.Mesh(panelGeo, panelMat);
+  panel2.position.x = 0.27;
+  const antGeo = new THREE.ConeGeometry(0.03, 0.12, 8);
+  const antMat = new THREE.MeshPhongMaterial({ color: 0xffaa44 });
+  const antenna = new THREE.Mesh(antGeo, antMat);
+  antenna.position.y = 0.1;
+  satellite.add(body, panel1, panel2, antenna);
+  satellite.scale.set(0.7, 0.7, 0.7);
+  scene.add(satellite);
+
+  const starGeo = new THREE.BufferGeometry();
+  const starCount = 2000;
+  const starPositions = new Float32Array(starCount * 3);
+  const starColors = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount; i++) {
+    const r = 80 + Math.random() * 120;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    starPositions[i*3] = r * Math.sin(phi) * Math.cos(theta);
+    starPositions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+    starPositions[i*3+2] = r * Math.cos(phi);
+    const brightness = 0.4 + Math.random() * 0.6;
+    starColors[i*3] = brightness;
+    starColors[i*3+1] = brightness * (0.85 + Math.random() * 0.15);
+    starColors[i*3+2] = brightness;
+  }
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+  starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+  stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.6, vertexColors: true, transparent: true, opacity: 0.8, sizeAttenuation: true }));
+  scene.add(stars);
+
+  const sunLight = new THREE.DirectionalLight(0xfff5e6, 1.4);
+  sunLight.position.set(8, 3, 5);
+  scene.add(sunLight);
+  const ambient = new THREE.AmbientLight(0x223366, 0.6);
+  scene.add(ambient);
+
+  controls = new OrbitControls(camera, canvas);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.enablePan = false;
+  controls.minDistance = 4;
+  controls.maxDistance = 12;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.4;
+  controls.rotateSpeed = 0.5;
+
+  animate();
+}
+
+let satAngle = 0;
+function animate() {
+  animationId = requestAnimationFrame(animate);
+  if (earth) earth.rotation.y += 0.0008;
+  if (stars) stars.rotation.y += 0.00005;
+  satAngle += 0.006;
+  if (satellite) {
+    const orbitR = 3.3;
+    satellite.position.x = Math.cos(satAngle) * orbitR;
+    satellite.position.z = Math.sin(satAngle) * orbitR;
+    satellite.position.y = Math.sin(satAngle * 0.3) * 0.8;
+    satellite.lookAt(0, 0, 0);
+    satellite.rotation.z += 0.01;
+  }
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+function onResize() {
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  if (camera && renderer) {
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  }
+}
+
+initEarth();
+window.addEventListener('resize', onResize);
+
+const heroObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) {
+      controls.autoRotate = false;
+      cancelAnimationFrame(animationId);
+    } else {
+      controls.autoRotate = true;
+      animate();
+    }
+  });
+}, { threshold: 0 });
+heroObserver.observe(heroSection);
+</script>
 </body>
 </html>

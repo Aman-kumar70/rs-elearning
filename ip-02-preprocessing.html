@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radiometric & Geometric Correction — IP.2</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="page-hero">
+  <div class="chapter-badge">Track B · IP.2 of 5</div>
+  <h1>Radiometric &amp; <span>Geometric Correction</span></h1>
+  <p class="hero-intro">Raw satellite data is never perfect — sensors drift, the atmosphere interferes, and Earth's curvature and rotation distort geometry. Preprocessing fixes these errors before any real analysis begins. Skip this step and every measurement downstream is quietly wrong.</p>
+  <div class="chapter-progress"><span class="done"></span><span class="now"></span><span></span><span></span><span></span></div>
+</header>
+
+<section class="content-section reveal">
+  <div class="section-label">02.1 / Two Families of Error</div>
+  <h2 class="section-title">What goes wrong, and why</h2>
+  <div class="www-grid">
+    <div class="www-card what">
+      <div class="www-label">What</div>
+      <p><strong>Radiometric errors</strong> corrupt the pixel <em>values</em> — sensor miscalibration, atmospheric haze, uneven illumination. <strong>Geometric errors</strong> corrupt pixel <em>positions</em> — Earth's rotation and curvature, platform attitude, terrain relief.</p>
+    </div>
+    <div class="www-card why">
+      <div class="www-label">Why</div>
+      <p>Radiometric errors make brightness comparisons meaningless (two identical fields looking different only because of striping). Geometric errors make location comparisons meaningless (a pixel that should be at 30.32°N is actually at 30.34°N) — fatal for change detection or GIS overlay.</p>
+    </div>
+    <div class="www-card how">
+      <div class="www-label">How</div>
+      <p>Radiometric correction models and removes the systematic error pattern (interpolate, subtract, normalize). Geometric correction fits a mathematical transformation between image coordinates and map coordinates using Ground Control Points, then resamples the image onto the correct grid.</p>
+    </div>
+  </div>
+
+  <div class="figure">
+    <div class="figure-img-wrap"><img src="img/dip-radiometric-errors.jpg" alt="Causes of radiometric errors, IIRS slide"></div>
+    <figcaption>Radiometric errors originate in the sensor itself (detector miscalibration), the atmosphere (scattering/absorption), and geometry of illumination (sun angle, topography).
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun — "Digital Image Processing: Basic Concepts," Ms. Minakshi Kumar</span>
+    </figcaption>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">02.2 / Radiometric Correction</div>
+  <h2 class="section-title">Fixing pixel values</h2>
+
+  <div class="figure-row">
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/dip-line-dropout.jpg" alt="Line dropout error example"></div>
+      <figcaption><strong>Line dropout</strong> — an entire scan line records zero or garbage values because a detector failed momentarily. Common in push-broom sensors (RS.3) when one CCD element malfunctions.</figcaption>
+    </div>
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/dip-line-striping.jpg" alt="Line striping / banding error example"></div>
+      <figcaption><strong>Line striping / banding</strong> — one detector is systematically miscalibrated relative to the others, so every Nth line is consistently brighter or darker. Common in whisk-broom sensors (RS.3) as mirror elements wear differently.</figcaption>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-head"><span>fix_line_dropout.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><code><span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+
+<span class="c-kw">def</span> <span class="c-fn">fix_dropped_lines</span>(band, threshold=5):
+    <span class="c-com">"""Replace dead scan lines with the average of the line above and below."""</span>
+    fixed = band.<span class="c-fn">copy</span>()
+    row_means = band.<span class="c-fn">mean</span>(axis=1)
+    dead_rows = np.<span class="c-fn">where</span>(row_means < threshold)[0]   <span class="c-com"># near-zero rows = dropped lines</span>
+    <span class="c-kw">for</span> r <span class="c-kw">in</span> dead_rows:
+        <span class="c-kw">if</span> 0 < r < band.shape[0] - 1:
+            fixed[r] = ((band[r-1].<span class="c-fn">astype</span>(<span class="c-str">"float32"</span>) +
+                         band[r+1].<span class="c-fn">astype</span>(<span class="c-str">"float32"</span>)) / 2).<span class="c-fn">astype</span>(band.dtype)
+    <span class="c-kw">return</span> fixed</code></pre>
+  </div>
+
+  <div class="figure">
+    <div class="figure-img-wrap"><img src="img/dip-haze-correction.jpg" alt="Haze correction using dark object subtraction"></div>
+    <figcaption><strong>Atmospheric haze</strong> scatters extra light into the sensor uniformly across a scene, artificially raising every DN. Dark Object Subtraction (DOS) finds the darkest pixel in the image (theoretically should read ~0, e.g. a deep shadow or clear water body) and subtracts its DN from every pixel in that band.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Ms. Minakshi Kumar</span>
+    </figcaption>
+  </div>
+
+  <div class="code-block">
+    <div class="code-head"><span>dark_object_subtraction.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><code><span class="c-kw">def</span> <span class="c-fn">dark_object_subtraction</span>(band):
+    <span class="c-com">"""Simple haze correction: subtract the darkest 0.1th-percentile DN."""</span>
+    haze_value = np.<span class="c-fn">percentile</span>(band, 0.1)
+    corrected = np.clip(band.<span class="c-fn">astype</span>(<span class="c-str">"float32"</span>) - haze_value, 0, <span class="c-kw">None</span>)
+    <span class="c-fn">print</span>(<span class="c-fn">f</span><span class="c-str">"Removed haze offset: {haze_value:.1f} DN"</span>)
+    <span class="c-kw">return</span> corrected</code></pre>
+    <div class="out"># Removed haze offset: 312.0 DN</div>
+  </div>
+
+  <div class="figure">
+    <div class="figure-img-wrap"><img src="img/dip-sun-angle-correction.jpg" alt="Sun angle correction diagram"></div>
+    <figcaption><strong>Sun angle correction</strong> normalizes for the Sun's elevation angle at capture time, so two images of the same place taken in different seasons (different sun angles) become radiometrically comparable — essential for any change-detection or time-series work.</figcaption>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">02.3 / Geometric Correction</div>
+  <h2 class="section-title">Fixing pixel positions</h2>
+  <p class="section-intro">Geometric distortion comes from Earth's rotation during the scan, sensor viewing angle, platform velocity variations, and terrain relief. The fix: rectify the image onto a real map coordinate system.</p>
+
+  <div class="figure">
+    <div class="figure-img-wrap"><img src="img/dip-geometric-error-diagram.jpg" alt="Geometric error and correction diagram"></div>
+    <figcaption>Raw satellite imagery is distorted relative to a true map projection; rectification warps it back onto correct ground coordinates.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Ms. Minakshi Kumar</span>
+    </figcaption>
+  </div>
+
+  <div class="pipeline">
+    <div class="p-step"><div class="p-num">STEP 1</div><h4>Collect GCPs</h4><p>Ground Control Points — locations identifiable in both the image and a known-accurate map/GPS</p></div>
+    <div class="p-arrow">→</div>
+    <div class="p-step"><div class="p-num">STEP 2</div><h4>Fit transformation</h4><p>Polynomial (affine) equations relating image (row,col) to map (x,y)</p></div>
+    <div class="p-arrow">→</div>
+    <div class="p-step"><div class="p-num">STEP 3</div><h4>Check RMS error</h4><p>Root-mean-square error of GCP fit — should be well under 1 pixel</p></div>
+    <div class="p-arrow">→</div>
+    <div class="p-step"><div class="p-num">STEP 4</div><h4>Resample</h4><p>Interpolate new pixel values onto the corrected grid</p></div>
+  </div>
+
+  <div class="figure">
+    <div class="figure-img-wrap"><img src="img/dip-ground-control-points.jpg" alt="Ground control points example"></div>
+    <figcaption>Ground Control Points (GCPs) — features precisely identifiable in both the raw image and a reference map (road intersections, bridges, field corners). More, well-distributed GCPs give a more reliable transformation.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Ms. Minakshi Kumar</span>
+    </figcaption>
+  </div>
+
+  <div class="plain-english">
+    <div class="pe-icon">💡</div>
+    <div class="pe-body">
+      <div class="pe-label">Plain English</div>
+      <p>Imagine stretching a slightly warped photo to match a known-accurate map, like fitting a wrinkled sticker onto a phone screen. You pin down a handful of points you're sure about — "this road crossing in the photo is exactly here on the map" — and stretch/rotate everything else to make those pins line up. The more pins (GCPs) you use, and the more spread out they are, the less wrinkled and more accurate the final fit.</p>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:24px;">02.4 / Resampling</div>
+  <h2 class="section-title">Filling in the new grid</h2>
+  <p class="section-intro">Once the transformation is known, the corrected image needs pixel values on a brand-new grid — a process called resampling / intensity interpolation. Three methods dominate:</p>
+
+  <div class="widget-panel">
+    <h3>Resampling Sandbox</h3>
+    <p class="widget-sub">This 5×5 grid holds real DN values. Drag the two sliders to place a "query point" — the location the corrected grid needs a value for, which almost never lands exactly on an original pixel. Watch how Nearest Neighbour and Bilinear disagree.</p>
+    <div class="resample-lab">
+      <svg viewBox="0 0 320 320" id="resample-svg" style="width:100%; max-width:340px;"></svg>
+      <div class="resample-controls">
+        <div class="rc-row">
+          <label>Query X position <span id="rx-val">2.30</span></label>
+          <input type="range" id="rx-slider" min="0" max="400" value="230">
+        </div>
+        <div class="rc-row">
+          <label>Query Y position <span id="ry-val">1.60</span></label>
+          <input type="range" id="ry-slider" min="0" max="400" value="160">
+        </div>
+        <div class="resample-results">
+          <div class="resample-result nn">
+            <div class="rr-label">Nearest Neighbour</div>
+            <div class="rr-val" id="nn-result">—</div>
+          </div>
+          <div class="resample-result bl">
+            <div class="rr-label">Bilinear (4-pixel blend)</div>
+            <div class="rr-val" id="bl-result">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="figure">
+    <div class="figure-img-wrap"><img src="img/dip-resampling-intro.jpg" alt="Intensity interpolation resampling overview"></div>
+    <figcaption>Once the output grid is warped and no longer lines up with the input pixel grid, every output cell needs a brightness value assigned from its nearby input pixels — that assignment process is resampling.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Ms. Minakshi Kumar</span>
+    </figcaption>
+  </div>
+
+  <div class="figure-row">
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/dip-nearest-neighbor.jpg" alt="Nearest neighbor resampling"></div>
+      <figcaption><strong>Nearest Neighbour</strong> — copies the value of the closest original pixel. Fast, preserves original DN values exactly (important for classification), but can look blocky.</figcaption>
+    </div>
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/dip-bilinear-interpolation.jpg" alt="Bilinear interpolation resampling"></div>
+      <figcaption><strong>Bilinear</strong> averages the 4 nearest pixels, producing a smoother result than nearest neighbour. Alters original DN values — prefer nearest neighbour before classification, bilinear for visual display.</figcaption>
+    </div>
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/dip-cubic-convolution.jpg" alt="Cubic convolution resampling"></div>
+      <figcaption><strong>Cubic convolution</strong> uses the nearest 16 pixels for the smoothest result of the three methods — at the highest computational cost.</figcaption>
+    </div>
+  </div>
+
+  <div class="plain-english">
+    <div class="pe-icon">💡</div>
+    <div class="pe-body">
+      <div class="pe-label">Plain English</div>
+      <p>Resizing a corrected image is like resizing a digital photo, and you're choosing how new pixels get invented. <strong>Nearest neighbour</strong> just copies the closest original pixel — blocky, but never invents a value that wasn't really measured. <strong>Bilinear</strong> blends the 4 closest pixels — smoother, like a gentle blur. <strong>Cubic</strong> blends 16 — smoothest of all, like a photo-editing "smart resize." For a map you'll look at, smoother is nicer. For data you're about to classify (IP.4), you want the honest, un-blended original values — so nearest neighbour wins there.</p>
+    </div>
+  </div>
+
+  <div class="figure">
+    <div class="figure-img-wrap"><img src="img/dip-dakpathar-real-example.jpg" alt="Dakpathar Barrage satellite image rectification example"></div>
+    <figcaption>A real example: the Dakpathar Barrage satellite image before and after geometric rectification — note how linear features (the barrage itself, roads) straighten and align correctly with true ground geometry.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Ms. Minakshi Kumar</span>
+    </figcaption>
+  </div>
+
+  <div class="code-block">
+    <div class="code-head"><span>reproject_with_rasterio.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><code><span class="c-kw">import</span> rasterio
+<span class="c-kw">from</span> rasterio.warp <span class="c-kw">import</span> calculate_default_transform, reproject, Resampling
+
+dst_crs = <span class="c-str">"EPSG:32644"</span>   <span class="c-com"># target CRS, e.g. UTM Zone 44N</span>
+
+<span class="c-kw">with</span> rasterio.<span class="c-fn">open</span>(<span class="c-str">"raw_scene.tif"</span>) <span class="c-kw">as</span> src:
+    transform, width, height = <span class="c-fn">calculate_default_transform</span>(
+        src.crs, dst_crs, src.width, src.height, *src.bounds)
+    kwargs = src.meta.<span class="c-fn">copy</span>()
+    kwargs.<span class="c-fn">update</span>(crs=dst_crs, transform=transform, width=width, height=height)
+
+    <span class="c-kw">with</span> rasterio.<span class="c-fn">open</span>(<span class="c-str">"corrected_scene.tif"</span>, <span class="c-str">"w"</span>, **kwargs) <span class="c-kw">as</span> dst:
+        <span class="c-kw">for</span> band <span class="c-kw">in</span> <span class="c-fn">range</span>(1, src.count + 1):
+            <span class="c-fn">reproject</span>(
+                source=rasterio.<span class="c-fn">band</span>(src, band),
+                destination=rasterio.<span class="c-fn">band</span>(dst, band),
+                src_transform=src.transform, src_crs=src.crs,
+                dst_transform=transform, dst_crs=dst_crs,
+                resampling=Resampling.bilinear)   <span class="c-com"># or .nearest, .cubic</span></code></pre>
+  </div>
+
+  <div class="key-takeaways">
+    <div class="kt-label">Key Takeaways</div>
+    <ul>
+      <li><strong>Radiometric errors</strong> (line dropout, striping, haze, sun angle) corrupt values; <strong>geometric errors</strong> corrupt positions — different problems, different fixes.</li>
+      <li>Dead lines are typically patched by interpolating neighbouring lines; haze is removed with <strong>Dark Object Subtraction</strong>.</li>
+      <li>Geometric correction fits a transformation from <strong>Ground Control Points</strong>, checked via RMS error, then <strong>resamples</strong> onto the correct grid.</li>
+      <li><strong>Nearest neighbour</strong> preserves original DNs (use before classification); <strong>bilinear/cubic</strong> smooth the image (use for visual display).</li>
+      <li>In practice, most of this is one function call in <code>rasterio</code> — but knowing what it's doing tells you which resampling method and which correction to choose.</li>
+    </ul>
+  </div>
+</section>
+
+<script src="app.js"></script>
+<script>
+(function() {
+  // 5x5 grid of DN values, deliberately with a bright "river" cutting through
+  const DN = [
+    [120,128,60, 118,122],
+    [126,58, 62, 124,130],
+    [60, 64, 66, 68, 132],
+    [64, 68, 200,204,136],
+    [66, 202,208,210,140]
+  ];
+  const N = 5;
+  const svg = document.getElementById('resample-svg');
+  const pad = 20, cell = (320-2*pad)/N;
+
+  function drawGrid() {
+    let s = '';
+    for (let r=0;r<N;r++) {
+      for (let c=0;c<N;c++) {
+        const v = DN[r][c];
+        const x = pad + c*cell, y = pad + r*cell;
+        s += `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" fill="rgb(${v},${v},${v})" stroke="#0a0e22" stroke-width="1.5" id="rc-${r}-${c}"/>`;
+        const textColor = v > 140 ? '#111' : '#eee';
+        s += `<text x="${x+cell/2}" y="${y+cell/2+4}" text-anchor="middle" font-family="JetBrains Mono" font-size="12" fill="${textColor}">${v}</text>`;
+      }
+    }
+    svg.innerHTML = s;
+  }
+  drawGrid();
+
+  const rxSlider = document.getElementById('rx-slider');
+  const rySlider = document.getElementById('ry-slider');
+  const rxVal = document.getElementById('rx-val');
+  const ryVal = document.getElementById('ry-val');
+  const nnResult = document.getElementById('nn-result');
+  const blResult = document.getElementById('bl-result');
+
+  function update() {
+    // slider 0-400 maps to grid coord 0-4 (in cell units)
+    const gx = parseInt(rxSlider.value) / 100;
+    const gy = parseInt(rySlider.value) / 100;
+    rxVal.textContent = gx.toFixed(2);
+    ryVal.textContent = gy.toFixed(2);
+
+    const clamp = (v) => Math.max(0, Math.min(N-1, v));
+    // Nearest neighbour
+    const nr = clamp(Math.round(gy)), nc = clamp(Math.round(gx));
+    const nnVal = DN[nr][nc];
+
+    // Bilinear
+    const c0 = clamp(Math.floor(gx)), c1 = clamp(Math.ceil(gx));
+    const r0 = clamp(Math.floor(gy)), r1 = clamp(Math.ceil(gy));
+    const fx = gx - Math.floor(gx), fy = gy - Math.floor(gy);
+    const top = DN[r0][c0]*(1-fx) + DN[r0][c1]*fx;
+    const bot = DN[r1][c0]*(1-fx) + DN[r1][c1]*fx;
+    const blVal = top*(1-fy) + bot*fy;
+
+    nnResult.textContent = nnVal;
+    blResult.textContent = blVal.toFixed(1);
+
+    drawGrid();
+    // highlight
+    const nnCell = document.getElementById(`rc-${nr}-${nc}`);
+    if (nnCell) nnCell.setAttribute('stroke', '#f5a623'), nnCell.setAttribute('stroke-width','3');
+    [[r0,c0],[r0,c1],[r1,c0],[r1,c1]].forEach(([r,c]) => {
+      const el = document.getElementById(`rc-${r}-${c}`);
+      if (el && el.getAttribute('stroke') !== '#f5a623') { el.setAttribute('stroke','#2dd4bf'); el.setAttribute('stroke-width','2.5'); }
+    });
+    // query point marker
+    const px = pad + gx*cell, py = pad + gy*cell;
+    svg.innerHTML += `<circle cx="${px}" cy="${py}" r="6" fill="#fff" stroke="#000" stroke-width="1.5"/>`;
+  }
+
+  rxSlider.addEventListener('input', update);
+  rySlider.addEventListener('input', update);
+  update();
+})();
+</script>
+</body>
+</html>

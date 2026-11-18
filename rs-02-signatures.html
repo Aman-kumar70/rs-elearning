@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spectral Signatures — RS.2</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<header class="page-hero">
+  <div class="chapter-badge">Track A · RS.2 of 6</div>
+  <h1>Spectral <span>Signatures</span></h1>
+  <p class="hero-intro">Every material on Earth has a light "fingerprint" — the unique way it reflects and absorbs energy across wavelengths. Learn to read these curves and you can tell a satellite image what it's looking at, without ever visiting the place.</p>
+  <div class="chapter-progress"><span class="done"></span><span class="now"></span><span></span><span></span><span></span><span></span></div>
+</header>
+
+<section class="content-section reveal">
+  <div class="section-label">02.1 / The Concept</div>
+  <h2 class="section-title">A "fingerprint" made of light</h2>
+  <div class="www-grid">
+    <div class="www-card what">
+      <div class="www-label">What</div>
+      <p>A spectral signature (or spectral reflectance curve) is a plot of a material's reflectance (%) against wavelength. Vegetation, water, soil and snow each trace a distinctive curve — that shape <em>is</em> the identity of the material.</p>
+    </div>
+    <div class="www-card why">
+      <div class="www-label">Why</div>
+      <p>Because it's how automated classification works. A computer can't "see" a forest the way you do — but it can compare a pixel's reflectance pattern across bands to known signatures and decide "this pixel is vegetation" with no human ever looking at the image.</p>
+    </div>
+    <div class="www-card how">
+      <div class="www-label">How</div>
+      <p>Multispectral sensors record reflectance in several discrete bands (blue, green, red, NIR, SWIR...). Plotting the DN value of a pixel across those bands approximates its spectral curve — the more bands, the more precise the fingerprint (hyperspectral sensors use hundreds).</p>
+    </div>
+  </div>
+
+  <div class="figure">
+    <div class="figure-img-wrap"><img src="img/sig-vegetation-ideal-curve.jpg" alt="Ideal spectral reflectance curve of healthy vegetation, from IIRS lecture"></div>
+    <figcaption>The classic "peak-and-valley" curve of healthy vegetation: low reflectance in blue and red (chlorophyll absorption), a small green peak (why plants look green), and a sharp jump into the near-infrared.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun — "Spectral Signatures and Image Interpretation," Dr. Hina Pande</span>
+    </figcaption>
+  </div>
+
+  <div class="sig-visualizer-card">
+    <div class="sig-viz-header">
+      <div>
+        <h3>Interactive Spectral Reflectance Laboratory</h3>
+        <p>Compare reflectance fingerprints across wavelengths from visible light (0.4 µm) to short-wave infrared (2.4 µm). Check and uncheck curves to observe where they intersect and differ.</p>
+      </div>
+    </div>
+
+    <!-- Checkbox Toggle Controls -->
+    <div class="sig-controls-panel">
+      <span class="sig-ctrl-title">Active Curves:</span>
+      <label class="sig-checkbox-label veg active" for="chk-veg">
+        <input type="checkbox" id="chk-veg" checked>
+        <span class="sig-chk-indicator"></span>
+        <span>Healthy Vegetation</span>
+      </label>
+      <label class="sig-checkbox-label soil active" for="chk-soil">
+        <input type="checkbox" id="chk-soil" checked>
+        <span class="sig-chk-indicator"></span>
+        <span>Dry Bare Soil</span>
+      </label>
+      <label class="sig-checkbox-label water active" for="chk-water">
+        <input type="checkbox" id="chk-water" checked>
+        <span class="sig-chk-indicator"></span>
+        <span>Clear Water</span>
+      </label>
+      <label class="sig-checkbox-label turbid" for="chk-turbid">
+        <input type="checkbox" id="chk-turbid">
+        <span class="sig-chk-indicator"></span>
+        <span>Turbid / Sediment Water</span>
+      </label>
+      <label class="sig-checkbox-label stressed" for="chk-stressed">
+        <input type="checkbox" id="chk-stressed">
+        <span class="sig-chk-indicator"></span>
+        <span>Stressed Vegetation</span>
+      </label>
+    </div>
+
+    <!-- Spectral Band Region Strip -->
+    <div class="sig-band-strip">
+      <div class="sig-band-region vis">Visible (0.4 – 0.7 µm)</div>
+      <div class="sig-band-region nir">Near-Infrared / NIR (0.7 – 1.3 µm)</div>
+      <div class="sig-band-region swir1">SWIR-1 (1.55 – 1.75 µm)</div>
+      <div class="sig-band-region swir2">SWIR-2 (2.08 – 2.35 µm)</div>
+    </div>
+
+    <!-- Chart Canvas Container -->
+    <div class="sig-chart-wrapper">
+      <canvas id="sig-chart"></canvas>
+    </div>
+
+    <!-- Dynamic Intersections & Differences Inspector -->
+    <div class="sig-analysis-grid" id="sig-analysis-grid">
+      <div class="sig-insight-card" id="card-rededge">
+        <div class="sig-insight-head">
+          <div class="sig-insight-title">🌱 Red-Edge Crossover</div>
+          <span class="sig-insight-tag">&lambda; &approx; 0.69 – 0.72 &micro;m</span>
+        </div>
+        <div class="sig-insight-body">
+          <strong>Vegetation crosses Soil:</strong> In the red band (0.66 &micro;m), vegetation reflects only ~5% while soil reflects ~25%. At the Red-Edge, vegetation surges upward by over 40%, intersecting soil at ~0.70 &micro;m and leaving it far behind. This extreme contrast powers <strong>NDVI</strong>.
+        </div>
+      </div>
+
+      <div class="sig-insight-card" id="card-nirgap">
+        <div class="sig-insight-head">
+          <div class="sig-insight-title">⚡ Maximum NIR Separation</div>
+          <span class="sig-insight-tag">&lambda; &approx; 0.80 – 0.90 &micro;m</span>
+        </div>
+        <div class="sig-insight-body">
+          <strong>Maximum distance between all 3 curves:</strong> Vegetation reaches its peak reflectance (~50%), Soil sits at ~33%, and Water plummets to &lt;1% (total absorption). This makes NIR the cleanest band for automated land-water-vegetation segmentation.
+        </div>
+      </div>
+
+      <div class="sig-insight-card" id="card-swirwater">
+        <div class="sig-insight-head">
+          <div class="sig-insight-title">💧 SWIR Water Absorption Dips</div>
+          <span class="sig-insight-tag">&lambda; &approx; 1.4 &micro;m &amp; 1.9 &micro;m</span>
+        </div>
+        <div class="sig-insight-body">
+          <strong>Moisture Absorption Valleys:</strong> Deep troughs appear in the vegetation curve at 1.4 &micro;m and 1.9 &micro;m due to liquid water inside leaf cells. Dry bare soil shows no sharp dips, providing a quantitative measure of canopy moisture (NDWI).
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">02.2 / Vegetation</div>
+  <h2 class="section-title">Why healthy plants glow in the infrared</h2>
+  <p class="section-intro">A leaf's cell structure — spongy mesophyll tissue full of air pockets — scatters near-infrared light back out extremely efficiently, while chlorophyll absorbs blue and red light for photosynthesis. Stressed, dying, or sparse vegetation loses this NIR reflectance dramatically before it ever turns visibly yellow or brown — which is why NIR-based indices can detect crop stress before a farmer walking the field would notice it.</p>
+
+  <div class="figure-row">
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/sig-needleleaf-broadleaf.jpg" alt="Needle-leaf vs broad-leaf canopy reflectance"></div>
+      <figcaption>Needle-leaf (coniferous) canopies reflect noticeably less NIR than broad-leaf (deciduous) canopies — leaf shape and internal structure change the signature even within "vegetation."
+        <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
+      </figcaption>
+    </div>
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/sig-healthy-infected-plants.jpg" alt="Healthy vs infected/stressed plants reflectance curve"></div>
+      <figcaption>Healthy vs. stressed/infected plants: the stressed curve drops sharply in the NIR plateau well before any visible colour change appears — the basis for early crop-disease and drought detection.
+        <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
+      </figcaption>
+    </div>
+  </div>
+
+  <div class="tech-detail">
+    <div class="label">NDVI — Turning the Curve Into One Number</div>
+    <p>The steep rise from red to NIR is so diagnostic that it's been condensed into a single index used almost everywhere in agriculture and ecology: the <strong>Normalized Difference Vegetation Index</strong>.</p>
+  </div>
+  <div class="formula-box">
+    <div class="formula">NDVI = (NIR &minus; Red) / (NIR + Red)</div>
+    <div class="formula-note">Ranges from &minus;1 to +1. Dense healthy vegetation: 0.6–0.9. Sparse/stressed vegetation: 0.2–0.5. Bare soil: near 0. Water: negative. You'll compute this yourself with real satellite data in the Image Processing track.</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-head"><span>plot_signature.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><code><span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+<span class="c-kw">import</span> matplotlib.pyplot <span class="c-kw">as</span> plt
+
+<span class="c-com"># Approximate reflectance (%) at 5 representative wavelengths (µm)</span>
+wavelengths = [0.48, 0.56, 0.66, 0.86, 1.65]   <span class="c-com"># Blue, Green, Red, NIR, SWIR</span>
+vegetation  = [4, 9, 5, 45, 22]
+dry_soil    = [16, 20, 24, 32, 38]
+water       = [7, 5, 3, 1, 0.5]
+
+plt.plot(wavelengths, vegetation, <span class="c-str">'o-'</span>, color=<span class="c-str">'green'</span>,  label=<span class="c-str">'Vegetation'</span>)
+plt.plot(wavelengths, dry_soil,   <span class="c-str">'o-'</span>, color=<span class="c-str">'saddlebrown'</span>, label=<span class="c-str">'Dry soil'</span>)
+plt.plot(wavelengths, water,      <span class="c-str">'o-'</span>, color=<span class="c-str">'blue'</span>,  label=<span class="c-str">'Water'</span>)
+plt.xlabel(<span class="c-str">'Wavelength (µm)'</span>); plt.ylabel(<span class="c-str">'Reflectance (%)'</span>)
+plt.legend(); plt.title(<span class="c-str">'Spectral Reflectance Curves'</span>)
+plt.savefig(<span class="c-str">'signatures.png'</span>, dpi=150)</code></pre>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">02.3 / Soil, Water &amp; Snow</div>
+  <h2 class="section-title">The other three signatures you'll see constantly</h2>
+
+  <div class="card-grid">
+    <div class="info-card">
+      <div class="icon" style="background: var(--amber-dim); color: var(--amber);">🟤</div>
+      <h3>Soil</h3>
+      <p>Soil's curve is smoother than vegetation's — no sharp chlorophyll dips. Five properties control it, in order of importance: <strong>moisture</strong> (wet soil is darker/lower reflectance across all wavelengths), organic content, structure/texture, iron oxide content (raises reflectance in the red, lowers it in green), and surface roughness.</p>
+    </div>
+    <div class="info-card">
+      <div class="icon" style="background: var(--blue-dim); color: var(--blue);">💧</div>
+      <h3>Water</h3>
+      <p>Water absorbs NIR and SWIR almost completely — reflectance beyond ~0.9 µm is close to zero. This is actually useful: NIR bands are the easiest way to draw a clean water/land boundary. In the visible range, clear water reflects a little blue-green; turbid (sediment-loaded) water reflects more; algae-rich water shows a green reflectance peak from chlorophyll.</p>
+    </div>
+    <div class="info-card">
+      <div class="icon" style="background: var(--purple-dim); color: var(--purple);">❄️</div>
+      <h3>Snow</h3>
+      <p>Fresh snow has very high visible reflectance (up to 80%) but drops off in SWIR. Grain size (which increases with age), liquid water content (melting snow reflects less), and contamination (soot, dust) all shift the curve — so SWIR bands are used to distinguish old snow from fresh snow, not just visible brightness.</p>
+    </div>
+  </div>
+
+  <div class="figure-row">
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/sig-soil-moisture-curve.jpg" alt="Soil moisture effect on reflectance curve"></div>
+      <figcaption>Wet soil vs. dry soil: moisture lowers reflectance across the whole curve without changing its shape — the single biggest factor in how bright or dark bare ground appears in any image.
+        <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
+      </figcaption>
+    </div>
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/sig-water-reflectance.jpg" alt="Water spectral reflectance behaviour"></div>
+      <figcaption>Water's reflectance collapses to near-zero beyond the visible range — the sharp visible/NIR contrast at a shoreline is exactly why NIR is the easiest band for mapping water bodies.
+        <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
+      </figcaption>
+    </div>
+  </div>
+
+  <div class="figure">
+    <div class="figure-img-wrap"><img src="img/sig-landsat-multiband-real.jpg" alt="Same scene imaged in different Landsat bands"></div>
+    <figcaption>The same landscape, imaged in seven different bands (0.45 µm through 2.35 µm). Notice how features that are invisible or low-contrast in one band become obvious in another — that's the spectral signature at work, band by band.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
+    </figcaption>
+  </div>
+
+  <div class="figure">
+    <div class="figure-img-wrap"><img src="img/sig-band-table-applications.jpg" alt="Landsat band table with principal applications"></div>
+    <figcaption>A practical band-selection reference: which wavelength range to reach for depending on what you're trying to see — coastal water clarity, vegetation vigour, soil/vegetation moisture, mineral discrimination, or thermal anomalies.
+      <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
+    </figcaption>
+  </div>
+
+  <!-- AUTHENTIC SATELLITE DATA: TRUE COLOR VS FALSE COLOR COMPOSITE (FCC) -->
+  <div class="figure-row">
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/sig-truecolor-natural.jpg" alt="Landsat True Color Natural RGB composite"></div>
+      <figcaption><strong>True-Colour Composite (Bands 3, 2, 1 as R, G, B):</strong> Replicates human eye perception. Vegetation appears green, soil is brown/tan, and water is blue. Notice that subtle differences between healthy crops and stressed trees are difficult to distinguish.
+        <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
+      </figcaption>
+    </div>
+    <div class="figure">
+      <div class="figure-img-wrap"><img src="img/sig-falsecolor-fcc.jpg" alt="Landsat Standard False Color Infrared FCC composite"></div>
+      <figcaption><strong>Standard False-Colour Composite (Bands 4, 3, 2 as R, G, B):</strong> Assigns high-reflectance Near-Infrared (Band 4) to the Red channel. Healthy vegetation glows intense scarlet red; turbid water turns cyan-blue; deep clear water turns pitch black.
+        <span class="fig-credit">Source: IIRS-ISRO Dehradun, Dr. Hina Pande</span>
+      </figcaption>
+    </div>
+  </div>
+
+  <div class="try-it">
+    <div class="ti-label">Try It Yourself</div>
+    <p>Pick any two materials from the interactive chart above and predict which single band would separate them most cleanly — i.e. where the vertical gap between their curves is largest. That's exactly the logic band ratios and vegetation indices are built on (see IP.3, Enhancement).</p>
+  </div>
+
+  <div class="key-takeaways">
+    <div class="kt-label">Key Takeaways</div>
+    <ul>
+      <li>Every material has a distinctive <strong>spectral reflectance curve</strong> — its identity in light.</li>
+      <li><strong>Vegetation</strong>: low in blue/red (chlorophyll absorption), small green peak, sharp NIR jump. Stress shows up as an NIR drop before visible colour change.</li>
+      <li><strong>NDVI = (NIR &minus; Red)/(NIR + Red)</strong> condenses the vegetation signature into one comparable number.</li>
+      <li><strong>Soil</strong> reflectance is dominated by moisture content; <strong>water</strong> absorbs almost all NIR/SWIR; <strong>snow</strong> is bright in visible but distinguishable by age in SWIR.</li>
+      <li>Classification algorithms (Track B, IP.4) work by comparing a pixel's measured signature to known reference signatures.</li>
+    </ul>
+  </div>
+</section>
+
+<script src="app.js"></script>
+<script>
+(function() {
+  const wavelengths = ['0.40', '0.45', '0.50', '0.55', '0.60', '0.65', '0.68', '0.72', '0.75', '0.80', '0.85', '0.90', '1.00', '1.10', '1.20', '1.30', '1.40', '1.50', '1.65', '1.80', '1.90', '2.00', '2.20', '2.40'];
+
+  // Real spectral reflectance data (%) based on IIRS-ISRO Dr. Hina Pande lecture
+  const vegData =      [4,   5,   7,   12,  8,   5,   7,   26,  42,  48,  50,  48,  46,  44,  42,  35,  14,  24,  30,  20,  8,   14,  18,  10];
+  const soilData =     [12,  14,  17,  19,  22,  25,  26,  28,  30,  32,  33,  34,  36,  37,  39,  40,  38,  41,  43,  44,  42,  44,  42,  40];
+  const waterData =    [5.5, 6.0, 5.0, 4.0, 3.0, 2.0, 1.5, 1.0, 0.7, 0.5, 0.3, 0.2, 0.1, 0.1, 0.1, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+  const turbidData =   [6.0, 8.5, 12.0,14.0,12.5,10.0, 7.5, 5.0, 3.5, 2.0, 1.2, 0.8, 0.4, 0.2, 0.1, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+  const stressedData = [6.0, 8.0, 10.0,14.0,13.0,12.0, 14.0,20.0, 24.0,27.0, 28.0,27.0, 26.0,25.0, 24.0,22.0, 18.0,28.0, 35.0,26.0, 15.0,22.0, 25.0,16.0];
+
+  const ctx = document.getElementById('sig-chart');
+  if (!ctx) return;
+
+  const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: wavelengths,
+      datasets: [
+        {
+          label: 'Healthy Vegetation',
+          data: vegData,
+          borderColor: '#4ade80',
+          backgroundColor: 'rgba(74, 222, 128, 0.08)',
+          borderWidth: 3,
+          tension: 0.35,
+          fill: true,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#4ade80',
+          hidden: false
+        },
+        {
+          label: 'Dry Bare Soil',
+          data: soilData,
+          borderColor: '#f5a623',
+          backgroundColor: 'rgba(245, 166, 35, 0.06)',
+          borderWidth: 3,
+          tension: 0.35,
+          fill: true,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#f5a623',
+          hidden: false
+        },
+        {
+          label: 'Clear Water',
+          data: waterData,
+          borderColor: '#38bdf8',
+          backgroundColor: 'rgba(56, 189, 248, 0.08)',
+          borderWidth: 3,
+          tension: 0.35,
+          fill: true,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#38bdf8',
+          hidden: false
+        },
+        {
+          label: 'Turbid / Sediment Water',
+          data: turbidData,
+          borderColor: '#2dd4bf',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [5, 4],
+          tension: 0.35,
+          fill: false,
+          pointRadius: 2,
+          pointHoverRadius: 5,
+          pointBackgroundColor: '#2dd4bf',
+          hidden: true
+        },
+        {
+          label: 'Stressed Vegetation',
+          data: stressedData,
+          borderColor: '#f43f5e',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [6, 4],
+          tension: 0.35,
+          fill: false,
+          pointRadius: 2,
+          pointHoverRadius: 5,
+          pointBackgroundColor: '#f43f5e',
+          hidden: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: '#111938',
+          titleColor: '#f5a623',
+          bodyColor: '#e6ebf5',
+          borderColor: 'rgba(120, 160, 255, 0.3)',
+          borderWidth: 1,
+          padding: 12,
+          titleFont: { family: 'JetBrains Mono', size: 12 },
+          bodyFont: { family: 'JetBrains Mono', size: 11 },
+          callbacks: {
+            title: function(items) {
+              return `Wavelength: ${items[0].label} µm`;
+            },
+            label: function(context) {
+              return ` ${context.dataset.label}: ${context.parsed.y.toFixed(1)}%`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            color: 'rgba(120, 160, 255, 0.08)'
+          },
+          ticks: {
+            color: '#8893b5',
+            font: { family: 'JetBrains Mono', size: 10 },
+            maxRotation: 0,
+            callback: function(val, idx) {
+              const wl = wavelengths[idx];
+              return (idx % 2 === 0) ? `${wl} µm` : '';
+            }
+          },
+          title: {
+            display: true,
+            text: 'Wavelength (µm) →',
+            color: '#8893b5',
+            font: { family: 'JetBrains Mono', size: 11 }
+          }
+        },
+        y: {
+          min: 0,
+          max: 60,
+          grid: {
+            color: 'rgba(120, 160, 255, 0.08)'
+          },
+          ticks: {
+            color: '#8893b5',
+            font: { family: 'JetBrains Mono', size: 10 },
+            stepSize: 10,
+            callback: function(v) { return v + '%'; }
+          },
+          title: {
+            display: true,
+            text: 'Spectral Reflectance (%)',
+            color: '#8893b5',
+            font: { family: 'JetBrains Mono', size: 11 }
+          }
+        }
+      }
+    }
+  });
+
+  // Checkbox controls handling
+  const toggles = [
+    { id: 'chk-veg', datasetIdx: 0 },
+    { id: 'chk-soil', datasetIdx: 1 },
+    { id: 'chk-water', datasetIdx: 2 },
+    { id: 'chk-turbid', datasetIdx: 3 },
+    { id: 'chk-stressed', datasetIdx: 4 }
+  ];
+
+  function updateAnalysisCards() {
+    const vegOn = document.getElementById('chk-veg')?.checked;
+    const soilOn = document.getElementById('chk-soil')?.checked;
+    const waterOn = document.getElementById('chk-water')?.checked;
+
+    const cardRedEdge = document.getElementById('card-rededge');
+    const cardNirGap = document.getElementById('card-nirgap');
+    const cardSwirWater = document.getElementById('card-swirwater');
+
+    if (cardRedEdge) cardRedEdge.style.opacity = (vegOn && soilOn) ? '1' : '0.45';
+    if (cardNirGap) cardNirGap.style.opacity = (vegOn && waterOn) ? '1' : '0.45';
+    if (cardSwirWater) cardSwirWater.style.opacity = vegOn ? '1' : '0.45';
+  }
+
+  toggles.forEach(t => {
+    const input = document.getElementById(t.id);
+    if (!input) return;
+
+    input.addEventListener('change', (e) => {
+      const parentLabel = input.closest('.sig-checkbox-label');
+      if (parentLabel) {
+        parentLabel.classList.toggle('active', e.target.checked);
+      }
+      chart.setDatasetVisibility(t.datasetIdx, e.target.checked);
+      chart.update();
+      updateAnalysisCards();
+    });
+  });
+
+  updateAnalysisCards();
+})();
+</script>
+</body>
+</html>

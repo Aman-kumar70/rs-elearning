@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turning Pixels Into Classes — IP.4</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="page-hero">
+  <div class="chapter-badge">Track B · IP.4 of 5</div>
+  <h1>Turning Pixels <span>Into Classes</span></h1>
+  <p class="hero-intro">This is the payoff of everything so far: turning a corrected, enhanced grid of numbers into a map that says "this pixel is forest, this one is water, this one is urban" — automatically, across millions of pixels, using the spectral signatures from RS.2.</p>
+  <div class="chapter-progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="now"></span><span></span></div>
+</header>
+
+<section class="content-section reveal">
+  <div class="section-label">04.1 / The Core Idea</div>
+  <h2 class="section-title">Classification is nearest-neighbour matching in spectral space</h2>
+  <div class="www-grid">
+    <div class="www-card what">
+      <div class="www-label">What</div>
+      <p>Image classification assigns every pixel to one of a fixed set of land-cover classes (water, forest, urban, agriculture...) based on its spectral signature — the DN values across all available bands, treated as a point in multi-dimensional "spectral space."</p>
+    </div>
+    <div class="www-card why">
+      <div class="www-label">Why</div>
+      <p>Because a visually interpreted map (RS.5) doesn't scale — you can't manually label every pixel across a whole country, repeated every season. Classification automates exactly the kind of tone/pattern judgement a human interpreter makes, at planetary scale.</p>
+    </div>
+    <div class="www-card how">
+      <div class="www-label">How</div>
+      <p>Every pixel's band values are treated as a vector. The algorithm either compares that vector to known reference signatures you provide (<strong>supervised</strong>), or groups similar vectors together without any prior labels and lets you name the resulting clusters afterward (<strong>unsupervised</strong>).</p>
+    </div>
+  </div>
+
+  <div class="widget-panel">
+    <h3>Spectral Space, Visualized</h3>
+    <p class="widget-sub">Each dot is one pixel, plotted by its Red-band DN (x-axis) and NIR-band DN (y-axis) — exactly the two-band version of what a classifier does with many bands at once. Notice how land-cover types naturally cluster.</p>
+    <svg viewBox="0 0 600 320" id="scatter-svg" style="width:100%; background:var(--surface-2); border-radius:12px;"></svg>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">04.2 / Supervised vs Unsupervised</div>
+  <h2 class="section-title">Two opposite starting points</h2>
+
+  <div class="card-grid">
+    <div class="info-card">
+      <div class="icon" style="background: var(--amber-dim); color: var(--amber);">🎯</div>
+      <h3>Supervised Classification</h3>
+      <p>You start by defining <strong>training samples</strong> — pixels you (or ground-truth data) know belong to each class. The algorithm learns the statistical signature of each class from those samples, then classifies every remaining pixel by comparing it to those learned signatures.</p>
+      <p style="margin-top:10px; font-size:0.85rem; color:var(--text-faint);">Common algorithms: Maximum Likelihood, Minimum Distance, Support Vector Machine, Random Forest.</p>
+    </div>
+    <div class="info-card">
+      <div class="icon" style="background: var(--teal-dim); color: var(--teal);">🧩</div>
+      <h3>Unsupervised Classification</h3>
+      <p>No training samples needed. The algorithm groups pixels purely by spectral similarity into a chosen number of clusters (K). You examine the resulting clusters afterward and assign each one a meaningful land-cover label.</p>
+      <p style="margin-top:10px; font-size:0.85rem; color:var(--text-faint);">Common algorithms: K-Means, ISODATA.</p>
+    </div>
+  </div>
+
+  <div class="pipeline">
+    <div class="p-step"><div class="p-num">SUPERVISED</div><h4>1. Define classes</h4><p>Decide what you're mapping: water, forest, crop, urban...</p></div>
+    <div class="p-arrow">→</div>
+    <div class="p-step"><div class="p-num"> </div><h4>2. Collect training pixels</h4><p>Draw sample regions of known class on the image</p></div>
+    <div class="p-arrow">→</div>
+    <div class="p-step"><div class="p-num"> </div><h4>3. Train classifier</h4><p>Model learns each class's spectral statistics</p></div>
+    <div class="p-arrow">→</div>
+    <div class="p-step"><div class="p-num"> </div><h4>4. Classify all pixels</h4><p>Every pixel assigned to its most likely class</p></div>
+    <div class="p-arrow">→</div>
+    <div class="p-step"><div class="p-num"> </div><h4>5. Assess accuracy</h4><p>Compare against independent ground truth</p></div>
+  </div>
+
+  <div class="tech-detail">
+    <div class="label">Maximum Likelihood — the Classic Supervised Algorithm</div>
+    <p>Maximum Likelihood Classification assumes each class's pixels form a (multivariate) Gaussian cluster in spectral space, defined by a mean vector and covariance matrix estimated from training samples. For any new pixel, it computes the <em>probability</em> that pixel belongs to each class given those Gaussian distributions, and assigns the class with highest probability — accounting not just for distance to the class mean, but how "spread out" and correlated that class's bands tend to be.</p>
+  </div>
+
+  <div class="plain-english">
+    <div class="pe-icon">💡</div>
+    <div class="pe-body">
+      <div class="pe-label">Plain English</div>
+      <p><strong>Supervised</strong> classification is like sorting a basket of laundry when someone has already shown you five example red shirts, five blue shirts, and five towels — you learn what each pile "looks like" first, then sort the rest. <strong>Unsupervised</strong> is sorting the same basket with no examples at all — you just group items that look similar to each other, ending up with piles you then have to inspect and label yourself ("oh, this pile is all towels"). Maximum Likelihood specifically doesn't just ask "which pile's average shirt do I look most like" — it also considers how much each pile's items typically vary, the way you'd expect more variation among "blue shirts" than among "white towels."</p>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-head"><span>supervised_classification.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><code><span class="c-kw">from</span> sklearn.ensemble <span class="c-kw">import</span> RandomForestClassifier
+<span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+
+<span class="c-com"># X_train: (n_samples, n_bands) — DN values of labelled training pixels</span>
+<span class="c-com"># y_train: (n_samples,)         — class labels, e.g. 0=water 1=forest 2=urban 3=crop</span>
+
+clf = <span class="c-fn">RandomForestClassifier</span>(n_estimators=200, random_state=42)
+clf.<span class="c-fn">fit</span>(X_train, y_train)
+
+<span class="c-com"># Reshape the full image from (bands, rows, cols) to (pixels, bands) for prediction</span>
+bands, rows, cols = image.shape
+X_all = image.<span class="c-fn">reshape</span>(bands, -1).T
+
+predicted = clf.<span class="c-fn">predict</span>(X_all)
+classified_map = predicted.<span class="c-fn">reshape</span>(rows, cols)
+
+<span class="c-fn">print</span>(<span class="c-str">"Class pixel counts:"</span>, np.<span class="c-fn">bincount</span>(predicted))</code></pre>
+    <div class="out"># Class pixel counts: [ 84213 512040  91887 358120]</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-head"><span>unsupervised_kmeans.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><code><span class="c-kw">from</span> sklearn.cluster <span class="c-kw">import</span> KMeans
+
+X_all = image.<span class="c-fn">reshape</span>(bands, -1).T
+
+kmeans = <span class="c-fn">KMeans</span>(n_clusters=6, random_state=42, n_init=10)
+clusters = kmeans.<span class="c-fn">fit_predict</span>(X_all)
+cluster_map = clusters.<span class="c-fn">reshape</span>(rows, cols)
+
+<span class="c-com"># Inspect each cluster's mean spectral signature to decide what it represents</span>
+<span class="c-kw">for</span> c <span class="c-kw">in</span> <span class="c-fn">range</span>(6):
+    <span class="c-fn">print</span>(<span class="c-fn">f</span><span class="c-str">"Cluster {c} mean signature: {kmeans.cluster_centers_[c]}"</span>)</code></pre>
+    <div class="out"># Cluster 0 mean signature: [ 210  340  180 3480]  &larr; looks like vegetation<br># Cluster 3 mean signature: [ 620  610  590  310]  &larr; looks like bare soil/urban</div>
+  </div>
+</section>
+
+<section class="content-section reveal">
+  <div class="section-label">04.3 / Accuracy Assessment</div>
+  <h2 class="section-title">A classified map is worthless without a number attached</h2>
+  <p class="section-intro">Never trust an unchecked classification. Accuracy assessment compares the classified map against independent, trustworthy reference points (field visits, high-resolution imagery, existing verified maps) — usually withheld from training — and summarizes agreement in a <strong>confusion matrix</strong>.</p>
+
+  <div class="confusion-wrap">
+    <table class="confusion-matrix">
+      <tr><th class="corner">Reference &rarr;<br>Classified &darr;</th><th>Water</th><th>Forest</th><th>Urban</th><th>Crop</th><th>Total</th></tr>
+      <tr><th>Water</th><td class="diag">48</td><td class="off">0</td><td class="off">1</td><td class="off">0</td><td>49</td></tr>
+      <tr><th>Forest</th><td class="off">0</td><td class="diag">142</td><td class="off">3</td><td class="off">8</td><td>153</td></tr>
+      <tr><th>Urban</th><td class="off">2</td><td class="off">1</td><td class="diag">61</td><td class="off">4</td><td>68</td></tr>
+      <tr><th>Crop</th><td class="off">0</td><td class="off">6</td><td class="off">2</td><td class="diag">122</td><td>130</td></tr>
+      <tr><th>Total</th><td>50</td><td>149</td><td>67</td><td>134</td><td>400</td></tr>
+    </table>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula">Overall Accuracy = &Sigma;(diagonal) / Total = 373/400 = 93.25%</div>
+    <div class="formula-note"><strong>Producer's accuracy</strong> (per column): of all true Forest reference points, what % were correctly classified as Forest? <strong>User's accuracy</strong> (per row): of all pixels the map calls Forest, what % are actually Forest on the ground? <strong>Kappa coefficient</strong> goes further, correcting overall accuracy for the agreement expected by pure chance.</div>
+  </div>
+
+  <div class="plain-english">
+    <div class="pe-icon">💡</div>
+    <div class="pe-body">
+      <div class="pe-label">Plain English</div>
+      <p>Overall accuracy is like a test score — how many you got right out of the total. But imagine a test where 90% of answers were "True" — you could score 90% just by guessing "True" every time, without knowing anything. <strong>Kappa</strong> asks the harder question: "how much better did the classifier do than random guessing would have scored, given how common each class already is?" A Kappa near 1.0 means genuinely skillful classification; a Kappa near 0 means it's barely beating a coin flip, even if the raw accuracy number looked impressive.</p>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-head"><span>accuracy_assessment.py</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <pre><code><span class="c-kw">from</span> sklearn.metrics <span class="c-kw">import</span> confusion_matrix, classification_report, cohen_kappa_score
+
+<span class="c-com"># y_true, y_pred: class labels at independent, withheld reference points</span>
+cm = <span class="c-fn">confusion_matrix</span>(y_true, y_pred)
+kappa = <span class="c-fn">cohen_kappa_score</span>(y_true, y_pred)
+
+<span class="c-fn">print</span>(<span class="c-fn">classification_report</span>(y_true, y_pred,
+      target_names=[<span class="c-str">"Water"</span>,<span class="c-str">"Forest"</span>,<span class="c-str">"Urban"</span>,<span class="c-str">"Crop"</span>]))
+<span class="c-fn">print</span>(<span class="c-fn">f</span><span class="c-str">"Kappa coefficient: {kappa:.3f}"</span>)</code></pre>
+    <div class="out"># Water    precision 0.98  recall 0.96  f1-score 0.97<br>
+# Forest   precision 0.93  recall 0.95  f1-score 0.94<br>
+# ...<br>
+# Kappa coefficient: 0.902</div>
+  </div>
+
+  <div class="try-it">
+    <div class="ti-label">Try It Yourself</div>
+    <p>In the confusion matrix above, Forest and Crop are confused with each other more than with Water or Urban (6 + 8 misclassifications). That makes spectral sense — both are vegetation, occupying nearby regions of spectral space (RS.2). Adding a SWIR band, a texture measure, or a time-series (crops change faster than forest) typically resolves exactly this kind of confusion.</p>
+  </div>
+
+  <div class="key-takeaways">
+    <div class="kt-label">Key Takeaways</div>
+    <ul>
+      <li>Classification assigns every pixel to a class using its position in <strong>spectral space</strong> — the multi-band equivalent of the signature charts from RS.2.</li>
+      <li><strong>Supervised</strong> classification needs labelled training samples; <strong>unsupervised</strong> (K-Means, ISODATA) groups pixels by similarity with no prior labels.</li>
+      <li><strong>Maximum Likelihood</strong> is the classic statistical supervised method; modern workflows often use Random Forest or SVM instead.</li>
+      <li>A classified map is meaningless without <strong>accuracy assessment</strong> against independent reference data — overall accuracy, producer's/user's accuracy, and Kappa.</li>
+      <li>Classes that are spectrally similar (e.g. forest vs. crop) are the ones most often confused — more bands, texture, or time-series data usually help.</li>
+    </ul>
+  </div>
+</section>
+
+<script src="app.js"></script>
+<script>
+(function() {
+  const svg = document.getElementById('scatter-svg');
+  const W=600,H=320,padL=50,padB=36,padT=16,padR=16;
+  const clusters = [
+    { color:'#3b82f6', name:'Water', cx:60, cy:270, spread:22, n:35 },
+    { color:'#4ade80', name:'Forest', cx:140, cy:70, spread:28, n:45 },
+    { color:'#f5a623', name:'Urban', cx:330, cy:200, spread:30, n:40 },
+    { color:'#a78bfa', name:'Crop', cx:220, cy:110, spread:26, n:40 }
+  ];
+  function rnd(mean, spread) { return mean + (Math.random()+Math.random()+Math.random()-1.5)*spread; }
+  let s = '';
+  s += `<line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#5a6789"/>`;
+  s += `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="#5a6789"/>`;
+  s += `<text x="${W/2}" y="${H-8}" fill="#8893b5" font-size="11" text-anchor="middle" font-family="JetBrains Mono">Red band DN &rarr;</text>`;
+  s += `<text x="16" y="${H/2}" fill="#8893b5" font-size="11" text-anchor="middle" font-family="JetBrains Mono" transform="rotate(-90 16 ${H/2})">NIR band DN &rarr;</text>`;
+  clusters.forEach(cl => {
+    for (let i=0;i<cl.n;i++) {
+      const x = Math.max(padL+4, Math.min(W-padR-4, rnd(cl.cx, cl.spread) + padL - 20));
+      const y = Math.max(padT+4, Math.min(H-padB-4, rnd(cl.cy, cl.spread)));
+      s += `<circle cx="${x}" cy="${y}" r="3.5" fill="${cl.color}" fill-opacity="0.75"/>`;
+    }
+  });
+  let legendX = padL;
+  clusters.forEach(cl => {
+    s += `<circle cx="${legendX}" cy="${16}" r="5" fill="${cl.color}"/>`;
+    s += `<text x="${legendX+10}" y="20" fill="#c9d4f0" font-size="11" font-family="JetBrains Mono">${cl.name}</text>`;
+    legendX += 90;
+  });
+  svg.innerHTML = s;
+})();
+</script>
+</body>
+</html>
